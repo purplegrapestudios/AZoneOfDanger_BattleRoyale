@@ -4,6 +4,7 @@ using UIComponents;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GameUI.Intro
 {
@@ -32,7 +33,7 @@ namespace GameUI.Intro
 				Destroy(m_scrollView.content.GetChild(i).gameObject);
             }
 			m_sessionCount = 0;
-			m_buttonRefreshServerList.onClick.AddListener(() => { RefreshServerList(); });
+			m_buttonRefreshServerList.onClick.AddListener(async () => { await RefreshServerList(); });
 		}
 
         public async void Show(PlayMode mode)
@@ -108,7 +109,7 @@ namespace GameUI.Intro
 
 			return dict;
 		}
-		private void RefreshServerList()
+		private async Task RefreshServerList()
         {
 			m_sessionDict.Clear();
 			for (int i = 0; i < m_scrollView.content.childCount; i++)
@@ -116,6 +117,7 @@ namespace GameUI.Intro
 				Destroy(m_scrollView.content.GetChild(i).gameObject);
 			}
 			OnSessionListUpdated(new List<SessionInfo>());
+			await _app.EnterLobby($"GameMode{_playMode}", OnSessionListUpdated);
 		}
 
 		public void OnShowNewSessionUI()
