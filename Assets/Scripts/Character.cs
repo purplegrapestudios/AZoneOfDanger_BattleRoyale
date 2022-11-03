@@ -21,7 +21,7 @@ public class Character : NetworkBehaviour
 	{
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
-			App.FindInstance().ShowPlayerSetup();
+			//App.FindInstance().ShowPlayerSetup();
 		}
 	}
 

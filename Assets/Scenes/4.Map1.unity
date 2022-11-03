@@ -742,7 +742,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09dd44ce8b4649cbb7567ce19ba23b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _countdownMessage: {fileID: 0}
+  _countdownMessage: {fileID: 1292398068}
   _spawnPoints:
   - {fileID: 353071471}
   - {fileID: 87851297}
@@ -1716,14 +1716,6 @@ PrefabInstance:
     - target: {fileID: 6274724183888813006, guid: 8ff5f212714e94999abb71d8e7248bd9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6274724183888813008, guid: 8ff5f212714e94999abb71d8e7248bd9, type: 3}
-      propertyPath: _autoConnect
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6274724183888813008, guid: 8ff5f212714e94999abb71d8e7248bd9, type: 3}
-      propertyPath: _skipStaging
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6274724183888813009, guid: 8ff5f212714e94999abb71d8e7248bd9, type: 3}
       propertyPath: m_Name

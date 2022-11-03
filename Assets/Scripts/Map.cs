@@ -43,9 +43,12 @@ public class Map : SimulationBehaviour, ISpawned
 				Debug.Log($"RPC failed trying again later");
 		}
 		if (!session.PostLoadCountDown.Expired(Runner))
-			_countdownMessage.text = Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner)??0 ).ToString();
+			_countdownMessage.text = Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0).ToString();
 		else
+		{
 			_countdownMessage.gameObject.SetActive(false);
+			_app.AllowInput = true;
+		}
 	}
 
 	/// <summary>

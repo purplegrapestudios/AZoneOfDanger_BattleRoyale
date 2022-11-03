@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace GameUI.Staging
+namespace GameUI.Lobby
 {
 	public class PlayerListItem : GridCell
 	{

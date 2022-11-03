@@ -3,9 +3,9 @@ using UIComponents;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameUI.Staging
+namespace GameUI.Lobby
 {
-	public class Staging : MonoBehaviour
+	public class Lobby : MonoBehaviour
 	{
 		[SerializeField] private GridBuilder _playerGrid;
 		[SerializeField] private PlayerListItem _playerListItemPrefab;
