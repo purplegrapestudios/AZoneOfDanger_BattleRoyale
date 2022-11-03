@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: fusion-outer-loop
+  productName: Game_Using_PhotonFusion_Multiplay
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -878,11 +878,11 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 0
-  cloudProjectId: 
+  cloudProjectId: d9892e9f-08d4-41b5-8b00-4bfcc87b79b5
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Photon-Bolt-Fusion-Learning
+  organizationId: peter-tan-as-publisher
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
