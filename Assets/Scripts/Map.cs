@@ -10,7 +10,7 @@ public class Map : SimulationBehaviour, ISpawned
 {
 	[SerializeField] private Text _countdownMessage;
 	[SerializeField] private Transform[] _spawnPoints;
-
+	[SerializeField] private Camera m_sceneCamera;
 	private bool _sendMapLoadedMessage;
 	private App _app;
 
@@ -80,4 +80,11 @@ public class Map : SimulationBehaviour, ISpawned
 		// Note: This only works if the number of spawnpoints in the map matches the maximum number of players - otherwise there's a risk of spawning multiple players in the same location.
 		return _spawnPoints[((int) objectInputAuthority) % _spawnPoints.Length];
 	}
+
+	public void SetSceneCameraActive(bool val)
+    {
+		m_sceneCamera.GetComponent<AudioListener>().enabled = val;
+		m_sceneCamera.enabled = val;
+		m_sceneCamera.gameObject.SetActive(val);
+    }
 }

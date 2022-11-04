@@ -330,7 +330,7 @@ GameObject:
   - component: {fileID: 218966462}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -748,6 +748,7 @@ MonoBehaviour:
   - {fileID: 87851297}
   - {fileID: 555980797}
   - {fileID: 1246412433}
+  m_sceneCamera: {fileID: 1742798475}
 --- !u!4 &577297287
 Transform:
   m_ObjectHideFlags: 0
@@ -778,7 +779,7 @@ GameObject:
   - component: {fileID: 671003218}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
