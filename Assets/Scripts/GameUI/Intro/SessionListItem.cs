@@ -23,7 +23,7 @@ namespace GameUI.Intro
 			_info = info;
 			_name.text = $"{info.Name} ({info.Region})";
 			_map.text = $"Map {new SessionProps(info.Properties).StartMap}";
-			_players.text = $"{info.PlayerCount}/{info.MaxPlayers}";
+			_players.text = $"{info.PlayerCount - 1}/{info.MaxPlayers - 1}"; //Subtracting 1 if we do not want to count the server.
 			_onJoin = onJoin;
 		}
 		

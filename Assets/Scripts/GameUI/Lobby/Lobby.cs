@@ -2,6 +2,7 @@ using System.Text;
 using UIComponents;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace GameUI.Lobby
 {
@@ -11,8 +12,8 @@ namespace GameUI.Lobby
 		[SerializeField] private PlayerListItem _playerListItemPrefab;
 
 		[SerializeField] private Button _startButton;
-		[SerializeField] private Text _startLabel;
-		[SerializeField] private Text _sessionInfo;
+		[SerializeField] private TMP_Text _startLabel;
+		[SerializeField] private TMP_Text _sessionInfo;
 
 		private float _sessionRefresh;
 		private App _app;
@@ -36,7 +37,6 @@ namespace GameUI.Lobby
 				if (ply.Ready)
 					ready++;
 			});
-
 
 			string wait = null;
 			if (count > 0)

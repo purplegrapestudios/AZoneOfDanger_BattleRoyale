@@ -14,7 +14,7 @@ namespace GameUI.Lobby
 		public void Setup(Player ply)
 		{
 			_name.text = string.IsNullOrEmpty(ply.Name.Value) ? "no name" : ply.Name.Value;
-			_color.color = ply.Color;
+			//_color.color = ply.Color;
 			_ready.SetActive(ply.Ready);
 		}
 	}

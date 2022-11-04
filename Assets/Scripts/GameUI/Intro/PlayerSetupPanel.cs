@@ -22,7 +22,7 @@ namespace GameUI.Intro
 		private void OnEnable()
 		{
 			_app = App.FindInstance();
-			_playerReady.SetActive(false);
+			//_playerReady.SetActive(false);
 			_app.AllowInput = false;
 		}
 
@@ -52,7 +52,7 @@ namespace GameUI.Intro
 			else
 			{
 				Player ply = _app.GetPlayer();
-				_playerReady.SetActive(!ply.Ready);
+				//_playerReady.SetActive(!ply.Ready);
 				ply.RPC_SetIsReady(!ply.Ready);
 			}
 		}
