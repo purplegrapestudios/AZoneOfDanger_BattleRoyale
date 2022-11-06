@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using UnityEngine;
 
 [System.Flags]
 public enum ButtonFlag
@@ -8,11 +9,14 @@ public enum ButtonFlag
 	LEFT = 1 << 2,
 	RIGHT = 1 << 3,
 	RESPAWN = 1 << 4,
+	JUMP = 1 << 5,
 }
 
 public struct InputData : INetworkInput
 {
 	public ButtonFlag ButtonFlags;
+	public Vector2 aimDirection;
+	public Vector2 moveDirection;
 
 	public bool GetButton(ButtonFlag button)
 	{

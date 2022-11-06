@@ -19,6 +19,7 @@ public class Player : NetworkBehaviour
 
 	public bool InputEnabled => _app.AllowInput;
 
+	[SerializeField] Transform playerModel;
 	private Character _character;
 	private App _app;
 
@@ -74,4 +75,14 @@ public class Player : NetworkBehaviour
 	{
 		Color = color;
 	}
+
+	private float ClampAngle(float angle, float min, float max)
+	{
+		if (angle > -360f)
+			angle += 360f;
+		if (angle < 360f)
+			angle -= 360f;
+		return Mathf.Clamp(angle, min, max);
+	}
+
 }

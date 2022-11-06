@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace GameUI.Intro
 {
 	public class PlayerSetupPanel : MonoBehaviour
 	{
+		[SerializeField] private TMP_InputField m_nameInput;
 		[SerializeField] private Slider _sliderR;
 		[SerializeField] private Slider _sliderG;
 		[SerializeField] private Slider _sliderB;
@@ -56,5 +58,10 @@ namespace GameUI.Intro
 				ply.RPC_SetIsReady(!ply.Ready);
 			}
 		}
+
+		public string GetNameInputValue()
+        {
+			return string.IsNullOrEmpty(m_nameInput?.text) ? "no name" : m_nameInput.text;
+        }
 	}
 }

@@ -80,6 +80,7 @@ public class VivoxVoiceManager : MonoBehaviour
     private string _domain;
     [SerializeField]
     private string _server;
+    [SerializeField] private System.Action m_beginLoginCallback; 
 
     /// <summary>
     /// Access singleton instance through this propriety.
@@ -145,6 +146,10 @@ public class VivoxVoiceManager : MonoBehaviour
 
     private void Awake()
     {
+#if UNITY_SERVER
+        return;
+#endif
+
         return;
         if (m_Instance != this && m_Instance != null)
         {
@@ -157,6 +162,10 @@ public class VivoxVoiceManager : MonoBehaviour
 
     async void Start()
     {
+#if UNITY_SERVER
+        return;
+#endif
+
         var options = new InitializationOptions();
         if (CheckManualCredentials())
         {
@@ -169,9 +178,12 @@ public class VivoxVoiceManager : MonoBehaviour
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
+        //loginscreenui.LoginToVivoxService();
 #endif
 
         VivoxService.Instance.Initialize();
+        m_beginLoginCallback();
+
     }
 
     private void OnApplicationQuit()
@@ -185,9 +197,14 @@ public class VivoxVoiceManager : MonoBehaviour
         }
     }
 
+    public void SetBeginLoginCallback(System.Action callback)
+    {
+        m_beginLoginCallback = callback;
+    }
+
     public void Login(string displayName = null)
     {
-        m_Account = new Account("Test");
+        m_Account = new Account(displayName ?? "TEST");
 
         LoginSession = _client.GetLoginSession(m_Account);
         LoginSession.PropertyChanged += OnLoginSessionPropertyChanged;
@@ -199,6 +216,7 @@ public class VivoxVoiceManager : MonoBehaviour
             }
             catch (Exception e)
             {
+                Debug.Log($"Vivox Login Error../");
                 // Handle error 
                 VivoxLogError(nameof(e));
                 // Unbind if we failed to login.
@@ -352,6 +370,8 @@ public class VivoxVoiceManager : MonoBehaviour
         // Look up the participant via the key.
         var participant = source[keyEventArg.Key];
         var username = participant.Account.Name;
+        Debug.Log($"Participant added, username: {username}");
+
         var channel = participant.ParentChannelSession.Key;
         var channelSession = participant.ParentChannelSession;
 

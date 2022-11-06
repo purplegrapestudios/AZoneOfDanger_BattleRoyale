@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,51 +6,22 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VivoxUnity;
 
-public class LobbyScreenUI : MonoBehaviour
+public class VivoxLobbyController : MonoBehaviour
 {
+    [SerializeField] private string LobbyChannelName => ServerConfigData.ServerName;
 
     private VivoxVoiceManager _vivoxVoiceManager;
-
-    public string LobbyChannelName = "lobbyChannel";
-
-    private EventSystem _evtSystem;
-
-    public Button LogoutButton;
-    public GameObject LobbyScreen;
-    public GameObject ConnectionIndicatorDot;
-    public GameObject ConnectionIndicatorText;
-
-    private Image _connectionIndicatorDotImage;
-    private Text _connectionIndicatorDotText;
 
     #region Unity Callbacks
 
     private void Awake()
     {
-#if UNITY_SERVER
-        return;
-#endif
+        DontDestroyOnLoad(gameObject);
 
-        _evtSystem = EventSystem.current;
-        if (!_evtSystem)
-        {
-            Debug.LogError("Unable to find EventSystem object.");
-        }
-        _connectionIndicatorDotImage = ConnectionIndicatorDot.GetComponent<Image>();
-        if (!_connectionIndicatorDotImage)
-        {
-            Debug.LogError("Unable to find ConnectionIndicatorDot Image object.");
-        }
-        _connectionIndicatorDotText = ConnectionIndicatorText.GetComponent<Text>();
-        if (!_connectionIndicatorDotText)
-        {
-            Debug.LogError("Unable to find ConnectionIndicatorText Text object.");
-        }
         _vivoxVoiceManager = VivoxVoiceManager.Instance;
         _vivoxVoiceManager.OnUserLoggedInEvent += OnUserLoggedIn;
         _vivoxVoiceManager.OnUserLoggedOutEvent += OnUserLoggedOut;
         _vivoxVoiceManager.OnRecoveryStateChangedEvent += OnRecoveryStateChanged;
-        LogoutButton.onClick.AddListener(() => { LogoutOfVivoxService(); });
 
         if (_vivoxVoiceManager.LoginState == LoginState.LoggedIn)
         {
@@ -64,12 +35,11 @@ public class LobbyScreenUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        LogoutOfVivoxService();
         _vivoxVoiceManager.OnUserLoggedInEvent -= OnUserLoggedIn;
         _vivoxVoiceManager.OnUserLoggedOutEvent -= OnUserLoggedOut;
         _vivoxVoiceManager.OnParticipantAddedEvent -= VivoxVoiceManager_OnParticipantAddedEvent;
         _vivoxVoiceManager.OnRecoveryStateChangedEvent -= OnRecoveryStateChanged;
-
-        LogoutButton.onClick.RemoveAllListeners();
     }
 
     #endregion
@@ -83,10 +53,7 @@ public class LobbyScreenUI : MonoBehaviour
 
     private void LogoutOfVivoxService()
     {
-        LogoutButton.interactable = false;
-
         _vivoxVoiceManager.DisconnectAllChannels();
-
         _vivoxVoiceManager.Logout();
     }
 
@@ -103,12 +70,8 @@ public class LobbyScreenUI : MonoBehaviour
 
     private void OnUserLoggedIn()
     {
-        LobbyScreen.SetActive(true);
-        LogoutButton.interactable = true;
-        _evtSystem.SetSelectedGameObject(LogoutButton.gameObject, null);
-
         var lobbychannel = _vivoxVoiceManager.ActiveChannels.FirstOrDefault(ac => ac.Channel.Name == LobbyChannelName);
-        if ((_vivoxVoiceManager && _vivoxVoiceManager.ActiveChannels.Count == 0) 
+        if ((_vivoxVoiceManager && _vivoxVoiceManager.ActiveChannels.Count == 0)
             || lobbychannel == null)
         {
             JoinLobbyChannel();
@@ -131,8 +94,6 @@ public class LobbyScreenUI : MonoBehaviour
     private void OnUserLoggedOut()
     {
         _vivoxVoiceManager.DisconnectAllChannels();
-
-        LobbyScreen.SetActive(false);
     }
 
     private void OnRecoveryStateChanged(ConnectionRecoveryState recoveryState)
@@ -159,8 +120,8 @@ public class LobbyScreenUI : MonoBehaviour
                 indicatorColor = Color.white;
                 break;
         }
-        _connectionIndicatorDotImage.color = indicatorColor;
-        _connectionIndicatorDotText.text = recoveryState.ToString();
+        Debug.Log($"Vivox recovery state: {recoveryState}");
+        //TopBar.Instance.SetVivoxConnectionState(recoveryState.ToString(), indicatorColor);
     }
 
     #endregion

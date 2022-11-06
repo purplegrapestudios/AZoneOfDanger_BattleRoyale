@@ -8,8 +8,10 @@ namespace GameUI.Lobby
 {
 	public class Lobby : MonoBehaviour
 	{
+		public static Lobby Instance;
 		[SerializeField] private GridBuilder _playerGrid;
 		[SerializeField] private PlayerListItem _playerListItemPrefab;
+		[SerializeField] private Intro.PlayerSetupPanel m_PlayerSetupPanel;
 
 		[SerializeField] private Button _startButton;
 		[SerializeField] private TMP_Text _startLabel;
@@ -20,8 +22,11 @@ namespace GameUI.Lobby
 
 		private void Awake()
 		{
+			Instance = this;
 			_app = App.FindInstance();
 			_app.GetPlayer()?.RPC_SetIsReady(false);
+
+			TopBar.Instance.SetEscapeButtonCallback(OnDisconnect);
 		}
 
 		void Update()
@@ -98,5 +103,10 @@ namespace GameUI.Lobby
 			}
 			_sessionInfo.text = sb.ToString();
 		}
+
+		public Intro.PlayerSetupPanel GetPlayerSetup()
+        {
+			return m_PlayerSetupPanel;
+        }
 	}
 }

@@ -1077,6 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5271ff15de2e4cc1bdcc6210a60434b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_nameInput: {fileID: 7061040380646009474}
   _sliderR: {fileID: 7431105790694575130}
   _sliderG: {fileID: 7431105789598759815}
   _sliderB: {fileID: 7431105791491352693}

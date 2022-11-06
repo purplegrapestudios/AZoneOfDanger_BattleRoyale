@@ -336,8 +336,9 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		_data.ButtonFlags |= Input.GetKey( KeyCode.W ) ? ButtonFlag.FORWARD : 0;
 		_data.ButtonFlags |= Input.GetKey( KeyCode.A ) ? ButtonFlag.LEFT : 0;
 		_data.ButtonFlags |= Input.GetKey( KeyCode.S ) ? ButtonFlag.BACKWARD : 0;
-		_data.ButtonFlags |= Input.GetKey( KeyCode.D ) ? ButtonFlag.RIGHT : 0;
-
+		_data.ButtonFlags |= Input.GetKey(KeyCode.D) ? ButtonFlag.RIGHT : 0;
+		_data.ButtonFlags |= Input.GetKey(KeyCode.Space) ? ButtonFlag.JUMP : 0;
+		_data.aimDirection = new Vector2(Input.GetAxis("Mouse X") * 10, Input.GetAxis("Mouse Y") * 10);
 		input.Set( _data );
 
 		// Clear the flags so they don't spill over into the next tick unless they're still valid input.
