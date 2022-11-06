@@ -35,6 +35,8 @@ public class Character : NetworkBehaviour
 
 	public override void Spawned()
 	{
+		Cursor.lockState = CursorLockMode.Locked;
+		Cursor.visible = false;
 		m_canJump = true;
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
@@ -95,7 +97,13 @@ public class Character : NetworkBehaviour
 		}
 	}
 
-	public override void FixedUpdateNetwork()
+    private void OnApplicationFocus(bool focus)
+    {
+		Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
+		Cursor.visible = focus ? false : true;
+	}
+
+    public override void FixedUpdateNetwork()
 	{
 		if (Player && Player.InputEnabled && GetInput(out InputData data))
 		{
