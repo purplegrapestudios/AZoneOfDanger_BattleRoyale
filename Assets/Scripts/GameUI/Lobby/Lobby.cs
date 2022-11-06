@@ -25,8 +25,6 @@ namespace GameUI.Lobby
 			Instance = this;
 			_app = App.FindInstance();
 			_app.GetPlayer()?.RPC_SetIsReady(false);
-
-			TopBar.Instance.SetEscapeButtonCallback(OnDisconnect);
 		}
 
 		void Update()

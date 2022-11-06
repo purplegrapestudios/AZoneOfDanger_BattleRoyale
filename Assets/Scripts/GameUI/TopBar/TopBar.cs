@@ -15,17 +15,6 @@ public class TopBar : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) {
-            Instance = this; 
-        }
-        DontDestroyOnLoad(Instance.gameObject);
-    }
-
-    public void SetEscapeButtonCallback(System.Action escapeBtnCallback)
-    {
-        m_escapeBtn.onClick.AddListener(() => {
-            escapeBtnCallback();
-        });
     }
 
     public void SetVivoxConnectionState(string state, Color stateColor, Color[] stateGradient = null)

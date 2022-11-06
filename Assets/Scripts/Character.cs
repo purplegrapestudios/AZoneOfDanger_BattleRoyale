@@ -54,12 +54,24 @@ public class Character : NetworkBehaviour
 			Vector3 p = t.position;
 			_camera.position = p - 10 * t.forward + 5*Vector3.up;
 			_camera.LookAt(p+2*Vector3.up);
+
 		}
 		
 		// This is a little brute-force, but it gets the job done.
 		// Could use an OnChanged listener on the properties instead.
 		_name.text = Player.Name.Value;
 		_mesh.material.color = Player.Color;
+	}
+
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+			Cursor.lockState = Cursor.lockState == CursorLockMode.None ? CursorLockMode.Locked : CursorLockMode.None;
+			Cursor.visible = Cursor.visible ? false : true;
+        }
+
 	}
 
 	private IEnumerator JumpCoroutineHandle;
@@ -97,11 +109,11 @@ public class Character : NetworkBehaviour
 		}
 	}
 
-    private void OnApplicationFocus(bool focus)
-    {
-		Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
-		Cursor.visible = focus ? false : true;
-	}
+    //private void OnApplicationFocus(bool focus)
+    //{
+	//	Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
+	//	Cursor.visible = focus ? false : true;
+	//}
 
     public override void FixedUpdateNetwork()
 	{

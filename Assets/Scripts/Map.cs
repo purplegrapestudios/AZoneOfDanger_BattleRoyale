@@ -63,13 +63,11 @@ public class Map : SimulationBehaviour, ISpawned
 	public void OnLoadMap1()
 	{
 		_app.Session.LoadMap(MapIndex.Map1);
-		TopBar.Instance.SetEscapeButtonCallback(OnDisconnect);
 	}
 
 	public void OnLoadMap(int mapIndex)
 	{
 		_app.Session.LoadMap((MapIndex) mapIndex);
-		TopBar.Instance.SetEscapeButtonCallback(OnDisconnect);
 	}
 
 	public void OnGameOver()
