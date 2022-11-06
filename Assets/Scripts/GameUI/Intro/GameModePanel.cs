@@ -18,6 +18,10 @@ namespace GameUI.Intro
 			_app = App.FindInstance();
 			_sessionsPanel.Hide();
 
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+
+
 			m_buttonPublicServers.onClick.AddListener(() => { SelectGameMode(0); });
 			m_buttonArenaServers.onClick.AddListener(() => { SelectGameMode(1); });
 			m_buttonSandboxServers.onClick.AddListener(() => { SelectGameMode(2); });
