@@ -131,6 +131,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 	{
 		if (_runner != null)
 		{
+			Debug.Log("We are shutting down Photon Fusion Network");
 			SetConnectionStatus(ConnectionStatus.Disconnected);
 			_runner.Shutdown();
 		}

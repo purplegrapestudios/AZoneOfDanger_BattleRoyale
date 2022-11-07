@@ -60,6 +60,7 @@ public class LoginScreenUI : MonoBehaviour
     }
     private void OnDestroy()
     {
+        OnUserLoggedIn();
         _vivoxVoiceManager.OnUserLoggedInEvent -= OnUserLoggedIn;
         _vivoxVoiceManager.OnUserLoggedOutEvent -= OnUserLoggedOut;
 
