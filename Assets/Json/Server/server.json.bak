@@ -1,0 +1,8 @@
+{
+	"allocatedUUID": "434af841-586d-4403-939b-db19f77611a6",
+	"serverID": "42398863",
+	"queryType": "sqp",
+	"queryPort": "9010",
+	"port": "9000",
+	"serverLogDir": "/Logs/"
+}
