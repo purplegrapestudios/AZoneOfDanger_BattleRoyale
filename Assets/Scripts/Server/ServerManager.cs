@@ -30,6 +30,12 @@ public class ServerManager : MonoBehaviour
 		CommandLineUtility.GetCommandLineArgument("-playModeInt", out ServerConfigData.PlayModeInt);
 		CommandLineUtility.GetCommandLineArgument("-map", out ServerConfigData.MapIndexInt);
 		CommandLineUtility.GetCommandLineArgument("-maxPlayers", out ServerConfigData.MaxPlayers);
+		ServerConfigData.IPAddress = "3.98.173.106";
+		ServerConfigData.Port = 7777;
+		ServerConfigData.ServerName = $"AWS - {ServerConfigData.IPAddress}";
+		ServerConfigData.PlayModeInt = (int)PlayMode.Sandbox;
+		ServerConfigData.MapIndexInt = (int)MapIndex.Map0;
+		ServerConfigData.MaxPlayers = 44;
 	}
 
 	public void StartGame()
