@@ -169,7 +169,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 			PlayerCount = props.PlayerLimit,
 			SessionProperties = props.Properties,
 			DisableClientSessionCreation = disableClientSessionCreation,
-			Address = NetAddress.Any(ServerConfigData.Port),
+			Address = NetAddress.Any(),
 		};
 
 
