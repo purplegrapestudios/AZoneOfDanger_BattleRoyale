@@ -82,7 +82,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	public bool IsBatchMode()
     {
-		//Debug.Log($"{UnityEngine.por}")
+		Debug.Log($"Is Running in Batch mode? - {Application.isBatchMode}");
 		return (Application.isBatchMode);
 
 	}
@@ -169,11 +169,12 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 			PlayerCount = props.PlayerLimit,
 			SessionProperties = props.Properties,
 			DisableClientSessionCreation = disableClientSessionCreation,
-			Address = NetAddress.Any(ServerConfigData.Port),
+			Address = NetAddress.Any(),
 		};
 
-		Debug.Log($"Address if Port: {startGameArgs.Address}");
 
+		//startGameArgs.Address = NetAddress.CreateFromIpPort(ServerConfigData.IPAddress, ServerConfigData.Port);
+		Debug.Log($"IP Address and port: {startGameArgs.Address}");
 		StartGameResult result = await _runner.StartGame(startGameArgs);
 		if(!result.Ok)
 			SetConnectionStatus(ConnectionStatus.Failed, result.ShutdownReason.ToString());
