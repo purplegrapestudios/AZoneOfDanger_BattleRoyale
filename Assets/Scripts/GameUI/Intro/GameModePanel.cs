@@ -10,6 +10,7 @@ namespace GameUI.Intro
 		[SerializeField] private Button m_buttonPublicServers;
 		[SerializeField] private Button m_buttonArenaServers;
 		[SerializeField] private Button m_buttonSandboxServers;
+		[SerializeField] private Button m_buttonHostServers;
 
 		private App _app;
 
@@ -25,6 +26,7 @@ namespace GameUI.Intro
 			m_buttonPublicServers.onClick.AddListener(() => { SelectGameMode(0); });
 			m_buttonArenaServers.onClick.AddListener(() => { SelectGameMode(1); });
 			m_buttonSandboxServers.onClick.AddListener(() => { SelectGameMode(2); });
+			m_buttonHostServers.onClick.AddListener(() => { StartAsHost(); });
 		}
 
 		private void Start()
@@ -33,28 +35,43 @@ namespace GameUI.Intro
 			{
 				if (ServerGameModeCoroutine != null)
 					StopCoroutine(ServerGameModeCoroutine);
-				ServerGameModeCoroutine = ServerGameModeCO();
+				ServerGameModeCoroutine = ServerGameModeCO(useHostInsteadOfServer: false);
 				StartCoroutine(ServerGameModeCoroutine);
 			}
 		}
 
 		private IEnumerator ServerGameModeCoroutine;
-		private IEnumerator ServerGameModeCO()
-        {
+		private IEnumerator ServerGameModeCO(bool useHostInsteadOfServer)
+		{
 			yield return new WaitForSeconds(5);
-			SetGameMode();
+			SetGameMode(useHostInsteadOfServer);
 
 		}
 
-        private void SetGameMode()
+        private void SetGameMode(bool useHostInsteadOfServer)
 		{
 			ServerManager.Instance.SetPlayMode((PlayMode)ServerConfigData.PlayModeInt);
-			_sessionsPanel.Show((PlayMode)(PlayMode)ServerConfigData.PlayModeInt);
+			_sessionsPanel.Show((PlayMode)(PlayMode)ServerConfigData.PlayModeInt, useHostInsteadOfServer);
 		}
 
+		//Used for Clients to join Game Mode. So Set UseHostInsteadOfServer to false, as we won't be using that for joining anyway
 		public void SelectGameMode(int playMode)
         {
-			_sessionsPanel.Show((PlayMode) playMode);
+			_sessionsPanel.Show((PlayMode) playMode, useHostInsteadOfServer: false);
+		}
+
+		public void StartAsHost()
+        {
+			ServerConfigData.TargetFrameRate = 60;
+			ServerConfigData.ServerName = $"local - ";
+			ServerConfigData.PlayModeInt = (int)PlayMode.Sandbox;
+			ServerConfigData.MapIndexInt = (int)MapIndex.Map0;
+			ServerConfigData.MaxPlayers = 22;
+
+			if (ServerGameModeCoroutine != null)
+				StopCoroutine(ServerGameModeCoroutine);
+			ServerGameModeCoroutine = ServerGameModeCO(useHostInsteadOfServer: true);
+			StartCoroutine(ServerGameModeCoroutine);
 		}
 	}
 }

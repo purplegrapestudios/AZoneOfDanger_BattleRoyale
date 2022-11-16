@@ -7,6 +7,7 @@ public class ServerConfigData : MonoBehaviour
     
     public static string IPAddress;
     public static ushort Port;
+    public static int TargetFrameRate;
     public static string ServerName;
     public static int PlayModeInt;
     public static PlayMode PlayMode { get { return (PlayMode)PlayModeInt; } }

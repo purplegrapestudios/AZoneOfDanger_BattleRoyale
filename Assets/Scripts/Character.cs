@@ -9,11 +9,13 @@ using UnityEngine.UI;
 /// (I.e. the player gets a new avatar in each map)
 /// </summary>
 
+[RequireComponent(typeof(CharacterMoveComponent))]
 public class Character : NetworkBehaviour
 {
-	[SerializeField] private Transform m_headingTransform;
+	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
 	[SerializeField] private Text _name;
 	[SerializeField] private MeshRenderer _mesh;
+	[SerializeField] private Transform m_headingTransform;
 
 	[SerializeField] private float sensitivityX = 15f;
 	[SerializeField] private float sensitivityY = 15f;
@@ -23,21 +25,30 @@ public class Character : NetworkBehaviour
 	[SerializeField] private float maximumY = 60F;
 	[SerializeField] private float rotationX = 0f;
 	[SerializeField] private float rotationY = 0f;
-	[Networked][SerializeField] private bool m_canJump { get; set; }
-	[Networked] [SerializeField] private float m_speed { get; set; }
+	[SerializeField] private float m_baseSpeed = 25f;
+	[Networked][SerializeField] private bool CanJump { get; set; }
+	[Networked] [SerializeField] private float Speed { get; set; }
 	[Networked] public Player Player { get; set; }
 	[Networked] Vector2 m_aimDirection { get; set; }
+	[Networked] Vector3 m_directionVector { get; set; }
 	[Networked] private Quaternion m_lookRotation { get; set; }
-	[Networked] private Vector3 m_directionForward { get; set; }
-	[Networked] private Vector3 m_directionRight { get; set; }
+	[Networked] private Vector3 m_lookDirectionForward { get; set; }
+	[Networked] private Vector3 m_lookDirectionRight { get; set; }
 
 	private Transform _camera;
+	private Rigidbody rbody;
+
+	//Data for Character Components
+	private SlideOnObstacleData m_slideOnObstacleData;
 
 	public override void Spawned()
 	{
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
-		m_canJump = true;
+		CanJump = true;
+		m_slideOnObstacleData = new SlideOnObstacleData(Vector3.zero, 0f, false);
+		rbody = GetComponent<Rigidbody>();
+
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();
@@ -77,76 +88,96 @@ public class Character : NetworkBehaviour
 	private IEnumerator JumpCoroutineHandle;
 	private IEnumerator JumpCoroutine()
 	{
-		float startingHeight = transform.position.y;    //Will change implementation later with ground detection as opposed to using position.y < 0
-		float jumpheight = transform.position.y + 5f;
-		float dt = 0f;
+		float startingHeight = rbody.position.y;    //Will change implementation later with ground detection as opposed to using position.y < 0
+		float jumpheight = rbody.position.y + 5f;
 
-		m_canJump = false;
-		while (transform.position.y < jumpheight)
+		CanJump = false;
+		while (rbody.position.y < jumpheight)
 		{
-			transform.position += Runner.DeltaTime * 25f * transform.up;
+			rbody.position += Runner.DeltaTime * 25 * m_headingTransform.up;
 			yield return new WaitForSeconds(Runner.DeltaTime);
-            if (dt >= jumpheight)
-            {
-				Debug.Log("JumpHeight: " + (int)transform.position.y);
-            }
 		}
 
-		dt = 0;
-		yield return new WaitForSeconds(Runner.DeltaTime);
-
-		while (transform.position.y > 0)
+		Ray groundRay = new Ray(rbody.position, -transform.up * transform.localScale.y / 2);
+		while (!CanJump && !m_characterMoveComponent.GroundCheck(groundRay))//(rbody.position.y > 0)
 		{
-			transform.position -= Runner.DeltaTime * 20f * transform.up;
+			rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
+			groundRay = new Ray(rbody.position, -transform.up * transform.localScale.y / 2);
 			yield return new WaitForSeconds(Runner.DeltaTime);
-			if (transform.position.y < 0)
-			{
-				transform.position = new Vector3(transform.position.x, startingHeight, transform.position.z);
-				m_canJump = true;
-				StopCoroutine(JumpCoroutineHandle);
-				JumpCoroutineHandle = null;
-			}
+			//if (rbody.position.y < 0)
+			//{
+			//	rbody.position = new Vector3(rbody.position.x, startingHeight, rbody.position.z);
+			//	CanJump = true;
+			//	StopCoroutine(JumpCoroutineHandle);
+			//	JumpCoroutineHandle = null;
+			//}
 		}
+		CanJump = true;
+		StopCoroutine(JumpCoroutineHandle);
+		JumpCoroutineHandle = null;
+
 	}
 
-    //private void OnApplicationFocus(bool focus)
-    //{
+	//private void OnApplicationFocus(bool focus)
+	//{
 	//	Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
 	//	Cursor.visible = focus ? false : true;
 	//}
 
-    public override void FixedUpdateNetwork()
+	public override void FixedUpdateNetwork()
 	{
 		if (Player && Player.InputEnabled && GetInput(out InputData data))
 		{
-			if (data.GetButton(ButtonFlag.LEFT))
-				transform.position -= Runner.DeltaTime * m_speed * transform.right;
-			if (data.GetButton(ButtonFlag.RIGHT))
-				transform.position += Runner.DeltaTime * m_speed * transform.right;
-			if (data.GetButton(ButtonFlag.FORWARD))
-				transform.position += Runner.DeltaTime * m_speed * transform.forward;
-			if (data.GetButton(ButtonFlag.BACKWARD))
-				transform.position -= Runner.DeltaTime * m_speed * transform.forward;
+			m_directionVector = Vector3.zero;
 
-			if (data.GetButton(ButtonFlag.JUMP) && m_canJump && JumpCoroutineHandle == null)
+			//Input Update
+			if (data.GetButton(ButtonFlag.LEFT))
+				m_directionVector -= m_headingTransform.right;
+			if (data.GetButton(ButtonFlag.RIGHT))
+				m_directionVector += m_headingTransform.right;
+			if (data.GetButton(ButtonFlag.FORWARD))
+				m_directionVector += m_headingTransform.forward;
+			if (data.GetButton(ButtonFlag.BACKWARD))
+				m_directionVector -= m_headingTransform.forward;
+
+			Debug.DrawRay(transform.position, m_directionVector, Color.blue, 5);
+			//Jump Update
+			if (data.GetButton(ButtonFlag.JUMP) && CanJump && JumpCoroutineHandle == null)
             {
 				JumpCoroutineHandle = JumpCoroutine();
 				StartCoroutine(JumpCoroutineHandle);
 			}
 
+			m_lookDirectionForward = m_lookRotation * Vector3.forward;
+			m_lookDirectionRight = m_lookRotation * Vector3.right;
+
+			//Wall Collision Detection
+			//m_slideOnObstacleData = m_characterMoveComponent.SlideOnObstacle(
+			//	ray: new Ray(m_headingTransform.position + (0) * (m_directionVector * (m_headingTransform.localScale.x / 2)) + m_headingTransform.up, m_directionVector),
+			//	rayDistance: 2 + Speed * Runner.DeltaTime,
+			//	directionVector: m_directionVector,
+			//	currentSpeed: Speed,
+			//	upVector: m_headingTransform.up
+			//);
+			//m_directionVector = m_slideOnObstacleData.directionVector;
+			//Speed = m_slideOnObstacleData.isHit ? m_slideOnObstacleData.finalSpeed : m_baseSpeed;
+
+			Speed = m_baseSpeed;
+			rbody.position += Runner.DeltaTime * Speed * m_directionVector;
+
+			//Rotation			
 			m_aimDirection = data.aimDirection;
 			//rotationY = ClampAngle(m_aimDirection.y, minimumY, maximumY);		//Don't need for now. But will need later for say head movement up and down.
 			Quaternion xQuaternion = Quaternion.AngleAxis(m_aimDirection.x, Vector3.up);
-			Quaternion yQuaternion = Quaternion.AngleAxis(rotationY, -Vector3.right);	//Don't need for now. But will need later for say head movement up and down.
-
-			m_lookRotation = transform.rotation *= xQuaternion;
-
-			m_directionForward = m_lookRotation * Vector3.forward;
-			m_directionRight = m_lookRotation * Vector3.right;
-
+			//Quaternion yQuaternion = Quaternion.AngleAxis(rotationY, -Vector3.right);	//Don't need for now. But will need later for say head movement up and down.
+			m_lookRotation = rbody.rotation *= xQuaternion;
+			rbody.angularDrag = 0;
+			rbody.velocity = Vector3.zero;
 			return;
 		}
+
 	}
+
 	private float ClampAngle(float angle, float min, float max)
 	{
 		if (angle > -360f)
