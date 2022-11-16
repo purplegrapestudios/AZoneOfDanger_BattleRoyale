@@ -22,7 +22,7 @@ namespace GameUI.Intro
 		private int _maxPly = 4;
 		private PlayMode _playMode;
 
-		public void Show(PlayMode mode)
+		public void Show(PlayMode mode, bool useHostInsteadOfServer)
 		{
 			//We've configured this button to automatically be called when the Server is running this.
 
@@ -30,7 +30,7 @@ namespace GameUI.Intro
 			_playMode = mode;
 			UpdateLoadingText();
 
-			ServerManager.Instance.StartGame();
+			ServerManager.Instance.StartGame(useHostInsteadOfServer);
 		}
 
 		private void StartGameInitialized(NetworkRunner runner)
@@ -70,7 +70,7 @@ namespace GameUI.Intro
 			props.AllowLateJoin = _allowLateJoin.isOn;
 			
 			// Pass the session properties to the app - this will unload the current scene and load the staging area if successful
-			App.FindInstance().CreateSession(props);
+			App.FindInstance().CreateSession(props, useHostInsteadOfServer: false);
 		}
 
 		private void UpdateUI()

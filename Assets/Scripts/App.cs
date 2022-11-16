@@ -82,10 +82,13 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	public bool IsBatchMode()
     {
-		Debug.Log($"Is Running in Batch mode? - {Application.isBatchMode}");
 		return (Application.isBatchMode);
-
 	}
+
+	public bool IsHost()
+    {
+		return Session.Runner.GameMode == GameMode.Host;
+    }
 
 	private void Awake()
 	{
@@ -145,9 +148,12 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		StartSession(_sharedMode ? GameMode.Shared : GameMode.Client, props);
 	}
 	
-	public void CreateSession(SessionProps props)
+	public void CreateSession(SessionProps props, bool useHostInsteadOfServer)
 	{
-		StartSession(_sharedMode ? GameMode.Shared : GameMode.Server, props, !_sharedMode);
+		if(useHostInsteadOfServer)
+			StartSession(_sharedMode ? GameMode.Shared : GameMode.Host, props, !_sharedMode);
+		else
+			StartSession(_sharedMode ? GameMode.Shared : GameMode.Server, props, !_sharedMode);
 	}
 
 	private async void StartSession(GameMode mode, SessionProps props, bool disableClientSessionCreation=true)

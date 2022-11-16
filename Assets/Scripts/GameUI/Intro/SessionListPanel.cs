@@ -36,7 +36,7 @@ namespace GameUI.Intro
 			m_buttonRefreshServerList.onClick.AddListener(async () => { await RefreshServerList(); });
 		}
 
-        public async void Show(PlayMode mode)
+        public async void Show(PlayMode mode, bool useHostInsteadOfServer)
 		{
 			gameObject.SetActive(true);
 			_playMode = mode;
@@ -47,7 +47,10 @@ namespace GameUI.Intro
 
 
 			if (_app.IsBatchMode())
-				OnShowNewSessionUI();
+				OnShowNewSessionUI(useHostInsteadOfServer: false);
+
+			if(useHostInsteadOfServer)
+				OnShowNewSessionUI(useHostInsteadOfServer: true);
 		}
 
 		public void Hide()
@@ -120,9 +123,9 @@ namespace GameUI.Intro
 			await _app.EnterLobby($"GameMode{_playMode}", OnSessionListUpdated);
 		}
 
-		public void OnShowNewSessionUI()
+		public void OnShowNewSessionUI(bool useHostInsteadOfServer)
 		{
-			_newSessionPanel.Show(_playMode);
+			_newSessionPanel.Show(_playMode, useHostInsteadOfServer);
 		}
 	}
 }

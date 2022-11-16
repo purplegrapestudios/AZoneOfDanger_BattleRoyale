@@ -57,6 +57,11 @@ namespace GameUI.Lobby
 					{
 						OnStart();
 					}
+
+                    if (_app.IsHost())
+                    {
+						OnStart();
+                    }
 				}
             }
             else

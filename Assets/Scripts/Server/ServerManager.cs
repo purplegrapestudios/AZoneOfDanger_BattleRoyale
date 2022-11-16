@@ -20,25 +20,29 @@ public class ServerManager : MonoBehaviour
 		Instance = this;
 		_app = App.FindInstance();
 		InitCommandLineArguments();
+		Application.targetFrameRate = ServerConfigData.TargetFrameRate;
+		Debug.Log($"Setting TargetFrameRate: {Application.targetFrameRate}");
 	}
 
 	private void InitCommandLineArguments()
     {
 		CommandLineUtility.GetCommandLineArgument("-ip", out ServerConfigData.IPAddress);
 		CommandLineUtility.GetCommandLineArgument("-port", out ServerConfigData.Port);
+		CommandLineUtility.GetCommandLineArgument("-targetFrameRate", out ServerConfigData.TargetFrameRate);
 		CommandLineUtility.GetCommandLineArgument("-serverName", out ServerConfigData.ServerName);
 		CommandLineUtility.GetCommandLineArgument("-playModeInt", out ServerConfigData.PlayModeInt);
-		CommandLineUtility.GetCommandLineArgument("-map", out ServerConfigData.MapIndexInt);
+		CommandLineUtility.GetCommandLineArgument("-mapIndexInt", out ServerConfigData.MapIndexInt);
 		CommandLineUtility.GetCommandLineArgument("-maxPlayers", out ServerConfigData.MaxPlayers);
-		ServerConfigData.IPAddress = "3.98.173.106";
-		ServerConfigData.Port = 7777;
-		ServerConfigData.ServerName = $"AWS - {ServerConfigData.IPAddress}";
-		ServerConfigData.PlayModeInt = (int)PlayMode.Sandbox;
-		ServerConfigData.MapIndexInt = (int)MapIndex.Map0;
-		ServerConfigData.MaxPlayers = 44;
+		//ServerConfigData.IPAddress = "3.98.173.106";
+		//ServerConfigData.Port = 7777;
+		//ServerConfigData.TargetFrameRate = 60;
+		//ServerConfigData.ServerName = $"AWS - {ServerConfigData.IPAddress}";
+		//ServerConfigData.PlayModeInt = (int)PlayMode.Sandbox;
+		//ServerConfigData.MapIndexInt = (int)MapIndex.Map0;
+		//ServerConfigData.MaxPlayers = 44;
 	}
 
-	public void StartGame()
+	public void StartGame(bool useHostInsteadOfServer)
 	{
 		if (_app.IsBatchMode())
 		{
@@ -49,7 +53,19 @@ public class ServerManager : MonoBehaviour
 			props.RoomName = $"Server {ServerConfigData.ServerName} Room";
 			props.AllowLateJoin = true;
 
-			App.FindInstance().CreateSession(props);
+			App.FindInstance().CreateSession(props, useHostInsteadOfServer: false);
+		}
+
+        if (useHostInsteadOfServer)
+        {
+			SessionProps props = new SessionProps();
+			props.StartMap = (MapIndex)ServerConfigData.MapIndexInt;
+			props.PlayMode = (PlayMode)ServerConfigData.PlayModeInt;
+			props.PlayerLimit = ServerConfigData.MaxPlayers;
+			props.RoomName = $"Host {ServerConfigData.ServerName} Room";
+			props.AllowLateJoin = true;
+
+			App.FindInstance().CreateSession(props, useHostInsteadOfServer: true);
 		}
 	}
 
