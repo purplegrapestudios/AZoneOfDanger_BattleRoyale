@@ -31,6 +31,19 @@ public struct SlideOnObstacleData
     }
 }
 
+public struct GroundCheckData
+{
+    public bool isGrounded;
+    public float groundedYPos;
+
+    public GroundCheckData(bool isGrounded, float groundedYPos)
+    {
+        this.isGrounded = isGrounded;
+        this.groundedYPos = groundedYPos;
+    }
+
+}
+
 public class CharacterMoveComponent : MonoBehaviour
 {
     [SerializeField] private float kDamper = .95f;
@@ -80,7 +93,10 @@ public class CharacterMoveComponent : MonoBehaviour
                 //We are not Modifying the Rotation here, rather the m_directionVector is used to Calculate Movement Direction. So player would move sideways along wall, if he ran into it.
                 //Using state.DirectionVector here, will change and synchronize the values across the network. But we do NOT want it to change in this situation.
                 m_directionVector = CorrectedDirection.normalized;
-                currentSpeed *= kDamper;
+
+                float speedDotResult =  Vector3.Dot(transform.forward, hits[0].normal);
+                currentSpeed = speedDotResult < 0 ? currentSpeed *= 1 + speedDotResult : currentSpeed;
+
                 return new SlideOnObstacleData(m_directionVector, currentSpeed, true);
             }
 
@@ -94,18 +110,25 @@ public class CharacterMoveComponent : MonoBehaviour
 
     private Transform groundTransform;
     private RaycastHit[] groundHits;
-    public bool GroundCheck(Ray ray)
+    public GroundCheckData GroundCheck(Ray ray)
     {
-        groundHits = new RaycastHit[1];
-        if (Physics.RaycastNonAlloc(ray, groundHits, transform.localScale.y / 2) > 0)
+        groundHits = new RaycastHit[10];
+        var origin = transform.position + new Vector3(0, transform.localScale.y / 2, 0);
+
+        //Debug.DrawLine(origin, origin -transform.up * transform.localScale.y, Color.magenta, 5);
+        if (Physics.RaycastNonAlloc(ray, groundHits, ray.direction.magnitude) > 0)
         {
-            if (groundHits[0].transform == this.transform)
+            foreach (var groundHit in groundHits)
             {
-                return false;
+                if (groundHit.transform == this.transform)
+                {
+                    continue;
+                }
+                //Debug.Log("Grounded");
+                return new GroundCheckData(true, groundHit.point.y);
             }
-            return true;
         }
-        return false;
+        return new GroundCheckData(false, transform.position.y);
     }
 
 }

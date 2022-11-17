@@ -38,6 +38,7 @@ namespace GameUI.Intro
 				ServerGameModeCoroutine = ServerGameModeCO(useHostInsteadOfServer: false);
 				StartCoroutine(ServerGameModeCoroutine);
 			}
+			//StartAsHost();
 		}
 
 		private IEnumerator ServerGameModeCoroutine;
@@ -62,7 +63,9 @@ namespace GameUI.Intro
 
 		public void StartAsHost()
         {
-			ServerConfigData.TargetFrameRate = 60;
+			ServerConfigData.TargetFrameRate = 144;
+			Application.targetFrameRate = ServerConfigData.TargetFrameRate;
+			QualitySettings.vSyncCount = 0;
 			ServerConfigData.ServerName = $"local - ";
 			ServerConfigData.PlayModeInt = (int)PlayMode.Sandbox;
 			ServerConfigData.MapIndexInt = (int)MapIndex.Map0;

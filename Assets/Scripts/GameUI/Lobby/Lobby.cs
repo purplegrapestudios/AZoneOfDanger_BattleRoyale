@@ -25,6 +25,14 @@ namespace GameUI.Lobby
 			Instance = this;
 			_app = App.FindInstance();
 			_app.GetPlayer()?.RPC_SetIsReady(false);
+
+			//TESTING
+			if (_app.IsHost())
+			{
+				_app.GetPlayer()?.RPC_SetIsReady(true);
+				OnStart();
+			}
+			//TESTING
 		}
 
 		void Update()

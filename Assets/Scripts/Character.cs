@@ -26,7 +26,7 @@ public class Character : NetworkBehaviour
 	[SerializeField] private float rotationX = 0f;
 	[SerializeField] private float rotationY = 0f;
 	[SerializeField] private float m_baseSpeed = 25f;
-	[Networked][SerializeField] private bool CanJump { get; set; }
+	[Networked] [SerializeField] private bool m_isJumping { get; set; }
 	[Networked] [SerializeField] private float Speed { get; set; }
 	[Networked] public Player Player { get; set; }
 	[Networked] Vector2 m_aimDirection { get; set; }
@@ -45,9 +45,9 @@ public class Character : NetworkBehaviour
 	{
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
-		CanJump = true;
-		m_slideOnObstacleData = new SlideOnObstacleData(Vector3.zero, 0f, false);
 		rbody = GetComponent<Rigidbody>();
+		SetIsJumping(true);
+		m_slideOnObstacleData = new SlideOnObstacleData(Vector3.zero, 0f, false);
 
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
@@ -63,11 +63,11 @@ public class Character : NetworkBehaviour
 				_camera = Camera.main.transform;
 			Transform t = _mesh.transform;
 			Vector3 p = t.position;
-			_camera.position = p - 10 * t.forward + 5*Vector3.up;
-			_camera.LookAt(p+2*Vector3.up);
+			_camera.position = p - 10 * t.forward + 5 * Vector3.up;
+			_camera.LookAt(p + 2 * Vector3.up);
 
 		}
-		
+
 		// This is a little brute-force, but it gets the job done.
 		// Could use an OnChanged listener on the properties instead.
 		_name.text = Player.Name.Value;
@@ -75,47 +75,57 @@ public class Character : NetworkBehaviour
 	}
 
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
 			Cursor.lockState = Cursor.lockState == CursorLockMode.None ? CursorLockMode.Locked : CursorLockMode.None;
 			Cursor.visible = Cursor.visible ? false : true;
-        }
+		}
 
 	}
 
 	private IEnumerator JumpCoroutineHandle;
+	GroundCheckData groundCheckData;
+	[SerializeField] private bool isAscending;
+	Ray groundRay;
 	private IEnumerator JumpCoroutine()
 	{
 		float startingHeight = rbody.position.y;    //Will change implementation later with ground detection as opposed to using position.y < 0
 		float jumpheight = rbody.position.y + 5f;
 
-		CanJump = false;
+		SetIsJumping(true);
 		while (rbody.position.y < jumpheight)
 		{
+			isAscending = true;
 			rbody.position += Runner.DeltaTime * 25 * m_headingTransform.up;
 			yield return new WaitForSeconds(Runner.DeltaTime);
 		}
 
-		Ray groundRay = new Ray(rbody.position, -transform.up * transform.localScale.y / 2);
-		while (!CanJump && !m_characterMoveComponent.GroundCheck(groundRay))//(rbody.position.y > 0)
-		{
-			rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
-			groundRay = new Ray(rbody.position, -transform.up * transform.localScale.y / 2);
-			yield return new WaitForSeconds(Runner.DeltaTime);
-			//if (rbody.position.y < 0)
-			//{
-			//	rbody.position = new Vector3(rbody.position.x, startingHeight, rbody.position.z);
-			//	CanJump = true;
-			//	StopCoroutine(JumpCoroutineHandle);
-			//	JumpCoroutineHandle = null;
-			//}
-		}
-		CanJump = true;
+		isAscending = false;
+		//Debug.Log($"Apex height vs jumpTargetHeight: {rbody.position.y} vs {jumpheight}");
+
+		//	groundRay = new Ray(rbody.position + new Vector3(0, transform.localScale.y / 2, 0), -transform.up * transform.localScale.y);
+		//	//Ray groundRay = new Ray(rbody.position, -transform.up);
+		//	groundCheckData = m_characterMoveComponent.GroundCheck(groundRay);
+		//	while (!groundCheckData.isGrounded)//(rbody.position.y > 0)
+		//	{
+		//		rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
+		//		groundRay = new Ray(rbody.position + new Vector3(0, transform.localScale.y / 2, 0), -transform.up * transform.localScale.y);
+		//		//groundRay = new Ray(rbody.position, -transform.up);
+		//		groundCheckData = m_characterMoveComponent.GroundCheck(groundRay);
+		//		yield return new WaitForSeconds(Runner.DeltaTime);
+		//		//if (rbody.position.y < 0)
+		//		//{
+		//		//	rbody.position = new Vector3(rbody.position.x, startingHeight, rbody.position.z);
+		//		//	CanJump = true;
+		//		//	StopCoroutine(JumpCoroutineHandle);
+		//		//	JumpCoroutineHandle = null;
+		//		//}
+		//	}
+		//	SetCanJump(true);
 		StopCoroutine(JumpCoroutineHandle);
 		JumpCoroutineHandle = null;
-
 	}
 
 	//private void OnApplicationFocus(bool focus)
@@ -126,6 +136,21 @@ public class Character : NetworkBehaviour
 
 	public override void FixedUpdateNetwork()
 	{
+		if (Player && Player.InputEnabled)
+        {
+            if (!isAscending)
+            {
+				groundRay = new Ray(rbody.position + new Vector3(0, transform.localScale.y / 2, 0), -transform.up * transform.localScale.y);
+				groundCheckData = m_characterMoveComponent.GroundCheck(groundRay);
+				rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
+
+                if (groundCheckData.isGrounded)
+                {
+					SetIsJumping(false);
+				}
+			}
+        }
+
 		if (Player && Player.InputEnabled && GetInput(out InputData data))
 		{
 			m_directionVector = Vector3.zero;
@@ -140,10 +165,10 @@ public class Character : NetworkBehaviour
 			if (data.GetButton(ButtonFlag.BACKWARD))
 				m_directionVector -= m_headingTransform.forward;
 
-			Debug.DrawRay(transform.position, m_directionVector, Color.blue, 5);
+			//Debug.DrawRay(transform.position, m_directionVector, Color.blue, 5);
 			//Jump Update
-			if (data.GetButton(ButtonFlag.JUMP) && CanJump && JumpCoroutineHandle == null)
-            {
+			if (data.GetButton(ButtonFlag.JUMP) && !m_isJumping && JumpCoroutineHandle == null)
+			{
 				JumpCoroutineHandle = JumpCoroutine();
 				StartCoroutine(JumpCoroutineHandle);
 			}
@@ -152,17 +177,17 @@ public class Character : NetworkBehaviour
 			m_lookDirectionRight = m_lookRotation * Vector3.right;
 
 			//Wall Collision Detection
-			//m_slideOnObstacleData = m_characterMoveComponent.SlideOnObstacle(
-			//	ray: new Ray(m_headingTransform.position + (0) * (m_directionVector * (m_headingTransform.localScale.x / 2)) + m_headingTransform.up, m_directionVector),
-			//	rayDistance: 2 + Speed * Runner.DeltaTime,
-			//	directionVector: m_directionVector,
-			//	currentSpeed: Speed,
-			//	upVector: m_headingTransform.up
-			//);
-			//m_directionVector = m_slideOnObstacleData.directionVector;
-			//Speed = m_slideOnObstacleData.isHit ? m_slideOnObstacleData.finalSpeed : m_baseSpeed;
+			m_slideOnObstacleData = m_characterMoveComponent.SlideOnObstacle(
+				ray: new Ray(m_headingTransform.position + (0) * (m_directionVector * (m_headingTransform.localScale.x / 2)) + m_headingTransform.up, m_directionVector),
+				rayDistance: 1.1f + Speed * Runner.DeltaTime,
+				directionVector: m_directionVector,
+				currentSpeed: Speed,
+				upVector: m_headingTransform.up
+			);
+			m_directionVector = m_slideOnObstacleData.directionVector;
+			Speed = m_slideOnObstacleData.isHit ? m_slideOnObstacleData.finalSpeed : m_baseSpeed;
 
-			Speed = m_baseSpeed;
+			//Speed = m_baseSpeed;
 			rbody.position += Runner.DeltaTime * Speed * m_directionVector;
 
 			//Rotation			
@@ -181,9 +206,19 @@ public class Character : NetworkBehaviour
 	private float ClampAngle(float angle, float min, float max)
 	{
 		if (angle > -360f)
-         angle += 360f;
+			angle += 360f;
 		if (angle < 360f)
-         angle -= 360f;
+			angle -= 360f;
 		return Mathf.Clamp(angle, min, max);
 	}
+
+	//RPCs
+
+	//[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+	public void SetIsJumping(bool isJumping)
+	{
+		m_isJumping = isJumping;
+		rbody.position = new Vector3(rbody.position.x, groundCheckData.groundedYPos, rbody.position.z);
+	}
+
 }

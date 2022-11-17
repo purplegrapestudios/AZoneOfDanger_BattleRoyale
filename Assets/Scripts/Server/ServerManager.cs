@@ -20,8 +20,12 @@ public class ServerManager : MonoBehaviour
 		Instance = this;
 		_app = App.FindInstance();
 		InitCommandLineArguments();
-		Application.targetFrameRate = ServerConfigData.TargetFrameRate;
-		Debug.Log($"Setting TargetFrameRate: {Application.targetFrameRate}");
+
+		if (_app.IsBatchMode())
+		{
+			Application.targetFrameRate = ServerConfigData.TargetFrameRate;
+			Debug.Log($"Setting TargetFrameRate: {Application.targetFrameRate}");
+		}
 	}
 
 	private void InitCommandLineArguments()
