@@ -12,6 +12,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CharacterMoveComponent))]
 public class Character : NetworkBehaviour
 {
+	private App _app;
+	[SerializeField] private CharacterComponents m_components;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
 	[SerializeField] private Text _name;
 	[SerializeField] private MeshRenderer _mesh;
@@ -26,6 +28,12 @@ public class Character : NetworkBehaviour
 	[SerializeField] private float rotationX = 0f;
 	[SerializeField] private float rotationY = 0f;
 	[SerializeField] private float m_baseSpeed = 25f;
+	public bool m_inputForward { get; set; }
+	public bool m_inputBack { get; set; }
+	public bool m_inputRight { get; set; }
+	public bool m_inputLeft { get; set; }
+	public bool m_inputJump { get; set; }
+
 	[Networked] [SerializeField] private bool m_isJumping { get; set; }
 	[Networked] [SerializeField] private float Speed { get; set; }
 	[Networked] public Player Player { get; set; }
@@ -41,6 +49,11 @@ public class Character : NetworkBehaviour
 	//Data for Character Components
 	private SlideOnObstacleData m_slideOnObstacleData;
 
+	private void Awake()
+    {
+		_app = App.FindInstance();
+	}
+
 	public override void Spawned()
 	{
 		Cursor.lockState = CursorLockMode.Locked;
@@ -52,10 +65,14 @@ public class Character : NetworkBehaviour
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();
+			_app.Session.Map.SetSceneCameraActive(false);
+			m_components.Dolly.SetActive(true);
+			m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize();
+			m_characterMoveComponent.InitCharacterMovement();
 		}
 	}
 
-	public void LateUpdate()
+	public void SomeLateUpdate()
 	{
 		if (Object.HasInputAuthority)
 		{
@@ -136,42 +153,61 @@ public class Character : NetworkBehaviour
 
 	public override void FixedUpdateNetwork()
 	{
-		if (Player && Player.InputEnabled)
-        {
-            if (!isAscending)
-            {
-				groundRay = new Ray(rbody.position + new Vector3(0, transform.localScale.y / 2, 0), -transform.up * transform.localScale.y);
-				groundCheckData = m_characterMoveComponent.GroundCheck(groundRay);
-				rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
-
-                if (groundCheckData.isGrounded)
-                {
-					SetIsJumping(false);
-				}
-			}
-        }
+		//if (Player && Player.InputEnabled)
+		//{
+		//    if (!isAscending)
+		//    {
+		//		groundRay = new Ray(rbody.position + new Vector3(0, transform.localScale.y / 2, 0), -transform.up * transform.localScale.y);
+		//		groundCheckData = m_characterMoveComponent.GroundCheck(groundRay);
+		//		rbody.position -= Runner.DeltaTime * 20f * m_headingTransform.up;
+		//
+		//        if (groundCheckData.isGrounded)
+		//        {
+		//			SetIsJumping(false);
+		//		}
+		//	}
+		//}
 
 		if (Player && Player.InputEnabled && GetInput(out InputData data))
 		{
 			m_directionVector = Vector3.zero;
 
 			//Input Update
+			m_inputLeft = m_inputRight = m_inputBack = m_inputForward = false;
+
 			if (data.GetButton(ButtonFlag.LEFT))
+			{
+				m_inputLeft = true;
 				m_directionVector -= m_headingTransform.right;
-			if (data.GetButton(ButtonFlag.RIGHT))
+			}
+			else if (data.GetButton(ButtonFlag.RIGHT))
+			{
+				m_inputRight = true;
 				m_directionVector += m_headingTransform.right;
+			}
 			if (data.GetButton(ButtonFlag.FORWARD))
+			{
+				m_inputForward = true;
 				m_directionVector += m_headingTransform.forward;
-			if (data.GetButton(ButtonFlag.BACKWARD))
+			}
+			else if (data.GetButton(ButtonFlag.BACKWARD))
+			{
+				m_inputBack = true;
 				m_directionVector -= m_headingTransform.forward;
+			}
+
 
 			//Debug.DrawRay(transform.position, m_directionVector, Color.blue, 5);
 			//Jump Update
-			if (data.GetButton(ButtonFlag.JUMP) && !m_isJumping && JumpCoroutineHandle == null)
+			if (data.GetButton(ButtonFlag.JUMP))
 			{
-				JumpCoroutineHandle = JumpCoroutine();
-				StartCoroutine(JumpCoroutineHandle);
+				m_inputJump = true;
 			}
+            else
+            {
+				m_inputJump = false;
+			}
+			return;
 
 			m_lookDirectionForward = m_lookRotation * Vector3.forward;
 			m_lookDirectionRight = m_lookRotation * Vector3.right;
@@ -201,6 +237,11 @@ public class Character : NetworkBehaviour
 			return;
 		}
 
+	}
+
+	public Vector2 GetAimDirection()
+    {
+		return m_aimDirection;
 	}
 
 	private float ClampAngle(float angle, float min, float max)
