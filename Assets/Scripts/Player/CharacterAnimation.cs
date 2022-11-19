@@ -55,9 +55,9 @@ public class CharacterAnimation : NetworkBehaviour {
     private bool isInitialized;
 
     //Networked Variables used for Character Animation
-    [Networked] public Vector3 NetworkedVelocity { get; set; }
-    [Networked] public bool NetworkedFloorDetected { get; set; }
-    [Networked] public float NetworkedAimDirectionY { get; set; }
+    //[Networked] public Vector3 NetworkedVelocity { get; set; }
+    //[Networked] public bool NetworkedFloorDetected { get; set; }
+    //[Networked] public float NetworkedAimDirectionY { get; set; }
 
     public void Initialize () {
 
@@ -86,20 +86,20 @@ public class CharacterAnimation : NetworkBehaviour {
     bool __isFiringBullet;
     bool __isAiming;
 
-    private void Update () {
-
+    public override void FixedUpdateNetwork()
+    {
         if (!isInitialized) return;
         //if (!Object.HasInputAuthority) return;
-        
+
 
         //Animation Behavior of Our Controlled Character
-        AnimationBehavior_OurPlayer(isPlayerAlive: true);
+        //NetworkedAimDirectionY = m_characterCamera.NetworkedRotationY / 80f;
+        //AnimationBehavior_OurPlayer(isPlayerAlive: true);
         __isFiringBullet = false;
         __isAiming = false;
 
-        NetworkedVelocity = m_characterMoveComponent.m_moveData.V_PlayerVelocity;
-        NetworkedFloorDetected = m_characterMoveComponent.m_moveData.V_IsFloorDetected;
-        NetworkedAimDirectionY = m_characterMoveComponent.m_moveData.V_AimDirection.y;
+        //NetworkedVelocity = m_characterMoveComponent.m_moveData.V_PlayerVelocity;
+        //NetworkedFloorDetected = m_characterMoveComponent.m_moveData.V_IsFloorDetected;
         //if (PhotonView.isMine)
         //{
         //    if (PlayerMovement.MovementType.Equals(MovementType.Player))
@@ -117,15 +117,18 @@ public class CharacterAnimation : NetworkBehaviour {
     }
 
 
-    /// <summary>
-    /// 1ST Person Animation
-    /// </summary>
+    public override void Render()
+    {
+        AnimationBehavior_OurPlayer(isPlayerAlive: true);
+    }
+
+
     private void AnimationBehavior_OurPlayer(bool isPlayerAlive)
     {
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat_3rdPersonAimAngle(m_characterCamera.GetCameraRotationY()/ 80);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
+            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 80f);
 
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
@@ -207,7 +210,7 @@ public class CharacterAnimation : NetworkBehaviour {
 
 
             //MOVEMENT (WHOLE BODY)
-            if (NetworkedFloorDetected)
+            if (m_characterMoveComponent.NetworkedFloorDetected)
             {
                 //JUMP
                 if (AnimLocal_BOOL_Jump != false)
@@ -216,7 +219,7 @@ public class CharacterAnimation : NetworkBehaviour {
                     SetStateBool_3rdPersonJump(AnimLocal_BOOL_Jump);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
                 }
 
-                if (NetworkedVelocity.magnitude > 15)
+                if (m_characterMoveComponent.NetworkedVelocity.magnitude > 15)
                 {
                     //RUNNING LOWER BODY
                     if (AnimLocal_INT_LowerBody != 1)
@@ -233,7 +236,7 @@ public class CharacterAnimation : NetworkBehaviour {
                         SetStateInt_3rdPersonUpperBody(AnimLocal_INT_UpperBody);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
                     }
                 }
-                else if (NetworkedVelocity.magnitude <= 15 && NetworkedVelocity.magnitude > 0)
+                else if (m_characterMoveComponent.NetworkedVelocity.magnitude <= 15 && m_characterMoveComponent.NetworkedVelocity.magnitude > 0)
                 {
                     //WALKING LOWER BODY
                     if (AnimLocal_INT_LowerBody != 1)
@@ -287,7 +290,7 @@ public class CharacterAnimation : NetworkBehaviour {
                 AnimLocal_BOOL_Death = true;
                 SetStateBool_3rdPersonDeath(AnimLocal_BOOL_Death);
 
-                SetStateFloat_3rdPersonAimAngle(0);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
+                //SetStateFloat_3rdPersonAimAngle(0);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
             }
 
         }
@@ -325,7 +328,9 @@ public class CharacterAnimation : NetworkBehaviour {
     private void SetStateFloat_3rdPersonAimAngle(float val)
     {
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
+        {
             Animator_3rdPerson.SetFloat(Param_3rdPerson_AimAngle, val);
+        }
     }
 
     private void SetStateInt_1stPersonArms(int val)

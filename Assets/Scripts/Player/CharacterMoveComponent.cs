@@ -55,6 +55,10 @@ public class CharacterMoveComponent : NetworkBehaviour
     private CharacterAnimation PlayerAnimation;
     private Character m_character;
     private bool m_initialized;
+
+    [Networked] [SerializeField] public bool NetworkedFloorDetected { get; set; }
+    [Networked] [SerializeField] public Vector3 NetworkedVelocity { get; set; }
+
     /// <summary>
     /// //////
     /// </summary>
@@ -63,6 +67,9 @@ public class CharacterMoveComponent : NetworkBehaviour
     {
         m_character = GetComponent<Character>();
         Rigidbody = GetComponent<Rigidbody>();
+        Rigidbody.velocity = Vector3.zero;
+        Rigidbody.angularVelocity = Vector3.zero;
+
         Transform = GetComponent<Transform>();
         PlayerObjectComponents = GetComponent<CharacterComponents>();
         MainCameraTransform = PlayerObjectComponents.PlayerCamera.transform;
@@ -114,6 +121,15 @@ public class CharacterMoveComponent : NetworkBehaviour
 
         OnLimitSpeed();
 
+        //Used for animation
+        UpdateNetworkedVariables();
+    }
+
+    private void UpdateNetworkedVariables()
+    {
+        //Used for animation
+        NetworkedFloorDetected = m_moveData.V_IsFloorDetected;
+        NetworkedVelocity = m_moveData.V_PlayerVelocity;
     }
 
     public override void FixedUpdateNetwork()
@@ -472,7 +488,6 @@ public class CharacterMoveComponent : NetworkBehaviour
         //SingleJump
         if (m_moveData.V_WishJump && !m_moveData.V_IsHitCeiling)
         {
-            Debug.Log("Jump");
             m_moveData.V_IsJumping = true;
             m_moveData.V_PlayerVelocity.y = m_moveData.P_JumpSpeed;
             m_moveData.V_IsDoubleJumping = false;

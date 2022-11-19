@@ -100,10 +100,10 @@ public class Character : NetworkBehaviour
 
 		m_characterMoveComponent.InitCharacterMovement();
 		m_characterAnimation.Initialize();
+		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();
-			m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 		}
 	}
 
