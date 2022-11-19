@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 44505921}
   m_Layer: 0
   m_Name: Cube (24)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1492,7 +1492,7 @@ GameObject:
   - component: {fileID: 230420832}
   m_Layer: 0
   m_Name: Cube (10)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -2160,7 +2160,7 @@ GameObject:
   - component: {fileID: 358746376}
   m_Layer: 0
   m_Name: Cube (20)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -2548,7 +2548,7 @@ GameObject:
   - component: {fileID: 457669377}
   m_Layer: 0
   m_Name: Cube (12)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -3326,7 +3326,7 @@ GameObject:
   - component: {fileID: 594719959}
   m_Layer: 0
   m_Name: Cube (9)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -4576,7 +4576,7 @@ GameObject:
   - component: {fileID: 799441200}
   m_Layer: 0
   m_Name: Cube (21)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -5161,7 +5161,7 @@ GameObject:
   - component: {fileID: 870551031}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -5558,7 +5558,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &967406333
 Transform:
   m_ObjectHideFlags: 0
@@ -8141,6 +8141,103 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299448832}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1312377449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1312377450}
+  - component: {fileID: 1312377453}
+  - component: {fileID: 1312377452}
+  - component: {fileID: 1312377451}
+  m_Layer: 0
+  m_Name: Cube (34)
+  m_TagString: Level
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &1312377450
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312377449}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -110, y: 7, z: 0}
+  m_LocalScale: {x: 50, y: 10, z: 50}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1498305371}
+  m_RootOrder: 35
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1312377451
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312377449}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1312377452
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312377449}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 4294967295
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 0e0f83bf33510c942ab629867e3276c0, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1312377453
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312377449}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1313897218
 GameObject:
   m_ObjectHideFlags: 0
@@ -8356,7 +8453,7 @@ GameObject:
   - component: {fileID: 1370988269}
   m_Layer: 0
   m_Name: Cube (23)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -8550,7 +8647,7 @@ GameObject:
   - component: {fileID: 1413434129}
   m_Layer: 0
   m_Name: Cube (13)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -8647,7 +8744,7 @@ GameObject:
   - component: {fileID: 1445513239}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Level
+  m_TagString: BouncePad
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -8700,7 +8797,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0e0f83bf33510c942ab629867e3276c0, type: 2}
+  - {fileID: 2100000, guid: 6eced3233a3c9214fae96062cec072e0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8939,7 +9036,7 @@ GameObject:
   - component: {fileID: 1491318326}
   m_Layer: 0
   m_Name: Cube (6)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -9085,6 +9182,7 @@ Transform:
   - {fileID: 953176151}
   - {fileID: 1379396567}
   - {fileID: 130695059}
+  - {fileID: 1312377450}
   m_Father: {fileID: 1701811990}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9820,7 +9918,7 @@ GameObject:
   - component: {fileID: 1717594196}
   m_Layer: 0
   m_Name: Cube (14)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -10250,7 +10348,7 @@ GameObject:
   - component: {fileID: 1761359597}
   m_Layer: 0
   m_Name: Cube (11)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -10347,7 +10445,7 @@ GameObject:
   - component: {fileID: 1771361405}
   m_Layer: 0
   m_Name: Cube (16)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -10861,7 +10959,7 @@ GameObject:
   - component: {fileID: 1824250581}
   m_Layer: 0
   m_Name: Cube (17)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -10958,7 +11056,7 @@ GameObject:
   - component: {fileID: 1840504701}
   m_Layer: 0
   m_Name: Cube (15)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -12261,7 +12359,7 @@ GameObject:
   - component: {fileID: 2005895935}
   m_Layer: 0
   m_Name: Cube (18)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -12358,7 +12456,7 @@ GameObject:
   - component: {fileID: 2017668711}
   m_Layer: 0
   m_Name: Cube (4)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -12553,7 +12651,7 @@ GameObject:
   - component: {fileID: 2026868105}
   m_Layer: 0
   m_Name: Cube (19)
-  m_TagString: BouncePad
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

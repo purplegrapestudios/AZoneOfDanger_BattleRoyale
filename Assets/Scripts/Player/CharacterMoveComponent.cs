@@ -77,7 +77,6 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     [SerializeField] private float kDamper = .95f;
     [SerializeField] private Vector3 m_directionVector;
-
     private Vector3 CrossResult;
     private float DotResult;
     private Vector3 CorrectedDirection;
@@ -97,7 +96,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         OnRotate();                 // 1) Rotate Player along Y Axis
 
         OnCollisionWall(2.5f);      // 2) Detect Collision Against Wall
-        OnGroundCheck(2.1f);        // 3) Detect Collision Against Ground
+        OnGroundCheck(2.5f);        // 3) Detect Collision Against Ground
         OnCeilingCheck();           // 4) Detect Collision Against Ceiling
         OnQueueJump();              // 5) Check Jump Input
 
@@ -126,7 +125,8 @@ public class CharacterMoveComponent : NetworkBehaviour
             UpdateMovement(data);
             Rigidbody.velocity = Vector3.zero;
             Rigidbody.angularVelocity = Vector3.zero;
-            Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * Time.fixedDeltaTime);
+            Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * m_character.Runner.DeltaTime);// Time.fixedDeltaTime);
+            m_moveData.V_AimDirection = data.aimDirection;
         }
     }
 
@@ -359,7 +359,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         if (m_moveData.V_IsGrounded)
         {
             control = speed < m_moveData.P_RunDeacceleration ? m_moveData.P_RunDeacceleration : speed;
-            drop = control * m_moveData.P_Friction * Time.deltaTime * t;
+            drop = control * m_moveData.P_Friction * m_character.Runner.DeltaTime * t;// Time.deltaTime * t;
         }
 
         newspeed = speed - drop;
@@ -390,7 +390,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         addspeed = wishspeed - currentspeed;
         if (addspeed <= 0)
             return;
-        accelspeed = accel * Time.deltaTime * wishspeed;
+        accelspeed = accel * m_character.Runner.DeltaTime * wishspeed;// Time.deltaTime * wishspeed;
         if (accelspeed > addspeed)
             accelspeed = addspeed;
 
@@ -526,7 +526,7 @@ public class CharacterMoveComponent : NetworkBehaviour
             OnAirControl(wishdir, wishspeed2);
         }
         // Apply gravity
-        m_moveData.V_PlayerVelocity.y -= m_moveData.P_Gravity * Time.deltaTime;
+        m_moveData.V_PlayerVelocity.y -= m_moveData.P_Gravity * m_character.Runner.DeltaTime;// Time.deltaTime;
     }
 
     // Updates PlayerVelocity based on AirControl Parameter Values
@@ -549,7 +549,7 @@ public class CharacterMoveComponent : NetworkBehaviour
 
         dot = Vector3.Dot(m_moveData.V_PlayerVelocity, wishdir);
         k = 32;
-        k *= m_moveData.P_AirControl * dot * dot * Time.deltaTime;
+        k *= m_moveData.P_AirControl * dot * dot * m_character.Runner.DeltaTime;// Time.deltaTime;
 
         // Change direction while slowing down
         if (dot > 0)

@@ -54,6 +54,11 @@ public class CharacterAnimation : NetworkBehaviour {
     private PlayerCameraView originalPlayerCamerView;
     private bool isInitialized;
 
+    //Networked Variables used for Character Animation
+    [Networked] public Vector3 NetworkedVelocity { get; set; }
+    [Networked] public bool NetworkedFloorDetected { get; set; }
+    [Networked] public float NetworkedAimDirectionY { get; set; }
+
     public void Initialize () {
 
         //NetworkPlayerMovement = GetComponent<NetworkPlayerMovement>();
@@ -91,6 +96,10 @@ public class CharacterAnimation : NetworkBehaviour {
         AnimationBehavior_OurPlayer(isPlayerAlive: true);
         __isFiringBullet = false;
         __isAiming = false;
+
+        NetworkedVelocity = m_characterMoveComponent.m_moveData.V_PlayerVelocity;
+        NetworkedFloorDetected = m_characterMoveComponent.m_moveData.V_IsFloorDetected;
+        NetworkedAimDirectionY = m_characterMoveComponent.m_moveData.V_AimDirection.y;
         //if (PhotonView.isMine)
         //{
         //    if (PlayerMovement.MovementType.Equals(MovementType.Player))
@@ -116,7 +125,7 @@ public class CharacterAnimation : NetworkBehaviour {
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat_3rdPersonAimAngle(m_characterCamera.GetCameraRotationY() / 90);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
+            SetStateFloat_3rdPersonAimAngle(m_characterCamera.GetCameraRotationY()/ 80);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
 
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
@@ -198,7 +207,7 @@ public class CharacterAnimation : NetworkBehaviour {
 
 
             //MOVEMENT (WHOLE BODY)
-            if (m_characterMoveComponent.m_moveData.V_IsFloorDetected)
+            if (NetworkedFloorDetected)
             {
                 //JUMP
                 if (AnimLocal_BOOL_Jump != false)
@@ -207,7 +216,7 @@ public class CharacterAnimation : NetworkBehaviour {
                     SetStateBool_3rdPersonJump(AnimLocal_BOOL_Jump);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
                 }
 
-                if (m_characterMoveComponent.m_moveData.V_PlayerVelocity.magnitude > 15)
+                if (NetworkedVelocity.magnitude > 15)
                 {
                     //RUNNING LOWER BODY
                     if (AnimLocal_INT_LowerBody != 1)
@@ -224,7 +233,7 @@ public class CharacterAnimation : NetworkBehaviour {
                         SetStateInt_3rdPersonUpperBody(AnimLocal_INT_UpperBody);    ///TO SHOW THE ANIMATION (OPTIONAL - FOR DEBUGGING)
                     }
                 }
-                else if (m_characterMoveComponent.m_moveData.V_PlayerVelocity.magnitude <= 15 && m_characterMoveComponent.m_moveData.V_PlayerVelocity.magnitude > 0)
+                else if (NetworkedVelocity.magnitude <= 15 && NetworkedVelocity.magnitude > 0)
                 {
                     //WALKING LOWER BODY
                     if (AnimLocal_INT_LowerBody != 1)

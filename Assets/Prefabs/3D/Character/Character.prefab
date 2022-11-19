@@ -80,7 +80,7 @@ MonoBehaviour:
   m_characterCam: {fileID: 4311980989418865909}
   minDistance: 0
   maxDistance: 1
-  smooth: 100
+  smooth: 40
   modZPos: 0
   modYPos: 0
   modXPos: 0
@@ -1453,11 +1453,11 @@ MonoBehaviour:
     P_AirAcceleration: 60
     P_AirDeacceleration: 60
     P_AirControl: 0
-    P_JumpAttempts: 2
+    P_JumpAttempts: 1
     P_DoubleJumpDeltaTime: 0.25
     P_Friction: 100
-    P_Gravity: 120
-    P_JumpSpeed: 25
+    P_Gravity: 50
+    P_JumpSpeed: 30
     P_MaxSpeed: 40
     P_MoveScale: 40
     P_MoveSpeed: 20
@@ -1487,6 +1487,8 @@ MonoBehaviour:
     V_PlayerFriction: -71.146805
     V_PlayerVelocity: {x: 0, y: 0, z: 0}
     V_WishJump: 0
+    V_AimDirection: {x: 0, y: 0}
+    V_AimRotation: {x: 0, y: 0}
     V_RaycastFloorType: -1
     V_SpeedReduction: {x: 0, y: 0, z: 0}
     V_GroundHitTransform: {fileID: 0}
@@ -1533,6 +1535,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   playerCameraView: 1
+  _NetworkedVelocity: {x: 0, y: 0, z: 0}
+  _NetworkedFloorDetected: 0
+  _NetworkedAimDirectionY: 0
 --- !u!1 &4610285446266597330
 GameObject:
   m_ObjectHideFlags: 0
@@ -2595,15 +2600,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46820a92aaa2fe7439f6dbd3e3bdf827, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_character: {fileID: 4610285444781331942}
+  m_character: {fileID: 0}
+  m_characterMoveComponent: {fileID: 0}
   axes: 2
   invertY: 0
   sensitivityX: 10
   sensitivityY: 10
   minimumX: -180
   maximumX: 180
-  minimumY: -90
-  maximumY: 90
+  minimumY: -80
+  maximumY: 80
   rotationX: 0
   rotationY: 0
   framesOfSmoothing: 2
