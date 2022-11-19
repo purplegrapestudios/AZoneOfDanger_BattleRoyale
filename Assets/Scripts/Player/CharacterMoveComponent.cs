@@ -137,7 +137,7 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     private void OnRotate()
     {
-        m_moveData.V_RotationY += Input.GetAxis(kLabelMouseX) * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
+        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale; //Input.GetAxis(kLabelMouseX) * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
         Transform.rotation = Quaternion.Euler(0, m_moveData.V_RotationY, 0); // 1) Rotates the collider
     }
 
@@ -309,12 +309,12 @@ public class CharacterMoveComponent : NetworkBehaviour
 
         if (m_character.m_inputForward.Equals(true))
         {
-            Debug.Log($"MoveCmd Forward: {m_moveData.moveCmd.ForwardMove}");
+            //Debug.Log($"MoveCmd Forward: {m_moveData.moveCmd.ForwardMove}, {m_moveData.V_PlayerVelocity}");
             m_moveData.moveCmd.ForwardMove = 1;
         }
         else if (m_character.m_inputBack.Equals(true))
         {
-            Debug.Log($"MoveCmd Forward: {m_moveData.moveCmd.ForwardMove}");
+            //Debug.Log($"MoveCmd Forward: {m_moveData.moveCmd.ForwardMove}, {m_moveData.V_PlayerVelocity}");
             m_moveData.moveCmd.ForwardMove = -1;
         }
         else
@@ -323,12 +323,12 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
         if (m_character.m_inputLeft.Equals(true))
         {
-            Debug.Log($"MoveCmd Right: {m_moveData.moveCmd.RightMove}");
+            //Debug.Log($"MoveCmd Right: {m_moveData.moveCmd.RightMove}, {m_moveData.V_PlayerVelocity}");
             m_moveData.moveCmd.RightMove = -1;
         }
         else if (m_character.m_inputRight.Equals(true))
         {
-            Debug.Log($"MoveCmd Right: {m_moveData.moveCmd.RightMove}");
+            //Debug.Log($"MoveCmd Right: {m_moveData.moveCmd.RightMove}, {m_moveData.V_PlayerVelocity}");
             m_moveData.moveCmd.RightMove = 1;
         }
         else
@@ -472,6 +472,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         //SingleJump
         if (m_moveData.V_WishJump && !m_moveData.V_IsHitCeiling)
         {
+            Debug.Log("Jump");
             m_moveData.V_IsJumping = true;
             m_moveData.V_PlayerVelocity.y = m_moveData.P_JumpSpeed;
             m_moveData.V_IsDoubleJumping = false;

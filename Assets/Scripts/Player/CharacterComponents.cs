@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CharacterComponents : MonoBehaviour
 {
+    public Transform CameraContainerTransform;
     public GameObject Dolly;
     public GameObject PlayerCamera;
     public GameObject DeathCamera;
@@ -16,5 +17,12 @@ public class CharacterComponents : MonoBehaviour
 
     //public PlayerShooting playerShooting;
     public Animator animator1, animator3;
+
+    private void Awake()
+    {
+        //Dolly = FindObjectOfType<CharacterCameraDolly>().gameObject;
+        //PlayerCamera = FindObjectOfType<CharacterCamera>().gameObject;
+        //CameraContainerTransform = Dolly.transform.parent;
+    }
 
 }

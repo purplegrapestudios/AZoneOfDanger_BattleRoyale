@@ -29,7 +29,7 @@ public class CharacterCameraDolly : MonoBehaviour
     [SerializeField] private bool hitLevel;
     private bool m_initailized;
 
-    public void Initialize()
+    public void Initialize(Character character)
     {
         tr = GetComponent<Transform>();
         m_cameraTr = m_characterCam.transform;
@@ -43,11 +43,13 @@ public class CharacterCameraDolly : MonoBehaviour
         
         m_initailized = true;
 
-        m_characterCam.Initialize();
+        m_characterCam.Initialize(character);
     }
 
     private void LateUpdate()
     {
+        if (!m_initailized) return;
+
         if (hitLevel)
         {
             modZPos = (maxDistance - .5f);
@@ -78,6 +80,7 @@ public class CharacterCameraDolly : MonoBehaviour
         m_cameraTr.localPosition = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, 0.75f - tr.localPosition.y - modYPos, modZPos), Time.deltaTime * smooth);
 
         desiredCameraPos = tr.parent.TransformPoint(dollyDir * maxDistance * 2);
+        Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
         if (Physics.Linecast(tr.parent.position, desiredCameraPos, out hit))
         {
             hitLevel = true;
@@ -101,4 +104,8 @@ public class CharacterCameraDolly : MonoBehaviour
         tr.localPosition = dollyDir * distance;
     }
 
+    public void UpdatePlayerPosition(Vector3 playerPos)
+    {
+        dollyDir = playerPos;
+    }
 }

@@ -5,11 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Level
+  - Head
+  - BouncePad
+  - SpeedRamp
+  - Camera
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - 

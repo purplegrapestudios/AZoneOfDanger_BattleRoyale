@@ -6,7 +6,7 @@ public enum RotationAxes { MouseX = 1, MouseY = 2 }
 
 public class CharacterCamera : MonoBehaviour
 {
-    [SerializeField] Character m_character;
+    [SerializeField] private Character m_character;
 
     public RotationAxes axes = RotationAxes.MouseX;
     public bool invertY = false;
@@ -20,8 +20,8 @@ public class CharacterCamera : MonoBehaviour
     public float minimumY = -80F;
     public float maximumY = 80F;
 
-    float rotationX = 0F;
-    float rotationY = 0F;
+    [SerializeField] private float rotationX = 0F;
+    [SerializeField] private float rotationY = 0F;
 
     private List<float> rotArrayX = new List<float>();
     float rotAverageX = 0F;
@@ -34,10 +34,14 @@ public class CharacterCamera : MonoBehaviour
     Quaternion originalRotation;
 
     private bool m_initialized;
-    public void Initialize()
+
+    public void Initialize(Character character)
     {
+        GetComponent<Camera>().enabled = true;
+        GetComponent<AudioListener>().enabled = true;
         originalRotation = transform.localRotation;
         m_initialized = true;
+        m_character = character;
     }
 
     private void LateUpdate()

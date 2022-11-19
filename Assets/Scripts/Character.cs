@@ -15,6 +15,7 @@ public class Character : NetworkBehaviour
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
+	[SerializeField] private CharacterAnimation m_characterAnimation;
 	[SerializeField] private Text _name;
 	[SerializeField] private MeshRenderer _mesh;
 	[SerializeField] private Transform m_headingTransform;
@@ -62,27 +63,63 @@ public class Character : NetworkBehaviour
 		SetIsJumping(true);
 		m_slideOnObstacleData = new SlideOnObstacleData(Vector3.zero, 0f, false);
 
+        //if (_app == null) { 
+		//	Debug.Log("There IS NO _app");
+        //}
+        //else
+        //{
+		//	Debug.Log("There IS _app");
+		//	if (_app.Session == null)
+		//	{
+		//		Debug.Log("There IS NO Session");
+		//	}
+		//	else
+		//	{
+		//		Debug.Log("There IS Session");
+		//		if (_app.Session.Map == null)
+		//		{
+		//			Debug.Log("There IS NO MAP");
+		//		}
+		//		else
+		//		{
+		//			Debug.Log("There IS MAP");
+		//			if (_app.Session.Map.m_sceneCamera == null)
+		//			{
+		//				Debug.Log("There IS NO Scene Camera");
+		//			}
+		//			else
+		//			{
+		//				Debug.Log("There IS Scene Camera");
+		//				_app.Session.Map.SetSceneCameraActive(false);
+		//			}
+		//		}
+		//	}
+		//}
+
+		SceneCamera.instance.SetSceneCameraActive(false);
+
+		m_characterMoveComponent.InitCharacterMovement();
+		m_characterAnimation.Initialize();
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();
-			_app.Session.Map.SetSceneCameraActive(false);
-			m_components.Dolly.SetActive(true);
-			m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize();
-			m_characterMoveComponent.InitCharacterMovement();
+			m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 		}
 	}
 
-	public void SomeLateUpdate()
+	public void LateUpdate()
 	{
 		if (Object.HasInputAuthority)
 		{
-			if (_camera == null)
-				_camera = Camera.main.transform;
+			//if (_camera == null)
+			//	_camera = Camera.main.transform;
 			Transform t = _mesh.transform;
 			Vector3 p = t.position;
-			_camera.position = p - 10 * t.forward + 5 * Vector3.up;
-			_camera.LookAt(p + 2 * Vector3.up);
-
+			//_camera.position = p - 10 * t.forward + 5 * Vector3.up;
+			//_camera.LookAt(p + 2 * Vector3.up);
+			//m_components.Dolly.GetComponent<CharacterCameraDolly>().UpdatePlayerPosition(t.localPosition.normalized);
+			//m_components.CameraContainerTransform.position = p - transform.forward * 4 + transform.up * 2 + transform.right * 2f;
+			//m_components.CameraContainerTransform.LookAt(p + 2 * transform.up + transform.forward);
 		}
 
 		// This is a little brute-force, but it gets the job done.
@@ -99,6 +136,21 @@ public class Character : NetworkBehaviour
 			Cursor.lockState = Cursor.lockState == CursorLockMode.None ? CursorLockMode.Locked : CursorLockMode.None;
 			Cursor.visible = Cursor.visible ? false : true;
 		}
+
+		//if (Input.GetKeyDown(KeyCode.Return))
+		//{
+		//	UnityEditor.EditorApplication.isPaused = !UnityEditor.EditorApplication.isPaused;
+        //    if (UnityEditor.EditorApplication.isPaused)
+        //    {
+		//		Cursor.lockState = CursorLockMode.None;
+		//		Cursor.visible = true;
+		//	}
+		//	else
+        //    {
+		//		Cursor.lockState = CursorLockMode.Locked;
+		//		Cursor.visible = false;
+		//	}
+		//}
 
 	}
 
@@ -207,6 +259,7 @@ public class Character : NetworkBehaviour
             {
 				m_inputJump = false;
 			}
+			m_aimDirection = data.aimDirection;
 			return;
 
 			m_lookDirectionForward = m_lookRotation * Vector3.forward;
@@ -227,7 +280,6 @@ public class Character : NetworkBehaviour
 			rbody.position += Runner.DeltaTime * Speed * m_directionVector;
 
 			//Rotation			
-			m_aimDirection = data.aimDirection;
 			//rotationY = ClampAngle(m_aimDirection.y, minimumY, maximumY);		//Don't need for now. But will need later for say head movement up and down.
 			Quaternion xQuaternion = Quaternion.AngleAxis(m_aimDirection.x, Vector3.up);
 			//Quaternion yQuaternion = Quaternion.AngleAxis(rotationY, -Vector3.right);	//Don't need for now. But will need later for say head movement up and down.
