@@ -10,7 +10,7 @@ public class Map : SimulationBehaviour, ISpawned
 {
 	[SerializeField] private Text _countdownMessage;
 	[SerializeField] private Transform[] _spawnPoints;
-	[SerializeField] private Camera m_sceneCamera;
+	[SerializeField] public Camera m_sceneCamera;
 	private bool _sendMapLoadedMessage;
 	private App _app;
 
@@ -82,9 +82,17 @@ public class Map : SimulationBehaviour, ISpawned
 	}
 
 	public void SetSceneCameraActive(bool val)
-    {
-		m_sceneCamera.GetComponent<AudioListener>().enabled = val;
-		m_sceneCamera.enabled = val;
-		m_sceneCamera.gameObject.SetActive(val);
+	{
+		if (m_sceneCamera == null)
+        {
+			Debug.Log("Scene Camera is NULL!");
+        }
+        else
+        {
+			Debug.Log("There IS a scene camera");
+			m_sceneCamera.GetComponent<AudioListener>().enabled = val;
+			m_sceneCamera.enabled = val;
+			m_sceneCamera.gameObject.SetActive(val);
+		}
     }
 }
