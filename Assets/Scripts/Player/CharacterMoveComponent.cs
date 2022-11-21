@@ -103,7 +103,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         OnRotate();                 // 1) Rotate Player along Y Axis
 
         OnCollisionWall(2.5f);      // 2) Detect Collision Against Wall
-        OnGroundCheck(2.5f);        // 3) Detect Collision Against Ground
+        OnGroundCheck(transform.localScale.y + .01f);        // 3) Detect Collision Against Ground
         OnCeilingCheck();           // 4) Detect Collision Against Ceiling
         OnQueueJump();              // 5) Check Jump Input
 
