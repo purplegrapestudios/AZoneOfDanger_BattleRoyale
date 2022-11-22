@@ -116,7 +116,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
         else if (!m_moveData.V_IsGrounded)
         {
-            OnAirMove(data);
+            OnAirMove(data, m_moveData.V_WishDirectionCollision);
         }
 
         OnLimitSpeed();
@@ -131,6 +131,11 @@ public class CharacterMoveComponent : NetworkBehaviour
         NetworkedFloorDetected = m_moveData.V_IsFloorDetected;
         NetworkedVelocity = m_moveData.V_PlayerVelocity;
     }
+
+    //private void LateUpdate()
+    //{
+    //    OnRotate();                 // 1) Rotate Player along Y Axis
+    //}
 
     public override void FixedUpdateNetwork()
     {
@@ -160,6 +165,8 @@ public class CharacterMoveComponent : NetworkBehaviour
     private void OnCollisionWall(float dist) {
         m_moveData.V_Ray_Velocity = new Ray(Transform.position, m_moveData.V_PlayerVelocity);
 
+        m_moveData.V_WishDirectionCollision = Vector3.zero;
+
         if (Physics.RaycastNonAlloc(m_moveData.V_Ray_Velocity, m_moveData.V_WallHits, dist, RayCastLayersToHit) > 0)
         {
             foreach (RaycastHit collisionHit in m_moveData.V_WallHits)
@@ -181,6 +188,7 @@ public class CharacterMoveComponent : NetworkBehaviour
                     //We are not Modifying the Rotation here, rather the m_directionVector is used to Calculate Movement Direction. So player would move sideways along wall, if he ran into it.
                     //Using state.DirectionVector here, will change and synchronize the values across the network. But we do NOT want it to change in this situation.
                     m_moveData.V_PlayerVelocity = CorrectedDirection.normalized;
+                    m_moveData.V_WishDirectionCollision = m_moveData.V_PlayerVelocity.normalized;
 
                     float speedDotResult = Vector3.Dot(transform.forward, m_moveData.V_WallHits[0].normal);
                     m_moveData.V_PlayerVelocity = speedDotResult < 0 ? m_moveData.V_PlayerVelocity *= 1 + speedDotResult : m_moveData.V_PlayerVelocity;
@@ -498,7 +506,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
     }
 
-    private void OnAirMove(InputData data)
+    private void OnAirMove(InputData data, Vector3 collisionWishDir)
     {
         Vector3 wishdir;
         float wishvel = m_moveData.P_AirAcceleration;
@@ -512,6 +520,8 @@ public class CharacterMoveComponent : NetworkBehaviour
         OnSetMovementDir(data);
 
         wishdir = new Vector3(m_moveData.moveCmd.RightMove, 0, m_moveData.moveCmd.ForwardMove);
+
+        wishdir = collisionWishDir != Vector3.zero ? collisionWishDir : wishdir;
         wishdir = Transform.TransformDirection(wishdir);
 
         float wishspeed = wishdir.magnitude;

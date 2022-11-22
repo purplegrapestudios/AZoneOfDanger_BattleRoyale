@@ -8,11 +8,12 @@ public class CharacterCamera : NetworkBehaviour
 {
     [SerializeField] private Character m_character;
     private CharacterMoveComponent m_characterMoveComponent;
-    public CameraRotationData CamRotationData;
+    private Camera m_camera;
 
     public RotationAxes axes = RotationAxes.MouseX;
     public bool invertY = false;
 
+    public float FieldOfView => m_camera.fieldOfView;
     public float sensitivityX = 10F;
     public float sensitivityY = 10F;
 
@@ -36,7 +37,8 @@ public class CharacterCamera : NetworkBehaviour
     Quaternion originalRotation;
 
     private bool m_initialized;
-
+    private App m_app;
+      
     public void Initialize(Character character)
     {
         if (Object.HasInputAuthority)
@@ -44,6 +46,8 @@ public class CharacterCamera : NetworkBehaviour
             GetComponent<Camera>().enabled = true;
             GetComponent<AudioListener>().enabled = true;
         }
+        m_camera = GetComponent<Camera>();
+        m_camera.fieldOfView = 70f;
         originalRotation = transform.localRotation;
         m_initialized = true;
         m_character = character;
@@ -64,15 +68,14 @@ public class CharacterCamera : NetworkBehaviour
             {
                 invertFlag = -1f;
             }
-            NetworkedRotationY += data.aimDirection.y;// m_character.GetAimDirection().y;// Input.GetAxis("Mouse Y") * (50 / 3f) * 0.2f * invertFlag * Time.timeScale;
+            NetworkedRotationY += data.aimDirection.y * (m_characterMoveComponent.m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;// m_character.GetAimDirection().y;// Input.GetAxis("Mouse Y") * (50 / 3f) * 0.2f * invertFlag * Time.timeScale;
             
             NetworkedRotationY = Mathf.Clamp(NetworkedRotationY, minimumY, maximumY);
             
-            m_characterMoveComponent.m_moveData.V_RotationX = NetworkedRotationY;
             //rotArrayY.Add(rotationY);
-            rotArrayY.Add(m_characterMoveComponent.m_moveData.V_RotationX);
+            rotArrayY.Add(NetworkedRotationY);
 
-            if (rotArrayY.Count >= framesOfSmoothing)
+            if (rotArrayY.Count > framesOfSmoothing)
             {
                 rotArrayY.RemoveAt(0);
             }
@@ -81,6 +84,7 @@ public class CharacterCamera : NetworkBehaviour
                 rotAverageY += rotArrayY[j];
             }
             rotAverageY /= rotArrayY.Count;
+            rotAverageY = framesOfSmoothing > 0 ? rotAverageY / rotArrayY.Count : NetworkedRotationY;
         }
     }
 
@@ -118,7 +122,6 @@ public class CharacterCamera : NetworkBehaviour
 
             Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
             transform.localRotation = originalRotation * yQuaternion;
-            CamRotationData.SetLocalRotation(transform.localRotation);
         }
     }
 

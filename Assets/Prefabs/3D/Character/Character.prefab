@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d43591fff1e104ca431241b4c6a4d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_characterCam: {fileID: 4311980989418865909}
+  m_characterCam: {fileID: 1881865336939130476}
   minDistance: 0
   maxDistance: 1
   smooth: 40
@@ -1488,9 +1488,7 @@ MonoBehaviour:
   - {fileID: 3881598384569189278}
   - {fileID: 7695338927694559921}
   - {fileID: 1881865336939130476}
-  - {fileID: 4311980989418865909}
   - {fileID: 8255610726429138148}
-  - {fileID: 793900442246164545}
   SimulationBehaviours: []
 --- !u!54 &5091494748097519978
 Rigidbody:
@@ -1585,7 +1583,7 @@ MonoBehaviour:
     V_KnockBackOverride: 0
     V_MouseSensitivity: 100
     V_MoveDirectionNorm: {x: 0, y: 0, z: 0}
-    V_RotationX: 0
+    V_WishDirectionCollision: {x: 0, y: 0, z: 0}
     V_RotationY: 560.83374
     V_TopVelocity: 0
     V_PlayerFriction: -71.146805
@@ -2103,7 +2101,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2365352286428183245}
   - component: {fileID: 8255610726429138148}
-  - component: {fileID: 793900442246164545}
   m_Layer: 3
   m_Name: CameraRotationTransformData
   m_TagString: Untagged
@@ -2154,19 +2151,6 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
---- !u!114 &793900442246164545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5975763478441887140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16a00b0b74d37194d829ffe703921e90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
 --- !u!1 &5990378014685893742
 GameObject:
   m_ObjectHideFlags: 0
@@ -2691,7 +2675,6 @@ GameObject:
   - component: {fileID: 5555258029342275770}
   - component: {fileID: 8621996102883607883}
   - component: {fileID: 1881865336939130476}
-  - component: {fileID: 4311980989418865909}
   m_Layer: 3
   m_Name: Camera
   m_TagString: Camera
@@ -2774,31 +2757,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 8577374848904345177}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16a00b0b74d37194d829ffe703921e90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
---- !u!114 &4311980989418865909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8577374848904345177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46820a92aaa2fe7439f6dbd3e3bdf827, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  m_character: {fileID: 0}
-  CamRotationData: {fileID: 793900442246164545}
+  m_character: {fileID: 4610285444781331942}
   axes: 2
   invertY: 0
   sensitivityX: 10
   sensitivityY: 10
-  minimumX: -180
-  maximumX: 180
+  minimumX: -60
+  maximumX: 60
   minimumY: -80
   maximumY: 80
   rotationX: 0

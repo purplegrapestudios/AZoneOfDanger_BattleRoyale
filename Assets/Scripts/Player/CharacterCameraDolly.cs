@@ -38,8 +38,8 @@ public class CharacterCameraDolly : MonoBehaviour
         //playerAnimation.playerCameraView = PlayerCameraView.FirstPerson;
 
         RestDollyPosition();
-        m_cameraTr.localPosition = new Vector3(modXPos, 0.75f - tr.localPosition.y - modYPos, modZPos);
-        m_cameraTr.localPosition = new Vector3(-.5f, .375f / 4, -tr.localPosition.z);
+        m_cameraTr.localPosition = new Vector3(modXPos, modYPos, modZPos);
+        //m_cameraTr.localPosition = new Vector3(-.5f, .375f / 4, -tr.localPosition.z);
         
         m_initailized = true;
 
@@ -48,44 +48,40 @@ public class CharacterCameraDolly : MonoBehaviour
 
     private void LateUpdate()
     {
+        maxDistance = 1 + (100 - m_characterCam.FieldOfView) / 100f;
+
         if (!m_initailized) return;
 
         if (hitLevel)
         {
-            modZPos = (maxDistance - .5f);
-            modXPos = modZPos / 2;
+            modZPos = 0.3f;
+            modXPos = 0;
+            modYPos = 0.75f;
         }
         else
         {
-            modZPos = Mathf.Abs(m_characterCam.GetCameraRotationY()) / 90f * (maxDistance - .5f);
-            modXPos = modZPos / 2;
+            if (m_characterCam.GetCameraRotationY() < 0)
+            {
+                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.maximumY) / 4 + 0.5f; //Inverse Y offset of 0.5 looking straight to 0.75 looking down
+                modZPos = -m_characterCam.GetCameraRotationY() * 1.1f / m_characterCam.maximumY;  //Z offset of +1.1 (Looing up)
+            }
+            else 
+            {
+                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.maximumY) + 0.5f; //Inverse Y offset of 0.5 looking straight to -0.5 looking up
+                modZPos = m_characterCam.GetCameraRotationY() * 0.3f / m_characterCam.maximumY;  //Z Offset of +0.3 (Looing Down)
+            }
+            modXPos = -0.2f;
         }
 
-        if (m_characterCam.GetCameraRotationY() > 0)
-        {
-            if (hitLevel)
-            {
-                modYPos = Mathf.Abs(m_characterCam.GetCameraRotationY()) / 90f * (maxDistance - .5f);
-            }
-            else
-            {
-                modYPos = modZPos;
-            }
-        }
-        else
-        {
-            modYPos = -maxDistance * modZPos / 2;
-        }
-
-        m_cameraTr.localPosition = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, 0.75f - tr.localPosition.y - modYPos, modZPos), Time.deltaTime * smooth);
+        m_cameraTr.localPosition = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Time.deltaTime * smooth);
 
         desiredCameraPos = tr.parent.TransformPoint(dollyDir * maxDistance * 2);
-        Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
+        //Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
         if (Physics.Linecast(tr.parent.position, desiredCameraPos, out hit))
         {
             hitLevel = true;
             distance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
-            distance -= .5f;
+            distance -= .75f;
         }
         else
         {
@@ -95,6 +91,9 @@ public class CharacterCameraDolly : MonoBehaviour
 
 
         tr.localPosition = Vector3.Lerp(tr.localPosition, dollyDir * distance, Time.deltaTime * smooth);
+
+        //if (Input.GetKeyDown(KeyCode.Return))
+        //    UnityEditor.EditorApplication.isPaused = true;
 
     }
 

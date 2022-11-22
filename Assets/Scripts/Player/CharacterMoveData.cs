@@ -68,7 +68,7 @@ public class CharacterMoveData
     public bool V_KnockBackOverride = false;
     public float V_MouseSensitivity = 100f;
     public Vector3 V_MoveDirectionNorm = Vector3.zero;
-    public float V_RotationX = 0.0f;
+    public Vector3 V_WishDirectionCollision = Vector3.zero;
     public float V_RotationY = 0.0f;
     public float V_TopVelocity = 0.0f;
     public float V_PlayerFriction = 0.0f;                 // Used to display real time friction values

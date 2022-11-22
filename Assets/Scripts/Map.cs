@@ -10,7 +10,7 @@ public class Map : SimulationBehaviour, ISpawned
 {
 	[SerializeField] private Text _countdownMessage;
 	[SerializeField] private Transform[] _spawnPoints;
-	[SerializeField] public Camera m_sceneCamera;
+	[SerializeField] private GameObject m_crosshair;
 	private bool _sendMapLoadedMessage;
 	private App _app;
 
@@ -37,6 +37,7 @@ public class Map : SimulationBehaviour, ISpawned
 			if ((invokeinfo.LocalInvokeResult == RpcLocalInvokeResult.Invoked) || (invokeinfo.SendResult.Result & RpcSendMessageResult.MaskSent) != 0)
 			{
 				_app.Session.Map = this;
+				SetCrosshairActive(true);
 				_sendMapLoadedMessage = false;
 			}
 			else
@@ -81,18 +82,7 @@ public class Map : SimulationBehaviour, ISpawned
 		return _spawnPoints[((int) objectInputAuthority) % _spawnPoints.Length];
 	}
 
-	public void SetSceneCameraActive(bool val)
-	{
-		if (m_sceneCamera == null)
-        {
-			Debug.Log("Scene Camera is NULL!");
-        }
-        else
-        {
-			Debug.Log("There IS a scene camera");
-			m_sceneCamera.GetComponent<AudioListener>().enabled = val;
-			m_sceneCamera.enabled = val;
-			m_sceneCamera.gameObject.SetActive(val);
-		}
-    }
+	public void SetCrosshairActive(bool val) {
+		m_crosshair.SetActive(val);
+	}
 }

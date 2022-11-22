@@ -128,7 +128,7 @@ public class CharacterAnimation : NetworkBehaviour {
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 80f);
+            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 90f);
 
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
