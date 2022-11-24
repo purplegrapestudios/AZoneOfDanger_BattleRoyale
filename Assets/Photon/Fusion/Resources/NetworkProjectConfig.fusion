@@ -32,7 +32,7 @@
         }
     },
     "SceneLoadSpawnMode": 2,
-    "DeltaCompressor": 0,
+    "DeltaCompressor": 1,
     "InvokeRenderInBatchMode": true,
     "MaxNetworkedObjectCount": 8192,
     "NetworkIdIsObjectName": false,
@@ -42,7 +42,7 @@
     "Simulation": {
         "InputDataWordCount": 0,
         "TickRate": 120,
-        "MaxPrediction": 60,
+        "MaxPrediction": 3,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
