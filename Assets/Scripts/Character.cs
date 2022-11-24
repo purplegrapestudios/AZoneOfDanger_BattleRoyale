@@ -101,6 +101,9 @@ public class Character : NetworkBehaviour
 		m_characterMoveComponent.InitCharacterMovement();
 		m_characterAnimation.Initialize();
 		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
+		transform.rotation = Quaternion.identity;
+		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
+
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();
