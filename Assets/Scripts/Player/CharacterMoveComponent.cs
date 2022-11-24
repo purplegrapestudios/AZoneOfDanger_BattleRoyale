@@ -71,6 +71,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         Rigidbody.angularVelocity = Vector3.zero;
 
         Transform = GetComponent<Transform>();
+        Transform.rotation = Quaternion.identity;
         PlayerObjectComponents = GetComponent<CharacterComponents>();
         MainCameraTransform = PlayerObjectComponents.PlayerCamera.transform;
         PlayerAnimation = GetComponent<CharacterAnimation>();

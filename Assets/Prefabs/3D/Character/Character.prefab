@@ -86,6 +86,9 @@ MonoBehaviour:
   modYPos: 0
   modXPos: 0
   hitLevel: 0
+  RayCastLineCastLayers:
+    serializedVersion: 2
+    m_Bits: 55
 --- !u!1 &751535108959765236
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,10 +1521,10 @@ MonoBehaviour:
   m_Script: {fileID: 1710889294, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 1
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 4568515329382100830}
-  InterpolateErrorCorrection: 1
+  InterpolateErrorCorrection: 0
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
     MaxRate: 10
@@ -1533,7 +1536,7 @@ MonoBehaviour:
     RotBlendEnd: 0.5
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
+  TargetInterpolationDelay: 0
 --- !u!114 &3881598384569189278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1557,9 +1560,9 @@ MonoBehaviour:
     P_JumpAttempts: 1
     P_DoubleJumpDeltaTime: 0.25
     P_Friction: 100
-    P_Gravity: 50
+    P_Gravity: 60
     P_JumpSpeed: 30
-    P_MaxSpeed: 40
+    P_MaxSpeed: 200
     P_MoveScale: 40
     P_MoveSpeed: 20
     P_RunAcceleration: 120
@@ -2720,7 +2723,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 100
   orthographic: 0

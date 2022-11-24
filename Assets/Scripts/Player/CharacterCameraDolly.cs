@@ -27,6 +27,7 @@ public class CharacterCameraDolly : MonoBehaviour
     [SerializeField] private float modXPos;
 
     [SerializeField] private bool hitLevel;
+    [Header("Layers for Camera LineCast")] public LayerMask RayCastLineCastLayers;
     private bool m_initailized;
 
     public void Initialize(Character character)
@@ -77,7 +78,7 @@ public class CharacterCameraDolly : MonoBehaviour
 
         desiredCameraPos = tr.parent.TransformPoint(dollyDir * maxDistance * 2);
         //Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
-        if (Physics.Linecast(tr.parent.position, desiredCameraPos, out hit))
+        if (Physics.Linecast(tr.parent.position, desiredCameraPos, out hit, RayCastLineCastLayers))
         {
             hitLevel = true;
             distance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
