@@ -41,8 +41,8 @@
     "HostMigrationSnapshotInterval": 60,
     "Simulation": {
         "InputDataWordCount": 0,
-        "TickRate": 120,
-        "MaxPrediction": 3,
+        "TickRate": 60,
+        "MaxPrediction": 2,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
@@ -52,7 +52,7 @@
     "Interpolation": {
         "DeltaAdjustment": 1,
         "AllowedJitter": 25,
-        "SnapLimit": 200,
+        "SnapLimit": 100,
         "MultiplierMin": 1.25,
         "MultiplierMax": 3.0
     },

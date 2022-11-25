@@ -44,7 +44,7 @@ public struct GroundCheckData
 
 }
 
-public class CharacterMoveComponent : NetworkBehaviour
+public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
 {
     [Header("Layers for Groundcheck (Player / Flight Runner)")] public LayerMask RayCastLayersToHit;
     [Header("Character Move Data")] public CharacterMoveData m_moveData;
@@ -101,7 +101,7 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     private void UpdateMovement(InputData data)
     {
-        OnRotate();                 // 1) Rotate Player along Y Axis
+        //OnRotate();                 // 1) Rotate Player along Y Axis
 
         OnCollisionWall(2.5f);      // 2) Detect Collision Against Wall
         OnGroundCheck(transform.localScale.y + .01f);        // 3) Detect Collision Against Ground
@@ -138,6 +138,22 @@ public class CharacterMoveComponent : NetworkBehaviour
     //    OnRotate();                 // 1) Rotate Player along Y Axis
     //}
 
+    void IBeforeUpdate.BeforeUpdate()
+    {
+        if (!m_initialized) return;
+
+        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
+        //Debug.Log($"Player RotationY: {m_moveData.V_RotationY}");
+        OnRotate();
+        if (!(m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))) return;
+
+    }
+
+    public override void Render()
+    {
+        //OnRotate();
+    }
+
     public override void FixedUpdateNetwork()
     {
         if (!m_initialized) return;
@@ -159,8 +175,9 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     private void OnRotate()
     {
-        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale; //Input.GetAxis(kLabelMouseX) * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
+        //m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
         Transform.rotation = Quaternion.Euler(0, m_moveData.V_RotationY, 0); // 1) Rotates the collider
+        //Debug.Log($"Player RotationY Applied: {Transform.rotation.y}");
     }
 
     private void OnCollisionWall(float dist) {
