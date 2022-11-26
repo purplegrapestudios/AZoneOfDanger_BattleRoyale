@@ -9,8 +9,8 @@ public enum PlayerCameraView
     ThirdPerson,
 }
 
-public class CharacterAnimation : NetworkBehaviour {
-
+public class CharacterAnimation : NetworkBehaviour
+{
     /// <summary>
     /// VARIABLE SECTION
     /// </summary>
@@ -90,7 +90,7 @@ public class CharacterAnimation : NetworkBehaviour {
     {
         if (!isInitialized) return;
         //if (!Object.HasInputAuthority) return;
-
+        AnimationBehavior_OurPlayer(isPlayerAlive: true);
 
         //Animation Behavior of Our Controlled Character
         //NetworkedAimDirectionY = m_characterCamera.NetworkedRotationY / 80f;
@@ -116,19 +116,12 @@ public class CharacterAnimation : NetworkBehaviour {
         //}
     }
 
-
-    public override void Render()
-    {
-        AnimationBehavior_OurPlayer(isPlayerAlive: true);
-    }
-
-
     private void AnimationBehavior_OurPlayer(bool isPlayerAlive)
     {
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 90f);
+            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
 
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
@@ -325,11 +318,19 @@ public class CharacterAnimation : NetworkBehaviour {
             Animator_3rdPerson.SetBool(Param_DeathBool, val);
     }
 
-    private void SetStateFloat_3rdPersonAimAngle(float val)
+    private void SetStateFloat_3rdPersonAimAngle(float val, float smooth = 1f)
     {
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
         {
-            Animator_3rdPerson.SetFloat(Param_3rdPerson_AimAngle, val);
+            if (smooth == 1)
+            {
+                Animator_3rdPerson.SetFloat(Param_3rdPerson_AimAngle, val);
+                return;
+            }
+
+            var curAimAngle = Animator_3rdPerson.GetFloat(Param_3rdPerson_AimAngle);
+            var lerpedAimAngle = Mathf.Lerp(curAimAngle, val, smooth);
+            Animator_3rdPerson.SetFloat(Param_3rdPerson_AimAngle, lerpedAimAngle);
         }
     }
 

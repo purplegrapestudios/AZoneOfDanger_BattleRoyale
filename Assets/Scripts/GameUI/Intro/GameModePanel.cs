@@ -16,7 +16,7 @@ namespace GameUI.Intro
 
 		private void Awake()
 		{
-			Application.targetFrameRate = 120;
+			Application.targetFrameRate = 144;
 			_app = App.FindInstance();
 			_sessionsPanel.Hide();
 

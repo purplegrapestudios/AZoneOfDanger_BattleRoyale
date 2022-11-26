@@ -81,7 +81,7 @@ MonoBehaviour:
   m_characterCam: {fileID: 1881865336939130476}
   minDistance: 0
   maxDistance: 1
-  smooth: 40
+  smooth: 10
   modZPos: 0
   modYPos: 0
   modXPos: 0
