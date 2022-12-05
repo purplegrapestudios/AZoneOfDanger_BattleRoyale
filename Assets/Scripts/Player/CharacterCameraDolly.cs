@@ -1,10 +1,12 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterCameraDolly : MonoBehaviour
+public class CharacterCameraDolly : NetworkBehaviour
 {
     [SerializeField] private CharacterCamera m_characterCam;
+    private Character m_character;
     private Transform m_cameraTr;
 
     [SerializeField] private float minDistance = 1.0f;
@@ -25,6 +27,9 @@ public class CharacterCameraDolly : MonoBehaviour
     [SerializeField] private float modZPos;
     [SerializeField] private float modYPos;
     [SerializeField] private float modXPos;
+    [Networked] public Vector3 NetworkedDollyOffset { get; set; }
+    [Networked] public Vector3 NetworkedCameraOffset { get; set; }
+
 
     [SerializeField] private bool hitLevel;
     [Header("Layers for Camera LineCast")] public LayerMask RayCastLineCastLayers;
@@ -34,7 +39,8 @@ public class CharacterCameraDolly : MonoBehaviour
     {
         tr = GetComponent<Transform>();
         m_cameraTr = m_characterCam.transform;
-        dollyDir = tr.localPosition.normalized;
+        tr.localPosition = new Vector3(1, 1, -2);
+        dollyDir = new Vector3(1, 1, -2).normalized;// tr.localPosition.normalized;
         distance = tr.localPosition.magnitude;
         //playerAnimation.playerCameraView = PlayerCameraView.FirstPerson;
 
@@ -42,9 +48,20 @@ public class CharacterCameraDolly : MonoBehaviour
         m_cameraTr.localPosition = new Vector3(modXPos, modYPos, modZPos);
         //m_cameraTr.localPosition = new Vector3(-.5f, .375f / 4, -tr.localPosition.z);
         
+        m_character = character;
         m_initailized = true;
-
         m_characterCam.Initialize(character);
+
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!m_initailized) return;
+        if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
+        {
+            NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
+            NetworkedDollyOffset = dollyDir * distance;
+        }
     }
 
     private void LateUpdate()

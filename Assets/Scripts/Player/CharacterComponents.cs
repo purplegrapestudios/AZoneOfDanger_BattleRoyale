@@ -1,9 +1,12 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterComponents : MonoBehaviour
 {
+    public ParticleSystem MuzzleFlash;
+    public Transform CharacterCollider;
     public Transform CameraContainerTransform;
     public GameObject Dolly;
     public GameObject PlayerCamera;

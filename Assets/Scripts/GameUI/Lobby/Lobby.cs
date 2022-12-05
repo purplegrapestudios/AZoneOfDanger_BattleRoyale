@@ -27,7 +27,7 @@ namespace GameUI.Lobby
 			_app.GetPlayer()?.RPC_SetIsReady(false);
 
 			//TESTING
-			if (_app.IsHost())
+			if (_app.IsHostMode())
 			{
 				_app.GetPlayer()?.RPC_SetIsReady(true);
 				OnStart();
@@ -66,7 +66,7 @@ namespace GameUI.Lobby
 						OnStart();
 					}
 
-                    if (_app.IsHost())
+                    if (_app.IsHostMode())
                     {
 						OnStart();
                     }
