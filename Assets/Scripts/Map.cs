@@ -10,7 +10,6 @@ public class Map : SimulationBehaviour, ISpawned
 {
 	[SerializeField] private Text _countdownMessage;
 	[SerializeField] private Transform[] _spawnPoints;
-	[SerializeField] private GameObject m_crosshair;
 	private bool _sendMapLoadedMessage;
 	private App _app;
 
@@ -37,7 +36,7 @@ public class Map : SimulationBehaviour, ISpawned
 			if ((invokeinfo.LocalInvokeResult == RpcLocalInvokeResult.Invoked) || (invokeinfo.SendResult.Result & RpcSendMessageResult.MaskSent) != 0)
 			{
 				_app.Session.Map = this;
-				SetCrosshairActive(true);
+				GameUIViewController.Instance.SetCrosshairActive(true);
 				_sendMapLoadedMessage = false;
 			}
 			else
@@ -82,7 +81,4 @@ public class Map : SimulationBehaviour, ISpawned
 		return _spawnPoints[((int) objectInputAuthority) % _spawnPoints.Length];
 	}
 
-	public void SetCrosshairActive(bool val) {
-		m_crosshair.SetActive(val);
-	}
 }
