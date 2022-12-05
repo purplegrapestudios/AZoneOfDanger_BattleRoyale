@@ -3238,7 +3238,6 @@ MonoBehaviour:
   - {fileID: 87851297}
   - {fileID: 555980797}
   - {fileID: 1246412433}
-  m_crosshair: {fileID: 212717424}
 --- !u!4 &577297287
 Transform:
   m_ObjectHideFlags: 0
@@ -13988,7 +13987,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_Pivot.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_RootOrder
@@ -14000,7 +13999,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_AnchorMin.x
@@ -14016,7 +14015,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 75
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6049904239022863903, guid: 51bbf0b25b607d347ac22d0618fdaa3a, type: 3}
       propertyPath: m_LocalPosition.x
