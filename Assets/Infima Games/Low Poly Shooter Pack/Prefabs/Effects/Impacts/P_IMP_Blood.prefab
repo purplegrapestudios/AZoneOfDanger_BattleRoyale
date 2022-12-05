@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4418440862474872}
   - component: {fileID: 114838615262841712}
   - component: {fileID: 82195507524791454}
+  - component: {fileID: 4801538664261962484}
   m_Layer: 0
   m_Name: P_IMP_Blood
   m_TagString: Untagged
@@ -65,7 +66,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
@@ -150,6 +151,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &4801538664261962484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036925697551712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cde57952a0042649a82c207318f9fdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selfDestructTime: 1
+  destroyFXType: 2
 --- !u!1 &1892667355371866
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +213,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 0
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
@@ -4982,7 +4997,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: ff9c94956dc07d8469bf32a1884b5a12, type: 2}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5082,7 +5096,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
