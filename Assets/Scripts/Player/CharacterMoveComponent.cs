@@ -63,15 +63,24 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     /// //////
     /// </summary>
 
+    private void ResetRigidBodyState()
+    {
+        Rigidbody.velocity = Vector3.zero;
+        Rigidbody.angularVelocity = Vector3.zero;
+        Rigidbody.angularDrag = 0;
+        Rigidbody.drag = 0;
+        Rigidbody.inertiaTensor = Vector3.zero;
+        Rigidbody.inertiaTensorRotation = Quaternion.identity;
+    }
+
     public void InitCharacterMovement()
     {
         m_character = GetComponent<Character>();
         Rigidbody = GetComponent<Rigidbody>();
-        Rigidbody.velocity = Vector3.zero;
-        Rigidbody.angularVelocity = Vector3.zero;
+        ResetRigidBodyState();
 
         Transform = GetComponent<Transform>();
-        Transform.rotation = Quaternion.identity;
+        Rigidbody.rotation = Quaternion.identity;
         PlayerObjectComponents = GetComponent<CharacterComponents>();
         MainCameraTransform = PlayerObjectComponents.PlayerCamera.transform;
         PlayerAnimation = GetComponent<CharacterAnimation>();
@@ -157,12 +166,11 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     public override void FixedUpdateNetwork()
     {
         if (!m_initialized) return;
-
+        ResetRigidBodyState();
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
             UpdateMovement(data);
-            Rigidbody.velocity = Vector3.zero;
-            Rigidbody.angularVelocity = Vector3.zero;
+            ResetRigidBodyState();
             Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * m_character.Runner.DeltaTime);// Time.fixedDeltaTime);
             m_moveData.V_AimDirection = data.aimDirection;
         }
@@ -175,9 +183,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
 
     private void OnRotate()
     {
-        //m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
-        Transform.rotation = Quaternion.Euler(0, m_moveData.V_RotationY, 0); // 1) Rotates the collider
-        //Debug.Log($"Player RotationY Applied: {Transform.rotation.y}");
+        Transform.rotation = Quaternion.Euler(0, m_moveData.V_RotationY, 0);
     }
 
     private void OnCollisionWall(float dist) {

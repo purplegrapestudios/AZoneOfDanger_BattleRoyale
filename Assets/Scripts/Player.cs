@@ -39,8 +39,9 @@ public class Player : NetworkBehaviour
 			_character = Runner.Spawn(CharacterPrefab, t.position, t.rotation, Object.InputAuthority, (runner, o) =>
 			{
 				Character character = o.GetComponent<Character>();
-				Debug.Log($"Created Character for Player {Name}");
+				Debug.Log($"Created Character for Player {Name} @ {t.position} & character pos = {character.transform.position}");
 				character.Player = this;
+				//UnityEditor.EditorApplication.isPaused = true;
 			});
 		}
 	}

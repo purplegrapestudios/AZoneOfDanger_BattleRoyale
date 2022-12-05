@@ -15,10 +15,15 @@ public class Character : NetworkBehaviour
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
+	[SerializeField] private CharacterHealthComponent m_characterHealth;
+	[SerializeField] private CharacterShootComponent m_characterShoot;
+	[SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
+	[SerializeField] private Hitbox m_hitboxBody;
+	[SerializeField] private Hitbox m_hitboxHead;
 	[SerializeField] private CharacterAnimation m_characterAnimation;
 	[SerializeField] private Text _name;
 	[SerializeField] private MeshRenderer _mesh;
-	[SerializeField] private Transform m_headingTransform;
+	[SerializeField] public Transform m_headingTransform;
 
 	[SerializeField] private float sensitivityX = 15f;
 	[SerializeField] private float sensitivityY = 15f;
@@ -29,6 +34,8 @@ public class Character : NetworkBehaviour
 	[SerializeField] private float rotationX = 0f;
 	[SerializeField] private float rotationY = 0f;
 	[SerializeField] private float m_baseSpeed = 25f;
+	[SerializeField] private LayerMask m_localPlayerLayerMask;
+
 	public bool m_inputForward { get; set; }
 	public bool m_inputBack { get; set; }
 	public bool m_inputRight { get; set; }
@@ -62,7 +69,7 @@ public class Character : NetworkBehaviour
 		rbody = GetComponent<Rigidbody>();
 		SetIsJumping(true);
 		m_slideOnObstacleData = new SlideOnObstacleData(Vector3.zero, 0f, false);
-
+		//rbody.isKinematic = false;
         //if (_app == null) { 
 		//	Debug.Log("There IS NO _app");
         //}
@@ -99,14 +106,23 @@ public class Character : NetworkBehaviour
 		SceneCamera.instance.SetSceneCameraActive(false);
 
 		m_characterMoveComponent.InitCharacterMovement();
+		//m_characterMuzzle.Initialize(this);
+		m_characterHealth.Initialize(this);
+		m_characterShoot.Initialize(this, m_components.PlayerCamera.GetComponent<CharacterCamera>(), m_characterMuzzle, m_components.MuzzleFlash, (damage) => { m_characterHealth.OnTakeDamage(damage); });
 		m_characterAnimation.Initialize();
-		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 		transform.rotation = Quaternion.identity;
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
+		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
+			m_hitboxBody.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+			m_hitboxHead.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 			//App.FindInstance().ShowPlayerSetup();
+			for (int i = 0; i < transform.childCount; i++)
+			{
+				//transform.GetChild(i).gameObject.layer = m_localPlayerLayerMask;
+			}
 		}
 	}
 
@@ -223,7 +239,7 @@ public class Character : NetworkBehaviour
 		//	}
 		//}
 
-		if (Player && Player.InputEnabled && GetInput(out InputData data))
+		if (PlayerInputEnabled() && GetInput(out InputData data))
 		{
 			m_directionVector = Vector3.zero;
 
@@ -250,7 +266,6 @@ public class Character : NetworkBehaviour
 				m_inputBack = true;
 				m_directionVector -= m_headingTransform.forward;
 			}
-
 
 			//Debug.DrawRay(transform.position, m_directionVector, Color.blue, 5);
 			//Jump Update
@@ -293,6 +308,11 @@ public class Character : NetworkBehaviour
 		}
 
 	}
+
+	public bool PlayerInputEnabled()
+    {
+		return (Player && Player.InputEnabled);
+    }
 
 	public Vector2 GetAimDirection()
     {

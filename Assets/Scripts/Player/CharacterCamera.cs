@@ -6,6 +6,7 @@ public enum RotationAxes { MouseX = 1, MouseY = 2 }
 
 public class CharacterCamera : NetworkBehaviour
 {
+    [SerializeField] private NetworkTransform simulatedCameraTransform;
     [SerializeField] private Character m_character;
     private CharacterMoveComponent m_characterMoveComponent;
     private Camera m_camera;
@@ -25,12 +26,16 @@ public class CharacterCamera : NetworkBehaviour
 
     [SerializeField] private float rotationX = 0F;
     [SerializeField] [Networked] public float NetworkedRotationY { get; set; }
+    [SerializeField] [Networked] public Vector3 NetworkedPosition { get; set; }
+    [SerializeField] [Networked(OnChanged = nameof(UpdateNetworkedForward))] public Vector3 NetworkedForward { get; set; }
+    [SerializeField] [Networked] public Vector3 NetworkedForwardRotation { get; set; }
+    public Vector3 CurrentForward;
 
     private List<float> rotArrayX = new List<float>();
-    float rotAverageX = 0F;
+    public float rotAverageX = 0F;
 
     private List<float> rotArrayY = new List<float>();
-    float rotAverageY = 0F;
+    public float rotAverageY = 0F;
 
     public float framesOfSmoothing = 1;
 
@@ -68,10 +73,12 @@ public class CharacterCamera : NetworkBehaviour
             {
                 invertFlag = -1f;
             }
+
             NetworkedRotationY += data.aimDirection.y * (m_characterMoveComponent.m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;// m_character.GetAimDirection().y;// Input.GetAxis("Mouse Y") * (50 / 3f) * 0.2f * invertFlag * Time.timeScale;
             
             NetworkedRotationY = Mathf.Clamp(NetworkedRotationY, minimumY, maximumY);
-            
+            NetworkedForward = transform.forward;
+            //NetworkedPosition = transform.position;
             //rotArrayY.Add(rotationY);
             rotArrayY.Add(NetworkedRotationY);
 
@@ -85,6 +92,11 @@ public class CharacterCamera : NetworkBehaviour
             }
             rotAverageY /= rotArrayY.Count;
             rotAverageY = framesOfSmoothing > 0 ? rotAverageY / rotArrayY.Count : NetworkedRotationY;
+
+            NetworkedForwardRotation = originalRotation * Quaternion.AngleAxis(rotAverageX, Vector3.up) * Quaternion.AngleAxis(rotAverageY, Vector3.left) * m_character.transform.forward;
+
+            simulatedCameraTransform.Transform.position = transform.position;
+            simulatedCameraTransform.Transform.rotation = transform.rotation;
         }
     }
 
@@ -114,14 +126,13 @@ public class CharacterCamera : NetworkBehaviour
 
             Quaternion xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
             transform.localRotation = originalRotation * xQuaternion;
-
-
         }
         else
         {
 
             Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
             transform.localRotation = originalRotation * yQuaternion;
+            NetworkedPosition = transform.position;
         }
     }
 
@@ -151,5 +162,21 @@ public class CharacterCamera : NetworkBehaviour
     public float GetCameraRotationY()
     {
         return NetworkedRotationY;
+    }
+
+    public static void UpdateNetworkedForward(Changed<CharacterCamera> changed)
+    {
+        changed.LoadNew();
+        changed.Behaviour.SetCurrentForward(changed.Behaviour.NetworkedForward);
+    }
+
+    private void SetCurrentForward(Vector3 forward)
+    {
+        CurrentForward = forward;
+    }
+
+    public Vector3 GetSimulatedCameraForward()
+    {
+        return simulatedCameraTransform.Transform.forward;
     }
 }

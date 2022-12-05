@@ -10,6 +10,7 @@ public enum ButtonFlag
 	RIGHT = 1 << 3,
 	RESPAWN = 1 << 4,
 	JUMP = 1 << 5,
+	FIRE = 1 << 6,
 }
 
 public struct InputData : INetworkInput
@@ -17,6 +18,7 @@ public struct InputData : INetworkInput
 	public ButtonFlag ButtonFlags;
 	public Vector2 aimDirection;
 	public Vector2 moveDirection;
+	public Vector3 cameraForward;
 
 	public bool GetButton(ButtonFlag button)
 	{
