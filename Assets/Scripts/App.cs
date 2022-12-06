@@ -340,6 +340,18 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 			_playerSetup.Show(true);
 	}
 
+	Queue<Vector2> aimDirQueue = new Queue<Vector2>();
+	Vector2 avgAimDir;
+	private void SetAverageAimDirection()
+    {
+		avgAimDir = Vector2.zero;
+		foreach (Vector2 aimDir in aimDirQueue)
+		{
+			avgAimDir += aimDir;
+		}
+		avgAimDir /= aimDirQueue.Count;
+	}
+
 	public void OnInput(NetworkRunner runner, NetworkInput input)
 	{
 		if (!AllowInput)
@@ -352,7 +364,24 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		_data.ButtonFlags |= Input.GetKey(KeyCode.D) ? ButtonFlag.RIGHT : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Space) ? ButtonFlag.JUMP : 0;
 		_data.ButtonFlags |= Input.GetMouseButton(0) ? ButtonFlag.FIRE : 0;
-		_data.aimDirection = new Vector2(Input.GetAxis("Mouse X") * 60 * _runner.DeltaTime, Input.GetAxis("Mouse Y") * 60 * _runner.DeltaTime);
+		//_data.aimDirection = new Vector2(Input.GetAxis("Mouse X") * 60 * _runner.DeltaTime, Input.GetAxis("Mouse Y") * 60 * _runner.DeltaTime);
+		if (aimDirQueue.Count < 1)
+		{
+			aimDirQueue.Enqueue(new Vector2(Input.GetAxis("Mouse X") * 60 * Time.deltaTime, Input.GetAxis("Mouse Y") * 60 * Time.deltaTime));
+			SetAverageAimDirection();
+		}
+		else
+		{
+			//Get the average aim direction of the current queue
+			SetAverageAimDirection();
+			//now dequeue the First item;
+			aimDirQueue.Dequeue();
+
+			//Finally Enqueue this current item
+			aimDirQueue.Enqueue(new Vector2(Input.GetAxis("Mouse X") * 60 * Time.deltaTime, Input.GetAxis("Mouse Y") * 60 * Time.deltaTime));
+
+		}
+		_data.aimDirection = avgAimDir;
 		input.Set( _data );
 
 		// Clear the flags so they don't spill over into the next tick unless they're still valid input.

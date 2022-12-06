@@ -64,11 +64,12 @@ public class CharacterCameraDolly : NetworkBehaviour
         }
     }
 
-    private void LateUpdate()
+    public override void Render()
     {
         maxDistance = 1 + (100 - m_characterCam.FieldOfView) / 100f;
 
         if (!m_initailized) return;
+        if (!m_character.PlayerInputEnabled()) return;
 
         if (hitLevel)
         {

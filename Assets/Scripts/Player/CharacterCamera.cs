@@ -100,7 +100,8 @@ public class CharacterCamera : NetworkBehaviour
         }
     }
 
-    private void LateUpdate()
+    //private void LateUpdate()
+    public override void Render()
     {
         if (!m_character) return;
         if (!m_initialized) return;
@@ -132,8 +133,13 @@ public class CharacterCamera : NetworkBehaviour
 
             Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
             transform.localRotation = originalRotation * yQuaternion;
-            NetworkedPosition = transform.position;
+            //NetworkedPosition = transform.position;
         }
+    }
+
+    public void LateUpdate()
+    {
+        NetworkedPosition = transform.position;
     }
 
     public void SetSensitivity(float s)

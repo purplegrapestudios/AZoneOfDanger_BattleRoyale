@@ -91,7 +91,7 @@ MonoBehaviour:
   hitLevel: 0
   RayCastLineCastLayers:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 51
 --- !u!1 &751535108959765236
 GameObject:
   m_ObjectHideFlags: 0
@@ -3289,6 +3289,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8974659549524474589}
     m_Modifications:
+    - target: {fileID: 2958616729008169997, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4742348811577898604, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
       propertyPath: InheritVelocityModule.enabled
       value: 1
@@ -3304,6 +3308,10 @@ PrefabInstance:
     - target: {fileID: 4834526503407549940, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
       propertyPath: m_Name
       value: P_LPSP_WEP_Flash
+      objectReference: {fileID: 0}
+    - target: {fileID: 4834526503407549940, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4836458910855560858, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
       propertyPath: m_RootOrder
