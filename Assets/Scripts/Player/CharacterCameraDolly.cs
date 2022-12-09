@@ -92,7 +92,7 @@ public class CharacterCameraDolly : NetworkBehaviour
             modXPos = -0.2f;
         }
 
-        m_cameraTr.localPosition = NetworkedCameraOffset;
+        m_cameraTr.localPosition = Vector3.Lerp(m_cameraTr.localPosition, NetworkedCameraOffset, Runner.DeltaTime * smooth);
 
         desiredCameraPos = tr.parent.TransformPoint(dollyDir * maxDistance * 2);
         //Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
@@ -109,7 +109,7 @@ public class CharacterCameraDolly : NetworkBehaviour
         }
 
 
-        tr.localPosition = NetworkedDollyOffset;
+        tr.localPosition = Vector3.Lerp(tr.localPosition, NetworkedDollyOffset, Runner.DeltaTime * smooth);
 
         //if (Input.GetKeyDown(KeyCode.Return))
         //    UnityEditor.EditorApplication.isPaused = true;
@@ -119,8 +119,13 @@ public class CharacterCameraDolly : NetworkBehaviour
 
     private void LateUpdate()
     {
-        NetworkedCameraOffset = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Time.deltaTime * smooth);
-        NetworkedDollyOffset = Vector3.Lerp(tr.localPosition, dollyDir * distance, Time.deltaTime * smooth);
+        //NetworkedCameraOffset = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Runner.DeltaTime * smooth);
+        //NetworkedDollyOffset = Vector3.Lerp(tr.localPosition, dollyDir * distance, Runner.DeltaTime * smooth);
+        if (Object.HasStateAuthority)
+        {
+            NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
+            NetworkedDollyOffset = dollyDir * distance;
+        }
     }
     public void RestDollyPosition()
     {

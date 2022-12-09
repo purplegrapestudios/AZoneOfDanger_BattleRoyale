@@ -2,7 +2,7 @@ using Fusion;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 /// <summary>
 /// Visual representation of a Player - the Character is instantiated by the map once it's loaded.
 /// This class handles camera tracking and player movement and is destroyed when the map is unloaded.
@@ -20,7 +20,7 @@ public class Character : NetworkBehaviour
 	[SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
 	[SerializeField] private CharacterAudioComponent m_characterAudio;
 	[SerializeField] private CharacterAnimation m_characterAnimation;
-	[SerializeField] private Text _name;
+	[SerializeField] private TMP_Text _name;
 	[SerializeField] private MeshRenderer _mesh;
 	[SerializeField] public Transform m_headingTransform;
 

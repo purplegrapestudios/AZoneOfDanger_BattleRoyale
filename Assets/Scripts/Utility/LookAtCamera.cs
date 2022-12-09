@@ -1,13 +1,12 @@
-
 using UnityEngine;
+using TMPro;
 
-namespace Utility
+public class LookAtCamera : MonoBehaviour
 {
-	public class LookAtCamera : MonoBehaviour
-	{
-		//private void Update()
-		//{
-		//	transform.LookAt(Camera.main.transform);
-		//}
-	}
+    [SerializeField] private TMP_Text m_nameLabel;
+
+    private void Awake()
+    {
+        m_nameLabel.gameObject.layer = LayerMask.NameToLayer("TransparentFX");
+    }
 }

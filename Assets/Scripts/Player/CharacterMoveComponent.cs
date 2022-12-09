@@ -56,7 +56,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     private Character m_character;
     private bool m_initialized;
 
-    [Networked] [SerializeField] public bool NetworkedFloorDetected { get; set; }
+    [Networked] [SerializeField] public NetworkBool NetworkedFloorDetected { get; set; }
     [Networked] [SerializeField] public Vector3 NetworkedVelocity { get; set; }
 
     /// <summary>
@@ -212,10 +212,10 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
                     //We are not Modifying the Rotation here, rather the m_directionVector is used to Calculate Movement Direction. So player would move sideways along wall, if he ran into it.
                     //Using state.DirectionVector here, will change and synchronize the values across the network. But we do NOT want it to change in this situation.
                     m_moveData.V_PlayerVelocity = CorrectedDirection.normalized;
-                    m_moveData.V_WishDirectionCollision = m_moveData.V_PlayerVelocity.normalized;
 
                     float speedDotResult = Vector3.Dot(transform.forward, m_moveData.V_WallHits[0].normal);
                     m_moveData.V_PlayerVelocity = speedDotResult < 0 ? m_moveData.V_PlayerVelocity *= 1 + speedDotResult : m_moveData.V_PlayerVelocity;
+                    m_moveData.V_WishDirectionCollision = m_moveData.V_PlayerVelocity.normalized;
                 }
 
                 if (collisionHit.transform.CompareTag(kTagBouncePad))

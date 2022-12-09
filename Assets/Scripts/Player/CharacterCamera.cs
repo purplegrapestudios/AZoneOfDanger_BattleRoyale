@@ -12,7 +12,7 @@ public class CharacterCamera : NetworkBehaviour
     public float FieldOfView => m_camera.fieldOfView;
     public float MinimumY => m_minimumY;
     public float MaximumY => m_maximumY;
-
+    public Camera Camera => m_camera;
     //Serialized Variables in Inspector
     [SerializeField] private float m_framesOfSmoothing = 1;
     [SerializeField] private float m_minimumY = -80F;
