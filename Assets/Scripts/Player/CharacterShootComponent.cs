@@ -15,7 +15,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
     private System.Action<EAudioClip> m_fireWeaponAudioCallback;
 
-    [Networked] public bool NetworkedFire { get; set; }
+    [Networked] public NetworkBool NetworkedFire { get; set; }
 
     private InputData m_inputData;
     private App m_app;
