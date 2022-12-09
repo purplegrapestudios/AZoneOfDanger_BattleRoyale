@@ -120,20 +120,20 @@ public class CharacterShootComponent : NetworkBehaviour
             {
         
                 //Debug.Log($"We hit a HitBox Object: {hitInfo.Hitbox.transform.root.name}, Pos: {hitInfo.Point}");
+                ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Player);
 
                 if (HasStateAuthority)
                 {
                     Debug.Log($"{m_character.Player.Name} took {5} damage");
-                    ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Player);
                     if (hitInfo.Hitbox.HitboxIndex == 0)
                         hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5, GetComponent<CharacterHealthComponent>());
                     else
                         hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(50, GetComponent<CharacterHealthComponent>());
-                    //Change localPlayer's crosshair only
-                    if (m_character.Object.HasInputAuthority)
-                        GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshair();
                 }
 
+                //Change localPlayer's crosshair only
+                if (m_character.Object.HasInputAuthority)
+                    GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshair();
 
             }
         }
