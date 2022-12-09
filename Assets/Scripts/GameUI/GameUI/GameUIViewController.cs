@@ -7,6 +7,8 @@ public class GameUIViewController : MonoBehaviour
 {
     public static GameUIViewController Instance;
     [SerializeField] private TMP_Text m_healthTxt;
+    [SerializeField] private TMP_Text m_killsTxt;
+    [SerializeField] private TMP_Text m_deathsTxt;
     [SerializeField] private GameObject m_crosshairObject;
     private Crosshair m_crosshair;
 
@@ -16,10 +18,9 @@ public class GameUIViewController : MonoBehaviour
         m_crosshair = m_crosshairObject.GetComponent<Crosshair>();
     }
 
-    public void UpdateHealthText(string value)
-    {
-        m_healthTxt.text = value;
-    }
+    public void UpdateHealthText(string value) => m_healthTxt.text = value;
+    public void UpdateKillsText(string value) => m_killsTxt.text = value;
+    public void UpdateDeathsText(string value) => m_deathsTxt.text = value;
 
     public void SetCrosshairActive(bool val)
     {

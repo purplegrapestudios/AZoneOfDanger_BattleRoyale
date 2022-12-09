@@ -59,8 +59,8 @@ public class CharacterCameraDolly : NetworkBehaviour
         if (!m_initailized) return;
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
-            NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
-            NetworkedDollyOffset = dollyDir * distance;
+            //NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
+            //NetworkedDollyOffset = dollyDir * distance;
         }
     }
 
@@ -81,18 +81,18 @@ public class CharacterCameraDolly : NetworkBehaviour
         {
             if (m_characterCam.GetCameraRotationY() < 0)
             {
-                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.maximumY) / 4 + 0.5f; //Inverse Y offset of 0.5 looking straight to 0.75 looking down
-                modZPos = -m_characterCam.GetCameraRotationY() * 1.1f / m_characterCam.maximumY;  //Z offset of +1.1 (Looing up)
+                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.MaximumY) / 4 + 0.5f; //Inverse Y offset of 0.5 looking straight to 0.75 looking down
+                modZPos = -m_characterCam.GetCameraRotationY() * 1.1f / m_characterCam.MaximumY;  //Z offset of +1.1 (Looing up)
             }
             else 
             {
-                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.maximumY) + 0.5f; //Inverse Y offset of 0.5 looking straight to -0.5 looking up
-                modZPos = m_characterCam.GetCameraRotationY() * 0.3f / m_characterCam.maximumY;  //Z Offset of +0.3 (Looing Down)
+                modYPos = (-m_characterCam.GetCameraRotationY() / m_characterCam.MaximumY) + 0.5f; //Inverse Y offset of 0.5 looking straight to -0.5 looking up
+                modZPos = m_characterCam.GetCameraRotationY() * 0.3f / m_characterCam.MaximumY;  //Z Offset of +0.3 (Looing Down)
             }
             modXPos = -0.2f;
         }
 
-        m_cameraTr.localPosition = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Time.deltaTime * smooth);
+        m_cameraTr.localPosition = NetworkedCameraOffset;
 
         desiredCameraPos = tr.parent.TransformPoint(dollyDir * maxDistance * 2);
         //Debug.DrawLine(tr.parent.position, desiredCameraPos, Color.magenta);
@@ -109,13 +109,19 @@ public class CharacterCameraDolly : NetworkBehaviour
         }
 
 
-        tr.localPosition = Vector3.Lerp(tr.localPosition, dollyDir * distance, Time.deltaTime * smooth);
+        tr.localPosition = NetworkedDollyOffset;
 
         //if (Input.GetKeyDown(KeyCode.Return))
         //    UnityEditor.EditorApplication.isPaused = true;
 
     }
 
+
+    private void LateUpdate()
+    {
+        NetworkedCameraOffset = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Time.deltaTime * smooth);
+        NetworkedDollyOffset = Vector3.Lerp(tr.localPosition, dollyDir * distance, Time.deltaTime * smooth);
+    }
     public void RestDollyPosition()
     {
         distance = maxDistance;

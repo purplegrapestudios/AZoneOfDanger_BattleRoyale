@@ -64,7 +64,7 @@ public class Character : NetworkBehaviour
 			characterCamera: m_components.PlayerCamera.GetComponent<CharacterCamera>(),
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_components.MuzzleFlash,
-			damageCallback: (damage) => { m_characterHealth.OnTakeDamage(damage); },
+			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
 			fireWeaponAudioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); });
 		m_characterAnimation.Initialize();
 		transform.rotation = Quaternion.identity;

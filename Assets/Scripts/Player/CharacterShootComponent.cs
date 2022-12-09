@@ -12,7 +12,7 @@ public class CharacterShootComponent : NetworkBehaviour
     [SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
     [SerializeField] private ParticleSystem m_muzzleFlash;
     [SerializeField] private bool m_isInitialized;
-    private System.Action<float> m_takeDamageCallback;
+    private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
     private System.Action<EAudioClip> m_fireWeaponAudioCallback;
 
     [Networked] public bool NetworkedFire { get; set; }
@@ -20,7 +20,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterCamera characterCamera, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
+    public void Initialize(Character character, CharacterCamera characterCamera, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
@@ -126,9 +126,9 @@ public class CharacterShootComponent : NetworkBehaviour
                 {
                     Debug.Log($"{m_character.Player.Name} took {5} damage");
                     if (hitInfo.Hitbox.HitboxIndex == 0)
-                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5);
+                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5, GetComponent<CharacterHealthComponent>());
                     else
-                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(50);
+                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(50, GetComponent<CharacterHealthComponent>());
                 }
 
                 //Change localPlayer's crosshair only

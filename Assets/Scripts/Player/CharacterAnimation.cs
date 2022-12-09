@@ -54,24 +54,12 @@ public class CharacterAnimation : NetworkBehaviour
     private PlayerCameraView originalPlayerCamerView;
     private bool isInitialized;
 
-    //Networked Variables used for Character Animation
-    //[Networked] public Vector3 NetworkedVelocity { get; set; }
-    //[Networked] public bool NetworkedFloorDetected { get; set; }
-    //[Networked] public float NetworkedAimDirectionY { get; set; }
-
     public void Initialize () {
 
-        //NetworkPlayerMovement = GetComponent<NetworkPlayerMovement>();
         m_characterMoveComponent = GetComponent<CharacterMoveComponent>();
-        //PlayerShooting = GetComponent<PlayerShooting>();
         m_characterCamera = GetComponent<CharacterComponents>().PlayerCamera.GetComponent<CharacterCamera>();
         Animator_1stPerson = GetComponent<CharacterComponents>().animator1;
         Animator_3rdPerson = GetComponent<CharacterComponents>().animator3;
-        //PhotonView = GetComponent<PhotonView>();
-        //PlayerCamera = GetComponent<PlayerObjectComponents>().PlayerCamera.GetComponent<Camera>();
-        //DeathCamera = GetComponent<PlayerObjectComponents>().DeathCamera.GetComponent<Camera>();
-        //
-        //playerCameraView = PlayerCameraView.FirstPerson;
 
         Param_3rdPersonLowerBody = Animator.StringToHash("Param_3rdPersonLowerBody");
         Param_3rdPersonUpperBody = Animator.StringToHash("Param_3rdPersonUpperBody");
@@ -86,34 +74,13 @@ public class CharacterAnimation : NetworkBehaviour
     bool __isFiringBullet;
     bool __isAiming;
 
-    public override void FixedUpdateNetwork()
+    private void LateUpdate()
     {
         if (!isInitialized) return;
-        //if (!Object.HasInputAuthority) return;
-        AnimationBehavior_OurPlayer(isPlayerAlive: true);
 
-        //Animation Behavior of Our Controlled Character
-        //NetworkedAimDirectionY = m_characterCamera.NetworkedRotationY / 80f;
-        //AnimationBehavior_OurPlayer(isPlayerAlive: true);
+        AnimationBehavior_OurPlayer(isPlayerAlive: true);
         __isFiringBullet = false;
         __isAiming = false;
-
-        //NetworkedVelocity = m_characterMoveComponent.m_moveData.V_PlayerVelocity;
-        //NetworkedFloorDetected = m_characterMoveComponent.m_moveData.V_IsFloorDetected;
-        //if (PhotonView.isMine)
-        //{
-        //    if (PlayerMovement.MovementType.Equals(MovementType.Player))
-        //    {
-        //        //Only Animate 
-        //    }
-        //    SwitchCameraBehavior();
-        //}
-        //else
-        //{
-        //    //Animation Behavior of Networked Characters
-        //    //Variables are baseed off NetworkPlayerMovement values provided based on (HP / Speed / Grounded / etc...)
-        //    AnimationBehavior_NetworkedPlayers();
-        //}
     }
 
     private void AnimationBehavior_OurPlayer(bool isPlayerAlive)

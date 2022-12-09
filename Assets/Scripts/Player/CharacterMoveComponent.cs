@@ -151,7 +151,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     {
         if (!m_initialized) return;
 
-        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity / 3f) * 0.1f * Time.timeScale;
+        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity * 1f) * Time.timeScale;
         //Debug.Log($"Player RotationY: {m_moveData.V_RotationY}");
         OnRotate();
         if (!(m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))) return;
