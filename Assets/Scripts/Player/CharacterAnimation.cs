@@ -16,6 +16,7 @@ public class CharacterAnimation : NetworkBehaviour
     /// </summary>
     //Player components required in animating the player
     private CharacterMoveComponent m_characterMoveComponent;
+    private CharacterShootComponent m_characterShootComponent;
     //private PlayerShooting PlayerShooting;
     private CharacterCamera m_characterCamera;
     private Animator Animator_1stPerson;
@@ -27,8 +28,11 @@ public class CharacterAnimation : NetworkBehaviour
     private int Param_3rdPersonLowerBody;
     private int Param_3rdPersonUpperBody;
     private int Param_3rdPerson_AimAngle;
-    private int Param_JumpBool;
+    private int Param_JumpInt;
     private int Param_DeathBool;
+    private int Param_Speed;
+    private int Param_AimInt;
+    private int Param_FireInt;
     private int Param_1stPersonUpperBody_AR;
 
     //Networked PlayerAnimator Component: Parameter values
@@ -57,6 +61,7 @@ public class CharacterAnimation : NetworkBehaviour
     public void Initialize () {
 
         m_characterMoveComponent = GetComponent<CharacterMoveComponent>();
+        m_characterShootComponent = GetComponent<CharacterShootComponent>();
         m_characterCamera = GetComponent<CharacterComponents>().PlayerCamera.GetComponent<CharacterCamera>();
         Animator_1stPerson = GetComponent<CharacterComponents>().animator1;
         Animator_3rdPerson = GetComponent<CharacterComponents>().animator3;
@@ -64,8 +69,11 @@ public class CharacterAnimation : NetworkBehaviour
         Param_3rdPersonLowerBody = Animator.StringToHash("Param_3rdPersonLowerBody");
         Param_3rdPersonUpperBody = Animator.StringToHash("Param_3rdPersonUpperBody");
         Param_3rdPerson_AimAngle = Animator.StringToHash("Param_3rdPerson_AimAngle");
-        Param_JumpBool = Animator.StringToHash("JumpBool");
+        Param_JumpInt = Animator.StringToHash("Param_JumpInt");
         Param_DeathBool = Animator.StringToHash("DeathBool");
+        Param_Speed = Animator.StringToHash("Param_Speed");
+        Param_AimInt = Animator.StringToHash("Param_AimInt");
+        Param_FireInt = Animator.StringToHash("Param_FireInt");
         Param_1stPersonUpperBody_AR = Animator.StringToHash("Param_1stPersonUpperBody_AR");
         isInitialized = true;
     }
@@ -88,7 +96,10 @@ public class CharacterAnimation : NetworkBehaviour
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat_3rdPersonAimAngle(m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
+            SetStateFloat(ref Param_Speed, m_characterMoveComponent.NetworkedVelocity.magnitude, smooth: .5f);
+            SetStateFloat(ref Param_3rdPerson_AimAngle, m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
+            SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
+            SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
 
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
@@ -276,7 +287,7 @@ public class CharacterAnimation : NetworkBehaviour
     private void SetStateBool_3rdPersonJump(bool val)
     {
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
-            Animator_3rdPerson.SetBool(Param_JumpBool, val);
+            Animator_3rdPerson.SetBool(Param_JumpInt, val);
     }
 
     private void SetStateBool_3rdPersonDeath(bool val)
@@ -284,6 +295,34 @@ public class CharacterAnimation : NetworkBehaviour
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
             Animator_3rdPerson.SetBool(Param_DeathBool, val);
     }
+
+    private void SetStateFloat(ref int param, float val, float smooth = 1)
+    {
+        if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
+
+            if (smooth == 1)
+            {
+                Animator_3rdPerson.SetFloat(param, val);
+                return;
+            }
+
+        var value = Animator_3rdPerson.GetFloat(param);
+        var lerpedValue = Mathf.Lerp(value, val, smooth);
+        Animator_3rdPerson.SetFloat(param, lerpedValue);
+    }
+
+    private void SetStateBool(ref int param, bool val)
+    {
+        if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
+            Animator_3rdPerson.SetBool(param, val);
+    }
+
+    private void SetStateInt(ref int param, int val)
+    {
+        if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
+            Animator_3rdPerson.SetInteger(param, val);
+    }
+
 
     private void SetStateFloat_3rdPersonAimAngle(float val, float smooth = 1f)
     {
@@ -306,6 +345,14 @@ public class CharacterAnimation : NetworkBehaviour
         return;
         if (playerCameraView.Equals(PlayerCameraView.FirstPerson))
             Animator_1stPerson.SetInteger(Param_1stPersonUpperBody_AR, val);
+    }
+
+    private int GetStateInt(ref int param)
+    {
+        if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
+            return Animator_3rdPerson.GetInteger(param);
+
+        return -1;
     }
 
     /// <summary>

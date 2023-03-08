@@ -50,6 +50,10 @@ public class CharacterShootComponent : NetworkBehaviour
 
                 NetworkedFire = true;
             }
+            else
+            {
+                NetworkedFire = false;
+            }
         }
         //GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshairUpdate(false);
         FireInput(m_inputData);
@@ -88,7 +92,7 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void StopFireCoroutine()
     {
-        NetworkedFire = false;
+        //NetworkedFire = false;
         StopCoroutine(FireCoroutine);
         FireCoroutine = null;
     }
