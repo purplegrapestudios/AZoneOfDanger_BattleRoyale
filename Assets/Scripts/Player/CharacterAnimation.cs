@@ -17,6 +17,7 @@ public class CharacterAnimation : NetworkBehaviour
     //Player components required in animating the player
     private CharacterMoveComponent m_characterMoveComponent;
     private CharacterShootComponent m_characterShootComponent;
+    private CharacterHealthComponent m_characterHealthComponent;
     //private PlayerShooting PlayerShooting;
     private CharacterCamera m_characterCamera;
     private Animator Animator_1stPerson;
@@ -29,7 +30,7 @@ public class CharacterAnimation : NetworkBehaviour
     private int Param_3rdPersonUpperBody;
     private int Param_3rdPerson_AimAngle;
     private int Param_JumpInt;
-    private int Param_DeathBool;
+    private int Param_DeadInt;
     private int Param_Speed;
     private int Param_AimInt;
     private int Param_FireInt;
@@ -62,6 +63,7 @@ public class CharacterAnimation : NetworkBehaviour
 
         m_characterMoveComponent = GetComponent<CharacterMoveComponent>();
         m_characterShootComponent = GetComponent<CharacterShootComponent>();
+        m_characterHealthComponent = GetComponent<CharacterHealthComponent>();
         m_characterCamera = GetComponent<CharacterComponents>().PlayerCamera.GetComponent<CharacterCamera>();
         Animator_1stPerson = GetComponent<CharacterComponents>().animator1;
         Animator_3rdPerson = GetComponent<CharacterComponents>().animator3;
@@ -70,7 +72,7 @@ public class CharacterAnimation : NetworkBehaviour
         Param_3rdPersonUpperBody = Animator.StringToHash("Param_3rdPersonUpperBody");
         Param_3rdPerson_AimAngle = Animator.StringToHash("Param_3rdPerson_AimAngle");
         Param_JumpInt = Animator.StringToHash("Param_JumpInt");
-        Param_DeathBool = Animator.StringToHash("DeathBool");
+        Param_DeadInt = Animator.StringToHash("Param_DeadInt");
         Param_Speed = Animator.StringToHash("Param_Speed");
         Param_AimInt = Animator.StringToHash("Param_AimInt");
         Param_FireInt = Animator.StringToHash("Param_FireInt");
@@ -100,7 +102,7 @@ public class CharacterAnimation : NetworkBehaviour
             SetStateFloat(ref Param_3rdPerson_AimAngle, m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
             SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
             SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
-
+            SetStateInt(ref Param_DeadInt, !m_characterHealthComponent.NetworkedIsAlive ? 1 : 0);
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
             {
@@ -293,7 +295,7 @@ public class CharacterAnimation : NetworkBehaviour
     private void SetStateBool_3rdPersonDeath(bool val)
     {
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
-            Animator_3rdPerson.SetBool(Param_DeathBool, val);
+            Animator_3rdPerson.SetBool(Param_DeadInt, val);
     }
 
     private void SetStateFloat(ref int param, float val, float smooth = 1)

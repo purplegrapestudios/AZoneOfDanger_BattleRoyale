@@ -128,7 +128,8 @@ public class CharacterHealthComponent : NetworkBehaviour
     private IEnumerator RespawnCO(CharacterHealthComponent changedBehaviour)
     {
         Debug.Log("Waiting to respawn");
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(3);
+        changedBehaviour.NetworkedIsAlive = true;
         GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
         Debug.Log("Finish respawn");
         StopRespawnCoroutine(changedBehaviour);

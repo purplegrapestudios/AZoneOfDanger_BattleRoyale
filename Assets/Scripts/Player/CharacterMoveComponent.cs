@@ -53,6 +53,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     private Rigidbody Rigidbody;
     private CharacterComponents PlayerObjectComponents;
     private CharacterAnimation PlayerAnimation;
+    private CharacterHealthComponent m_characterHealthComponent;
     private Character m_character;
     private bool m_initialized;
 
@@ -73,8 +74,10 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         Rigidbody.inertiaTensorRotation = Quaternion.identity;
     }
 
-    public void InitCharacterMovement()
+    public void InitCharacterMovement(CharacterHealthComponent characterHealthComponent)
     {
+        m_characterHealthComponent = characterHealthComponent;
+
         m_character = GetComponent<Character>();
         Rigidbody = GetComponent<Rigidbody>();
         ResetRigidBodyState();
@@ -150,6 +153,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     void IBeforeUpdate.BeforeUpdate()
     {
         if (!m_initialized) return;
+        if (!m_characterHealthComponent.NetworkedIsAlive) return;
 
         m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity * 1f) * Time.timeScale;
         //Debug.Log($"Player RotationY: {m_moveData.V_RotationY}");
@@ -166,6 +170,8 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     public override void FixedUpdateNetwork()
     {
         if (!m_initialized) return;
+        if (!m_characterHealthComponent.NetworkedIsAlive) return;
+
         ResetRigidBodyState();
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {

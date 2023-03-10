@@ -8,6 +8,7 @@ public class CharacterShootComponent : NetworkBehaviour
     public LayerMask m_damagableLayerMask = ~(1 << 9);  //Do not hit itemLayer
     [SerializeField] private int m_fireRate = 10;
     [SerializeField] private Character m_character;
+    [SerializeField] private CharacterHealthComponent m_characterHealth;
     [SerializeField] private CharacterCamera m_characterCamera;
     [SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
     [SerializeField] private ParticleSystem m_muzzleFlash;
@@ -20,10 +21,11 @@ public class CharacterShootComponent : NetworkBehaviour
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterCamera characterCamera, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
+        m_characterHealth = characterHealth;
         m_muzzleFlash = muzzleFlash;
         m_characterCamera = characterCamera;
         m_characterMuzzle = characterMuzzle;
@@ -39,7 +41,8 @@ public class CharacterShootComponent : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (!m_isInitialized) return;
-        
+        if (!m_characterHealth.NetworkedIsAlive) return;
+
         if (m_character.PlayerInputEnabled() && GetInput(out InputData data))
         {
             m_inputData = data;

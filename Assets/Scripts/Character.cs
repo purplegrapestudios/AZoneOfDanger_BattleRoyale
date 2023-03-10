@@ -56,11 +56,12 @@ public class Character : NetworkBehaviour
 
 		SceneCamera.instance.SetSceneCameraActive(false);
 
-		m_characterMoveComponent.InitCharacterMovement();
+		m_characterMoveComponent.InitCharacterMovement(m_characterHealth);
 		m_characterHealth.Initialize(this);
 		m_characterAudio.Initialize(m_components.PlayerCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
 			character: this, 
+			characterHealth: m_characterHealth,
 			characterCamera: m_components.PlayerCamera.GetComponent<CharacterCamera>(),
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_components.MuzzleFlash,
