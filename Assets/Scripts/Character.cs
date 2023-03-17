@@ -17,6 +17,7 @@ public class Character : NetworkBehaviour
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
 	[SerializeField] private CharacterHealthComponent m_characterHealth;
 	[SerializeField] private CharacterShootComponent m_characterShoot;
+	[SerializeField] private CharacterWeapons m_characterWeapons;
 	[SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
 	[SerializeField] private CharacterAudioComponent m_characterAudio;
 	[SerializeField] private CharacterAnimation m_characterAnimation;
@@ -63,6 +64,7 @@ public class Character : NetworkBehaviour
 			character: this, 
 			characterHealth: m_characterHealth,
 			characterCamera: m_components.PlayerCamera.GetComponent<CharacterCamera>(),
+			characterWeapons: m_characterWeapons,
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_components.MuzzleFlash,
 			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },

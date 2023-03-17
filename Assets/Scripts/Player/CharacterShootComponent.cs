@@ -6,26 +6,31 @@ using UnityEngine;
 public class CharacterShootComponent : NetworkBehaviour
 {
     public LayerMask m_damagableLayerMask = ~(1 << 9);  //Do not hit itemLayer
+    private Character m_character;
+    private CharacterHealthComponent m_characterHealth;
+    private CharacterCamera m_characterCamera;
+    private CharacterMuzzleComponent m_characterMuzzle;
+    private CharacterWeapons m_characterWeapons; 
+    private ParticleSystem m_muzzleFlash;
+    
     [SerializeField] private int m_fireRate = 10;
-    [SerializeField] private Character m_character;
-    [SerializeField] private CharacterHealthComponent m_characterHealth;
-    [SerializeField] private CharacterCamera m_characterCamera;
-    [SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
-    [SerializeField] private ParticleSystem m_muzzleFlash;
     [SerializeField] private bool m_isInitialized;
+    
     private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
     private System.Action<EAudioClip> m_fireWeaponAudioCallback;
 
     [Networked] public NetworkBool NetworkedFire { get; set; }
+    [Networked] public NetworkBool NetworkedSwitchWeapon { get; set; }
 
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
         m_characterHealth = characterHealth;
+        m_characterWeapons = characterWeapons;
         m_muzzleFlash = muzzleFlash;
         m_characterCamera = characterCamera;
         m_characterMuzzle = characterMuzzle;
@@ -50,19 +55,34 @@ public class CharacterShootComponent : NetworkBehaviour
             {
                 if (FireCoroutine != null)
                     return;
-
+            
                 NetworkedFire = true;
             }
             else
             {
                 NetworkedFire = false;
             }
+
+            if (data.GetButton(ButtonFlag.WEAPON_00))
+            {
+                SwitchWeapon(0);
+            }
+            else if (data.GetButton(ButtonFlag.WEAPON_01))
+            {
+                SwitchWeapon(1);
+            }
+
+            else
+            {
+                NetworkedSwitchWeapon = false;
+            }
         }
         //GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshairUpdate(false);
-        FireInput(m_inputData);
+        FireInput();
+        SwitchWeaponInput();
     }
 
-    private void FireInput(InputData data)
+    private void FireInput()
     {
         if (NetworkedFire)
         {
@@ -93,11 +113,53 @@ public class CharacterShootComponent : NetworkBehaviour
         StopFireCoroutine();
     }
 
+
     private void StopFireCoroutine()
     {
         //NetworkedFire = false;
         StopCoroutine(FireCoroutine);
         FireCoroutine = null;
+    }
+
+    private void SwitchWeapon(int weaponIndex)
+    {
+        var switchToWeapon = m_characterWeapons.Weapons[weaponIndex];
+        if (m_characterWeapons.CurrWeapon != switchToWeapon)
+        {
+            m_characterWeapons.SwitchWeapons(m_characterWeapons.CurrWeapon, switchToWeapon);
+            NetworkedSwitchWeapon = true;
+        }
+    }
+
+    private void SwitchWeaponInput()
+    {
+        if (NetworkedSwitchWeapon)
+        {
+            if (SwitchWeaponCoroutine != null) return;
+            BeginSwitchWeaponCoroutine();
+        }
+    }
+
+    private void BeginSwitchWeaponCoroutine()
+    {
+        if (SwitchWeaponCoroutine != null)
+        {
+            Debug.Log("Still Switching Weapon");
+            return;
+        }
+        SwitchWeaponCoroutine = SwitchWeaponCO();
+        StartCoroutine(SwitchWeaponCoroutine);
+    }
+
+    IEnumerator SwitchWeaponCoroutine;
+    IEnumerator SwitchWeaponCO()
+    {
+        if (NetworkedSwitchWeapon)
+        {
+            yield return new WaitForSeconds(.5f);
+        }
+        StopCoroutine(SwitchWeaponCoroutine);
+        SwitchWeaponCoroutine = null;
     }
 
     private void SpawnProjectile()

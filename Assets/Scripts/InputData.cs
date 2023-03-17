@@ -11,6 +11,8 @@ public enum ButtonFlag
 	RESPAWN = 1 << 4,
 	JUMP = 1 << 5,
 	FIRE = 1 << 6,
+	WEAPON_00 = 1 << 7,
+	WEAPON_01 = 1 << 8,
 }
 
 public struct InputData : INetworkInput

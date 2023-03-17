@@ -886,10 +886,10 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 0
-  cloudProjectId: d9892e9f-08d4-41b5-8b00-4bfcc87b79b5
+  cloudProjectId: a4e8e7c4-e7da-4c2c-b319-494fb42876c1
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Photon-Bolt-Fusion-Learning
+  projectName: AZoneOfDanger_BattleRoyale
   organizationId: peter-tan-as-publisher
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
