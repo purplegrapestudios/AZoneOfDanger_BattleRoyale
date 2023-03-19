@@ -68,7 +68,7 @@ public class Character : NetworkBehaviour
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_components.MuzzleFlash,
 			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
-			fireWeaponAudioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
+			audioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
 			ammoCounterCallback: (ammoRemaining, maxAmmoRemaining, clipSize) => { GameUIViewController.Instance.SetAmmoInfo(ammoRemaining, maxAmmoRemaining, clipSize); },
 			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); });
 		m_characterAnimation.Initialize();

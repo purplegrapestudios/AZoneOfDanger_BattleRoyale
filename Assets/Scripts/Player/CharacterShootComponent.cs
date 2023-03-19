@@ -17,10 +17,11 @@ public class CharacterShootComponent : NetworkBehaviour
     [SerializeField] private bool m_isInitialized;
     
     private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
-    private System.Action<EAudioClip> m_fireWeaponAudioCallback;
+    private System.Action<EAudioClip> m_audioCallback;
     private System.Action<int, int, int> m_ammoCounterCallback;
     private System.Action<CharacterShootComponent> m_crosshairCallback;
 
+    [Networked] public NetworkBool NetworkedHasAmmo { get; set; }
     [Networked] public NetworkBool NetworkedFire { get; set; }
     [Networked] public NetworkBool NetworkedReload { get; set; }
     [Networked] public NetworkBool NetworkedSwitchWeapon { get; set; }
@@ -30,7 +31,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> audioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
@@ -41,6 +42,7 @@ public class CharacterShootComponent : NetworkBehaviour
         m_characterMuzzle = characterMuzzle;
         m_characterMuzzle.Initialize(this, m_muzzleFlash);
 
+        NetworkedHasAmmo = false;
         NetworkedFire = false;
         NetworkedSwitchWeapon = false;
 
@@ -48,9 +50,11 @@ public class CharacterShootComponent : NetworkBehaviour
         NetworkedCurrWeaponID = 0;
 
         m_takeDamageCallback = damageCallback;
-        m_fireWeaponAudioCallback = fireWeaponAudioCallback;
+        m_audioCallback = audioCallback;
         m_ammoCounterCallback = ammoCounterCallback;
         m_crosshairCallback = crosshairCallback;
+
+        m_crosshairCallback(this);
 
         m_isInitialized = true;
     }
@@ -155,8 +159,6 @@ public class CharacterShootComponent : NetworkBehaviour
         {
             NetworkedSwitchWeapon = true;
         }
-
-        m_crosshairCallback(this);
     }
 
     private void SwitchWeaponInput()
@@ -187,6 +189,9 @@ public class CharacterShootComponent : NetworkBehaviour
             m_characterWeapons.SwitchWeapons(NetworkedWeaponID);
             NetworkedCurrWeaponID = NetworkedWeaponID;
             m_ammoCounterCallback(m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount, m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount, m_characterWeapons.Weapons[NetworkedWeaponID].clipSize);
+            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount > 0;
+            m_crosshairCallback(this);
+
             yield return new WaitForSeconds(.5f);
         }
         StopCoroutine(SwitchWeaponCoroutine);
@@ -209,7 +214,15 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedReload)
         {
+            if(NetworkedWeaponID == 0) m_audioCallback(NetworkedHasAmmo ? m_characterWeapons.Weapons[NetworkedWeaponID].reloadAudio : m_characterWeapons.Weapons[NetworkedWeaponID].reloadEmptyAudio);
+            if (NetworkedWeaponID == 1) {
+                m_audioCallback(m_characterWeapons.Weapons[NetworkedWeaponID].shotgunOpenAudio);
+                yield return new WaitForSeconds(0.2f);
+                m_audioCallback(m_characterWeapons.Weapons[NetworkedWeaponID].shotgunCloseAudio);
+            }
+
             yield return new WaitForSeconds(0.5f);
+            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ReloadAmmo();
             NetworkedReload = false;
         }
         StopCoroutine(ReloadCoroutine);
@@ -268,7 +281,7 @@ public class CharacterShootComponent : NetworkBehaviour
             ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Environment);
         }
 
-        m_fireWeaponAudioCallback(EAudioClip.FireAR);
+        m_audioCallback(EAudioClip.FireAR);
     }
 
 
@@ -326,7 +339,7 @@ public class CharacterShootComponent : NetworkBehaviour
             }
 
         }
-            m_fireWeaponAudioCallback(EAudioClip.FireShotgun);
+            m_audioCallback(EAudioClip.FireShotgun);
         //m_fireWeaponAudioCallback(EAudioClip.FireShotgun);
 
 

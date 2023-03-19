@@ -6,8 +6,14 @@ using UnityEngine;
 
 public enum EAudioClip
 {
+    None,
     FireAR,
-    FireShotgun
+    ReloadAR,
+    ReloadAREmpty,
+    FireShotgun,
+    ReloadShotgun,
+    ShotgunOpen,
+    ShotgunClose,
 }
 
 [Serializable]
