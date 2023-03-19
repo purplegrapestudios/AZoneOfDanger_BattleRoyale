@@ -41,6 +41,7 @@ public class Character : NetworkBehaviour
 	public bool m_inputRight { get; set; }
 	public bool m_inputLeft { get; set; }
 	public bool m_inputJump { get; set; }
+	public bool m_inputCrouch { get; set; }
 
 	[Networked] public Player Player { get; set; }
 	[Networked] Vector2 m_aimDirection { get; set; }
@@ -146,6 +147,16 @@ public class Character : NetworkBehaviour
             {
 				m_inputJump = false;
 			}
+
+			if (data.GetButton(ButtonFlag.CROUCH))
+			{
+				m_inputCrouch = true;
+			}
+			else
+			{
+				m_inputCrouch = false;
+			}
+
 			m_aimDirection = data.aimDirection;
 		}
 	}

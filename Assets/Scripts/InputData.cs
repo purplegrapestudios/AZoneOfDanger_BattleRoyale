@@ -10,10 +10,11 @@ public enum ButtonFlag
 	RIGHT = 1 << 3,
 	RESPAWN = 1 << 4,
 	JUMP = 1 << 5,
-	FIRE = 1 << 6,
-	RELOAD = 1 << 7,
-	WEAPON_00 = 1 << 8,
-	WEAPON_01 = 1 << 9,
+	CROUCH = 1 << 6,
+	FIRE = 1 << 7,
+	RELOAD = 1 << 8,
+	WEAPON_00 = 1 << 9,
+	WEAPON_01 = 1 << 10,
 }
 
 public struct InputData : INetworkInput

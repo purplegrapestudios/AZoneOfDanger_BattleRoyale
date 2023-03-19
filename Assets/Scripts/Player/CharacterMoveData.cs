@@ -74,6 +74,7 @@ public class CharacterMoveData
     public float V_PlayerFriction = 0.0f;                 // Used to display real time friction values
     public Vector3 V_PlayerVelocity = Vector3.zero;
     public bool V_WishJump = false;
+    public bool V_IsCrouched = false;
     public Vector2 V_AimDirection = Vector2.zero;
     //Values: Raycasting
     [HideInInspector] public int V_RaycastFloorType = -1;

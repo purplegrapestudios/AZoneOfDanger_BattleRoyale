@@ -58,6 +58,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     private bool m_initialized;
 
     [Networked] [SerializeField] public NetworkBool NetworkedFloorDetected { get; set; }
+    [Networked] [SerializeField] public NetworkBool NetworkedIsCrouched { get; set; }
     [Networked] [SerializeField] public Vector3 NetworkedVelocity { get; set; }
 
     /// <summary>
@@ -119,6 +120,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         OnGroundCheck(transform.localScale.y + .01f);        // 3) Detect Collision Against Ground
         OnCeilingCheck();           // 4) Detect Collision Against Ceiling
         OnQueueJump();              // 5) Check Jump Input
+        OnToggleCrouch();                 // 6) Crouching
 
         if (m_moveData.V_IsGrounded)
         {
@@ -143,12 +145,8 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         //Used for animation
         NetworkedFloorDetected = m_moveData.V_IsFloorDetected;
         NetworkedVelocity = m_moveData.V_PlayerVelocity;
+        NetworkedIsCrouched = m_moveData.V_IsCrouched;
     }
-
-    //private void LateUpdate()
-    //{
-    //    OnRotate();                 // 1) Rotate Player along Y Axis
-    //}
 
     void IBeforeUpdate.BeforeUpdate()
     {
@@ -156,15 +154,9 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         if (!m_characterHealthComponent.NetworkedIsAlive) return;
 
         m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity * 1f) * Time.timeScale;
-        //Debug.Log($"Player RotationY: {m_moveData.V_RotationY}");
         OnRotate();
         if (!(m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))) return;
 
-    }
-
-    public override void Render()
-    {
-        //OnRotate();
     }
 
     public override void FixedUpdateNetwork()
@@ -481,6 +473,22 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         {
             m_moveData.V_WishJump = false;
         }
+    }
+
+    private void OnToggleCrouch()
+    {
+        if (!m_moveData.V_IsGrounded)
+        {
+            m_moveData.V_IsCrouched = false;
+            return;
+        }
+
+        if (m_character.m_inputCrouch)
+        {
+            m_moveData.V_IsCrouched = !m_moveData.V_IsCrouched;
+        }
+        
+        
     }
 
     private void OnGroundMove(InputData data)

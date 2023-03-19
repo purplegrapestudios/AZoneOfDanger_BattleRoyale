@@ -29,6 +29,7 @@ public class CharacterAnimation : NetworkBehaviour
     private int Param_3rdPersonLowerBody;
     private int Param_3rdPersonUpperBody;
     private int Param_3rdPerson_AimAngle;
+    private int Param_CrouchInt;
     private int Param_JumpInt;
     private int Param_DeadInt;
     private int Param_Speed;
@@ -73,6 +74,7 @@ public class CharacterAnimation : NetworkBehaviour
         Param_3rdPersonLowerBody = Animator.StringToHash("Param_3rdPersonLowerBody");
         Param_3rdPersonUpperBody = Animator.StringToHash("Param_3rdPersonUpperBody");
         Param_3rdPerson_AimAngle = Animator.StringToHash("Param_3rdPerson_AimAngle");
+        Param_CrouchInt = Animator.StringToHash("Param_CrouchInt");
         Param_JumpInt = Animator.StringToHash("Param_JumpInt");
         Param_DeadInt = Animator.StringToHash("Param_DeadInt");
         Param_Speed = Animator.StringToHash("Param_Speed");
@@ -107,6 +109,7 @@ public class CharacterAnimation : NetworkBehaviour
             SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
             SetStateInt(ref Param_ReloadInt, m_characterShootComponent.NetworkedReload ? 1 : 0);
             SetStateInt(ref Param_SwitchWeaponInt, m_characterShootComponent.NetworkedSwitchWeapon ? 1 : 0);
+            SetStateInt(ref Param_CrouchInt, m_characterMoveComponent.NetworkedIsCrouched ? 1 : 0);
             SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
             SetStateInt(ref Param_DeadInt, !m_characterHealthComponent.NetworkedIsAlive ? 1 : 0);
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
