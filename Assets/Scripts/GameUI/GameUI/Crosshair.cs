@@ -1,11 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MPUIKIT;
 
 public class Crosshair : MonoBehaviour
 {
     [SerializeField] private GameObject m_crosshairNormal;
     [SerializeField] private GameObject m_crosshairDamage;
+
+    [SerializeField] private Sprite m_crosshairAR;
+    [SerializeField] private Sprite m_crosshairShotgun;
+    private MPImage m_crosshairImage;
+
+    private void Awake()
+    {
+        m_crosshairImage = GetComponent<MPImage>();
+    }
 
     public void ShowNormalCrosshair()
     {
@@ -36,5 +46,17 @@ public class Crosshair : MonoBehaviour
     {
         StopCoroutine(DamageCrosshairCoroutine);
         DamageCrosshairCoroutine = null;
+    }
+
+    public void SetWeaponCrosshair(CharacterShootComponent characterShoot)
+    {
+        if (characterShoot.NetworkedCurrWeaponID == 0)
+        {
+            m_crosshairImage.sprite = m_crosshairAR;
+        }
+        else if (characterShoot.NetworkedCurrWeaponID == 1)
+        {
+            m_crosshairImage.sprite = m_crosshairShotgun;
+        }
     }
 }

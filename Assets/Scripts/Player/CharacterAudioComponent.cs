@@ -6,7 +6,8 @@ using UnityEngine;
 
 public enum EAudioClip
 {
-    testShot,
+    FireAR,
+    FireShotgun
 }
 
 [Serializable]

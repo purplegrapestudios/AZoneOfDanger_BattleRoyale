@@ -61,14 +61,16 @@ public class Character : NetworkBehaviour
 		m_characterHealth.Initialize(this);
 		m_characterAudio.Initialize(m_components.PlayerCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
-			character: this, 
+			character: this,
 			characterHealth: m_characterHealth,
 			characterCamera: m_components.PlayerCamera.GetComponent<CharacterCamera>(),
 			characterWeapons: m_characterWeapons,
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_components.MuzzleFlash,
 			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
-			fireWeaponAudioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); });
+			fireWeaponAudioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
+			ammoCounterCallback: (ammoRemaining, maxAmmoRemaining, clipSize) => { GameUIViewController.Instance.SetAmmoInfo(ammoRemaining, maxAmmoRemaining, clipSize); },
+			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); });
 		m_characterAnimation.Initialize();
 		transform.rotation = Quaternion.identity;
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;

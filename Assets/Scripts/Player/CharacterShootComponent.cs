@@ -18,14 +18,19 @@ public class CharacterShootComponent : NetworkBehaviour
     
     private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
     private System.Action<EAudioClip> m_fireWeaponAudioCallback;
+    private System.Action<int, int, int> m_ammoCounterCallback;
+    private System.Action<CharacterShootComponent> m_crosshairCallback;
 
     [Networked] public NetworkBool NetworkedFire { get; set; }
+    [Networked] public NetworkBool NetworkedReload { get; set; }
     [Networked] public NetworkBool NetworkedSwitchWeapon { get; set; }
+    [Networked] public int NetworkedWeaponID { get; set; }
+    [Networked] public int NetworkedCurrWeaponID { get; set; }
 
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> fireWeaponAudioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
@@ -37,9 +42,16 @@ public class CharacterShootComponent : NetworkBehaviour
         m_characterMuzzle.Initialize(this, m_muzzleFlash);
 
         NetworkedFire = false;
+        NetworkedSwitchWeapon = false;
+
+        NetworkedWeaponID = 0;
+        NetworkedCurrWeaponID = 0;
+
         m_takeDamageCallback = damageCallback;
         m_fireWeaponAudioCallback = fireWeaponAudioCallback;
-        GameUIViewController.Instance.GetCrosshair().ShowNormalCrosshair();
+        m_ammoCounterCallback = ammoCounterCallback;
+        m_crosshairCallback = crosshairCallback;
+
         m_isInitialized = true;
     }
 
@@ -71,15 +83,20 @@ public class CharacterShootComponent : NetworkBehaviour
             {
                 SwitchWeapon(1);
             }
-
             else
             {
                 NetworkedSwitchWeapon = false;
+            }
+
+            if (data.GetButton(ButtonFlag.RELOAD))
+            {
+                NetworkedReload = true;
             }
         }
         //GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshairUpdate(false);
         FireInput();
         SwitchWeaponInput();
+        ReloadInput();
     }
 
     private void FireInput()
@@ -107,8 +124,16 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedFire)
         {
-            FireHitScanWeapon();
-            yield return new WaitForSeconds(1f / m_fireRate);
+            if (NetworkedWeaponID == 0)
+            {
+                FireHitScanWeapon();
+                yield return new WaitForSeconds(1f / m_fireRate);
+            }
+            else if (NetworkedWeaponID == 1)
+            {
+                FireShotgunSpread();
+                yield return new WaitForSeconds(1f);
+            }
         }
         StopFireCoroutine();
     }
@@ -124,11 +149,14 @@ public class CharacterShootComponent : NetworkBehaviour
     private void SwitchWeapon(int weaponIndex)
     {
         var switchToWeapon = m_characterWeapons.Weapons[weaponIndex];
-        if (m_characterWeapons.CurrWeapon != switchToWeapon)
+        NetworkedWeaponID = switchToWeapon.id;
+
+        if (NetworkedCurrWeaponID != NetworkedWeaponID)
         {
-            m_characterWeapons.SwitchWeapons(m_characterWeapons.CurrWeapon, switchToWeapon);
             NetworkedSwitchWeapon = true;
         }
+
+        m_crosshairCallback(this);
     }
 
     private void SwitchWeaponInput()
@@ -156,10 +184,36 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedSwitchWeapon)
         {
+            m_characterWeapons.SwitchWeapons(NetworkedWeaponID);
+            NetworkedCurrWeaponID = NetworkedWeaponID;
+            m_ammoCounterCallback(m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount, m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount, m_characterWeapons.Weapons[NetworkedWeaponID].clipSize);
             yield return new WaitForSeconds(.5f);
         }
         StopCoroutine(SwitchWeaponCoroutine);
         SwitchWeaponCoroutine = null;
+    }
+
+    private void ReloadInput()
+    {
+        if (ReloadCoroutine != null)
+        {
+            Debug.Log("Still Reloading");
+            return;
+        }
+        ReloadCoroutine = ReloadCO();
+        StartCoroutine(ReloadCoroutine);
+    }
+
+    IEnumerator ReloadCoroutine;
+    IEnumerator ReloadCO()
+    {
+        if (NetworkedReload)
+        {
+            yield return new WaitForSeconds(0.5f);
+            NetworkedReload = false;
+        }
+        StopCoroutine(ReloadCoroutine);
+        ReloadCoroutine = null;
     }
 
     private void SpawnProjectile()
@@ -170,6 +224,8 @@ public class CharacterShootComponent : NetworkBehaviour
     private void FireHitScanWeapon()
     {
         if (!NetworkedFire) return;
+        if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
+        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(1);
 
         var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
         var dir = rot * Vector3.forward;
@@ -195,7 +251,7 @@ public class CharacterShootComponent : NetworkBehaviour
                 {
                     Debug.Log($"{m_character.Player.Name} took {5} damage");
                     if (hitInfo.Hitbox.HitboxIndex == 0)
-                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5, GetComponent<CharacterHealthComponent>());
+                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(25, GetComponent<CharacterHealthComponent>());
                     else
                         hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(50, GetComponent<CharacterHealthComponent>());
                 }
@@ -212,7 +268,67 @@ public class CharacterShootComponent : NetworkBehaviour
             ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Environment);
         }
 
-        m_fireWeaponAudioCallback(EAudioClip.testShot);
+        m_fireWeaponAudioCallback(EAudioClip.FireAR);
     }
 
+
+    private void FireShotgunSpread()
+    {
+        if (!NetworkedFire) return;
+        if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
+        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(1);
+
+        var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
+        var dir = rot * Vector3.forward;
+        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.transform.position, m_characterCamera.NetworkedPosition);
+        distFromCamToMuzzle = Mathf.Min(distFromCamToMuzzle, m_character.transform.localScale.x * 1.5f);
+        var orig = m_characterCamera.NetworkedPosition + dir * distFromCamToMuzzle;
+
+        for (int i=0;i< 10; i++)
+        {
+            float angleX = Random.Range(-180, 180) * Mathf.Deg2Rad;
+            float angleZ = Random.Range(-180, 180) * Mathf.Deg2Rad;
+            Vector3 spreadDir = Quaternion.Euler(0f, angleX, angleZ) * dir;
+            Runner.LagCompensation.Raycast(origin: orig, direction: spreadDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
+            Debug.DrawRay(orig, spreadDir * 100, Color.red, 0.1f);
+
+            float hitDistance = 100;
+            if (hitInfo.Distance > 0)
+                hitDistance = hitInfo.Distance;
+
+            if (hitInfo.Hitbox != null)
+            {
+                if (hitInfo.Hitbox.Root.GetComponent<Character>().Object.Id != m_character.Object.Id)
+                {
+
+                    //Debug.Log($"We hit a HitBox Object: {hitInfo.Hitbox.transform.root.name}, Pos: {hitInfo.Point}");
+                    ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Player);
+
+                    if (HasStateAuthority)
+                    {
+                        Debug.Log($"{m_character.Player.Name} took {5} damage");
+                        if (hitInfo.Hitbox.HitboxIndex == 0)
+                            hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5, GetComponent<CharacterHealthComponent>());
+                        else
+                            hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(15, GetComponent<CharacterHealthComponent>());
+                    }
+
+                    //Change localPlayer's crosshair only
+                    if (m_character.Object.HasInputAuthority)
+                        GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshair();
+
+                }
+            }
+            else if (hitInfo.Collider != null)
+            {
+                //Debug.Log($"We hit a Physx Object: {hitInfo.Collider.transform.name}, Pos: {hitInfo.Point}");
+                ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Environment);
+            }
+
+        }
+            m_fireWeaponAudioCallback(EAudioClip.FireShotgun);
+        //m_fireWeaponAudioCallback(EAudioClip.FireShotgun);
+
+
+    }
 }

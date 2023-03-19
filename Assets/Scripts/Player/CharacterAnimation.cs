@@ -34,6 +34,7 @@ public class CharacterAnimation : NetworkBehaviour
     private int Param_Speed;
     private int Param_AimInt;
     private int Param_FireInt;
+    private int Param_ReloadInt;
     private int Param_SwitchWeaponInt;
     private int Param_1stPersonUpperBody_AR;
 
@@ -77,6 +78,7 @@ public class CharacterAnimation : NetworkBehaviour
         Param_Speed = Animator.StringToHash("Param_Speed");
         Param_AimInt = Animator.StringToHash("Param_AimInt");
         Param_FireInt = Animator.StringToHash("Param_FireInt");
+        Param_ReloadInt = Animator.StringToHash("Param_ReloadInt");
         Param_SwitchWeaponInt = Animator.StringToHash("Param_SwitchWeaponInt");
         Param_1stPersonUpperBody_AR = Animator.StringToHash("Param_1stPersonUpperBody_AR");
         isInitialized = true;
@@ -103,6 +105,7 @@ public class CharacterAnimation : NetworkBehaviour
             SetStateFloat(ref Param_Speed, m_characterMoveComponent.NetworkedVelocity.magnitude, smooth: .5f);
             SetStateFloat(ref Param_3rdPerson_AimAngle, m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
             SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
+            SetStateInt(ref Param_ReloadInt, m_characterShootComponent.NetworkedReload ? 1 : 0);
             SetStateInt(ref Param_SwitchWeaponInt, m_characterShootComponent.NetworkedSwitchWeapon ? 1 : 0);
             SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
             SetStateInt(ref Param_DeadInt, !m_characterHealthComponent.NetworkedIsAlive ? 1 : 0);
