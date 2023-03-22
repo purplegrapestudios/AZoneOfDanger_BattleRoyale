@@ -20,6 +20,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private System.Action<EAudioClip> m_audioCallback;
     private System.Action<int, int, int> m_ammoCounterCallback;
     private System.Action<CharacterShootComponent> m_crosshairCallback;
+    private System.Action<float> m_aimCallback;
 
     [Networked] public NetworkBool NetworkedHasAmmo { get; set; }
     [Networked] public NetworkBool NetworkedFire { get; set; }
@@ -31,7 +32,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> audioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> audioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback, System.Action<float> aimCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
@@ -53,6 +54,7 @@ public class CharacterShootComponent : NetworkBehaviour
         m_audioCallback = audioCallback;
         m_ammoCounterCallback = ammoCounterCallback;
         m_crosshairCallback = crosshairCallback;
+        m_aimCallback = aimCallback;
 
         m_crosshairCallback(this);
 
@@ -90,6 +92,15 @@ public class CharacterShootComponent : NetworkBehaviour
             else
             {
                 NetworkedSwitchWeapon = false;
+            }
+
+            if (data.GetButton(ButtonFlag.AIM))
+            {
+                m_aimCallback(50f);
+            }
+            else
+            {
+                m_aimCallback(70f);
             }
 
             if (data.GetButton(ButtonFlag.RELOAD))

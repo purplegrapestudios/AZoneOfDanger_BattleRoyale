@@ -86,4 +86,9 @@ public class CharacterCamera : NetworkBehaviour
     {
         return NetworkedRotationY;
     }
+
+    public void SetCameraFOV(float fieldOfView)
+    {
+        m_camera.fieldOfView = fieldOfView;
+    }
 }

@@ -72,7 +72,8 @@ public class Character : NetworkBehaviour
 			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
 			audioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
 			ammoCounterCallback: (ammoRemaining, maxAmmoRemaining, clipSize) => { GameUIViewController.Instance.SetAmmoInfo(Object.HasInputAuthority, ammoRemaining, maxAmmoRemaining, clipSize); },
-			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); });
+			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); },
+			aimCallback: (fov) => { m_components.PlayerCamera.GetComponent<CharacterCamera>().SetCameraFOV(fov); });
 		m_characterAnimation.Initialize();
 		transform.rotation = Quaternion.identity;
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
