@@ -111,7 +111,7 @@ public class CharacterAnimation : NetworkBehaviour
             SetStateInt(ref Param_SwitchWeaponInt, m_characterShootComponent.NetworkedSwitchWeapon ? 1 : 0);
             SetStateInt(ref Param_CrouchInt, m_characterMoveComponent.NetworkedIsCrouched ? 1 : 0);
             SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
-            SetStateInt(ref Param_DeadInt, !m_characterHealthComponent.NetworkedIsAlive ? 1 : 0);
+            SetStateInt(ref Param_DeadInt, m_characterHealthComponent.NetworkedRespawn ? 1 : 0);
             //1) SET DEATHBOOL TO FALSE (SET BOTH 1ST AND 3RD PERSON - AND AFFECTS WHOLE BODY)
             if (AnimLocal_BOOL_Death)
             {

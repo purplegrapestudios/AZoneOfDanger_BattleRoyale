@@ -332,8 +332,9 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 	{
 		// Check events like KeyDown or KeyUp in Unity's update. They might be missed otherwise because they're only true for 1 frame
 		_data.ButtonFlags |= Input.GetKeyDown( KeyCode.Backspace ) ? ButtonFlag.RESPAWN : 0;
+		_data.ButtonFlags |= Input.GetKeyDown(KeyCode.LeftShift) ? ButtonFlag.CROUCH : 0;
 	}
-	
+
 	public void ShowPlayerSetup()
 	{
 		if(_playerSetup)
@@ -363,7 +364,6 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		_data.ButtonFlags |= Input.GetKey( KeyCode.S ) ? ButtonFlag.BACKWARD : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.D) ? ButtonFlag.RIGHT : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Space) ? ButtonFlag.JUMP : 0;
-		_data.ButtonFlags |= Input.GetKeyDown(KeyCode.LeftShift) ? ButtonFlag.CROUCH : 0;
 		_data.ButtonFlags |= Input.GetMouseButton(0) ? ButtonFlag.FIRE : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.R) ? ButtonFlag.RELOAD : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha1) ? ButtonFlag.WEAPON_00 : 0;

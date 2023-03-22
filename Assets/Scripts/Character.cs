@@ -23,6 +23,7 @@ public class Character : NetworkBehaviour
 	[SerializeField] private CharacterAnimation m_characterAnimation;
 	[SerializeField] private TMP_Text _name;
 	[SerializeField] private MeshRenderer _mesh;
+	[SerializeField] private GameObject m_characterModel;
 	[SerializeField] public Transform m_headingTransform;
 
 	[SerializeField] private float sensitivityX = 15f;
@@ -58,8 +59,8 @@ public class Character : NetworkBehaviour
 
 		SceneCamera.instance.SetSceneCameraActive(false);
 
-		m_characterMoveComponent.InitCharacterMovement(m_characterHealth);
-		m_characterHealth.Initialize(this);
+		m_characterMoveComponent.InitCharacterMovement(m_characterHealth, (relativeDollyPos) => { m_components.Dolly.GetComponent<CharacterCameraDolly>().SetDollyDir(relativeDollyPos); });
+		m_characterHealth.Initialize(this, m_characterModel);
 		m_characterAudio.Initialize(m_components.PlayerCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
 			character: this,

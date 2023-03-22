@@ -94,7 +94,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: -5.70345, y: 13, z: 30}
+        value: {x: -5.70345, y: -1.67, z: 41.63}
         inSlope: {x: -0.000014305114, y: 0.00002324581, z: -0}
         outSlope: {x: -0.000014305114, y: 0.00002324581, z: -0}
         tangentMode: 0
@@ -7397,7 +7397,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 13
+        value: -1.67
         inSlope: 0.00002324581
         outSlope: 0.00002324581
         tangentMode: 0
@@ -7425,7 +7425,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 30
+        value: 41.63
         inSlope: -0
         outSlope: -0
         tangentMode: 0
@@ -24507,8 +24507,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: Armature/root/pelvis/spine_01
+    attribute: m_LocalEulerAngles.z
+    path: Armature/root/pelvis/spine_01/spine_02/spine_03
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -24518,7 +24518,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Armature/root/pelvis/spine_01
+    path: Armature/root/pelvis/spine_01/spine_02/spine_03
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -24527,8 +24527,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: Armature/root/pelvis/spine_01
+    attribute: m_LocalEulerAngles.x
+    path: Armature/root/pelvis/spine_01/spine_02/spine_03
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -24568,7 +24568,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Armature/root/pelvis/spine_01/spine_02/spine_03
+    path: Armature/root/pelvis/spine_01
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -24578,7 +24578,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Armature/root/pelvis/spine_01/spine_02/spine_03
+    path: Armature/root/pelvis/spine_01
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -24588,7 +24588,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Armature/root/pelvis/spine_01/spine_02/spine_03
+    path: Armature/root/pelvis/spine_01
     classID: 4
     script: {fileID: 0}
   m_HasGenericRootTransform: 0

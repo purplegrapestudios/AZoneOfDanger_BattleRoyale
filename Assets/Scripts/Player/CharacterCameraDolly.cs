@@ -133,8 +133,8 @@ public class CharacterCameraDolly : NetworkBehaviour
         tr.localPosition = dollyDir * distance;
     }
 
-    public void UpdatePlayerPosition(Vector3 playerPos)
+    public void SetDollyDir(Vector3 relativePosition)
     {
-        dollyDir = playerPos;
+        dollyDir = relativePosition;
     }
 }

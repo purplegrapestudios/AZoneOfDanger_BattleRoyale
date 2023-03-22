@@ -10,18 +10,21 @@ public class CharacterHealthComponent : NetworkBehaviour
     [Networked(OnChanged = nameof(OnKillsChanged))] public int NetworkedKills { get; set; }
     [Networked(OnChanged = nameof(OnDeathsChanged))] public int NetworkedDeaths { get; set; }
     [Networked(OnChanged = nameof(OnIsAliveChanged))] public NetworkBool NetworkedIsAlive { get; set; }
+    [Networked(OnChanged = nameof(OnIsRespawnChanged))] public NetworkBool NetworkedRespawn { get; set; }
     public CharacterHealthComponent Instigator => m_instigator;
 
     [SerializeField] private float m_baseHealth = 100f;
     private Character m_character;
+    private GameObject m_characterModel;
     private CharacterHealthComponent m_instigator;
     private bool isInitialized;
     private App m_app;
 
-    public void Initialize(Character character)
+    public void Initialize(Character character, GameObject characterModel)
     {
         m_app = App.FindInstance();
         m_character = character;
+        m_characterModel = characterModel;
         NetworkedHealth = m_baseHealth;
         NetworkedDeaths = 0;
         NetworkedKills = 0;
@@ -66,7 +69,12 @@ public class CharacterHealthComponent : NetworkBehaviour
         {
             if (data.GetButton(ButtonFlag.RESPAWN))
             {
+                NetworkedIsAlive = false;
+                NetworkedRespawn = true;
                 NetworkedDeaths += 1;
+            }
+            if (NetworkedRespawn)
+            {
                 Respawn(this);
             }
         }
@@ -81,6 +89,14 @@ public class CharacterHealthComponent : NetworkBehaviour
 
     }
 
+    static void OnIsRespawnChanged(Changed<CharacterHealthComponent> changed)
+    {
+        if (changed.Behaviour.NetworkedRespawn)
+        {
+            changed.Behaviour.Respawn(changed.Behaviour);
+        }
+    }
+
     static void OnIsAliveChanged(Changed<CharacterHealthComponent> changed)
     {
         //if (changed.Behaviour.m_character.Object.HasInputAuthority)
@@ -90,7 +106,9 @@ public class CharacterHealthComponent : NetworkBehaviour
         //}
 
         if (!changed.Behaviour.NetworkedIsAlive)
+        {
             changed.Behaviour.Respawn(changed.Behaviour);
+        }
     }
 
     static void OnKillsChanged(Changed<CharacterHealthComponent> changed)
@@ -128,9 +146,17 @@ public class CharacterHealthComponent : NetworkBehaviour
     private IEnumerator RespawnCO(CharacterHealthComponent changedBehaviour)
     {
         Debug.Log("Waiting to respawn");
-        yield return new WaitForSeconds(3);
-        changedBehaviour.NetworkedIsAlive = true;
+        NetworkedRespawn = false;
+        
+        yield return new WaitForSeconds(5);
+        
+        m_characterModel.SetActive(false);
         GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
+        
+        yield return new WaitForSeconds(3);
+        
+        m_characterModel.SetActive(true);
+        NetworkedIsAlive = true;
         Debug.Log("Finish respawn");
         StopRespawnCoroutine(changedBehaviour);
     }

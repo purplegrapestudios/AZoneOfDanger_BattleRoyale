@@ -55,6 +55,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     private CharacterAnimation PlayerAnimation;
     private CharacterHealthComponent m_characterHealthComponent;
     private Character m_character;
+    private System.Action<Vector3> m_crouchCameraCallback;
     private bool m_initialized;
 
     [Networked] [SerializeField] public NetworkBool NetworkedFloorDetected { get; set; }
@@ -75,9 +76,10 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         Rigidbody.inertiaTensorRotation = Quaternion.identity;
     }
 
-    public void InitCharacterMovement(CharacterHealthComponent characterHealthComponent)
+    public void InitCharacterMovement(CharacterHealthComponent characterHealthComponent, System.Action<Vector3> crouchCameraCallback)
     {
         m_characterHealthComponent = characterHealthComponent;
+        m_crouchCameraCallback = crouchCameraCallback;
 
         m_character = GetComponent<Character>();
         Rigidbody = GetComponent<Rigidbody>();
@@ -145,7 +147,6 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         //Used for animation
         NetworkedFloorDetected = m_moveData.V_IsFloorDetected;
         NetworkedVelocity = m_moveData.V_PlayerVelocity;
-        NetworkedIsCrouched = m_moveData.V_IsCrouched;
     }
 
     void IBeforeUpdate.BeforeUpdate()
@@ -467,6 +468,12 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     {
         if (m_character.m_inputJump)
         {
+            if (NetworkedIsCrouched)
+            {
+                NetworkedIsCrouched = false;
+                return;
+            }
+
             m_moveData.V_WishJump = true;
         }
         else
@@ -479,16 +486,15 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
     {
         if (!m_moveData.V_IsGrounded)
         {
-            m_moveData.V_IsCrouched = false;
+            NetworkedIsCrouched = false;
             return;
         }
 
         if (m_character.m_inputCrouch)
         {
-            m_moveData.V_IsCrouched = !m_moveData.V_IsCrouched;
+            NetworkedIsCrouched = !NetworkedIsCrouched;
         }
-        
-        
+        m_crouchCameraCallback(NetworkedIsCrouched ? new Vector3(1, 0, -2).normalized : new Vector3(1, 1, -2).normalized);
     }
 
     private void OnGroundMove(InputData data)

@@ -1356,6 +1356,7 @@ MonoBehaviour:
   m_characterAnimation: {fileID: 7695338927694559921}
   _name: {fileID: 8000666693784294418}
   _mesh: {fileID: 8382996144721734541}
+  m_characterModel: {fileID: 2041647188875555748}
   m_headingTransform: {fileID: 4568515329382100830}
   sensitivityX: 15
   sensitivityY: 15
@@ -1504,6 +1505,7 @@ MonoBehaviour:
     V_PlayerFriction: -71.146805
     V_PlayerVelocity: {x: 0, y: 0, z: 0}
     V_WishJump: 0
+    V_IsCrouched: 0
     V_AimDirection: {x: 0, y: 0}
     V_RaycastFloorType: -1
     V_SpeedReduction: {x: 0, y: 0, z: 0}
@@ -1512,6 +1514,8 @@ MonoBehaviour:
     V_TempRampJumpSpeed: 250
     v_GroundHitTransformName: Fog (1)
   _NetworkedFloorDetected:
+    _value: 0
+  _NetworkedIsCrouched:
     _value: 0
   _NetworkedVelocity: {x: 0, y: 0, z: 0}
   kDamper: 0.95
@@ -1573,6 +1577,8 @@ MonoBehaviour:
   _NetworkedKills: 0
   _NetworkedDeaths: 0
   _NetworkedIsAlive:
+    _value: 0
+  _NetworkedRespawn:
     _value: 0
   m_baseHealth: 100
 --- !u!114 &4689098138248902237
@@ -3543,6 +3549,11 @@ PrefabInstance:
 --- !u!4 &1665966693323270430 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 28acf773719c9914c8bb45f4b04aa182, type: 3}
+  m_PrefabInstance: {fileID: 1194591470545735413}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2041647188875555748 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 28acf773719c9914c8bb45f4b04aa182, type: 3}
   m_PrefabInstance: {fileID: 1194591470545735413}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &4755413306638316388 stripped
