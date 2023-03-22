@@ -12,7 +12,7 @@ public class CharacterCameraDolly : NetworkBehaviour
     [SerializeField] private float minDistance = 1.0f;
     [SerializeField] private float maxDistance = 4.0f;
     [SerializeField] private float smooth = 10.0f;
-    private Vector3 dollyDir;
+    [SerializeField] private Vector3 dollyDir;
     private Vector3 dollyDirAdjusted;
     private float distance;
 

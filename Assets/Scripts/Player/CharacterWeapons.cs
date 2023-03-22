@@ -33,21 +33,24 @@ public class Weapon
         this.shotgunCloseAudio = shotgunCloseAudio;
     }
 
-    public bool ReloadAmmo()
+    public bool ReloadAmmo(bool hasInputAuthority)
     {
+        if (!hasInputAuthority) return false;
+
         if (ammoCount <= 0) return false;
 
         var ammoInClipConsumed = clipSize - ammoInClipCount;  //For example, 30 clipsize - 0 ammoInClipCount means No ammo is used
         ammoInClipCount = (ammoCount - ammoInClipConsumed >= 0) ? clipSize : ammoCount;
         ammoCount = (ammoCount - ammoInClipConsumed >= 0) ? ammoCount - ammoInClipConsumed : 0;
-        GameUIViewController.Instance.SetAmmoInfo(ammoInClipCount, ammoCount, clipSize);
+        GameUIViewController.Instance.SetAmmoInfo(hasInputAuthority, ammoInClipCount, ammoCount, clipSize);
         return true;
     }
 
-    public void ConsumeAmmo(int ammoConsumed)
+    public void ConsumeAmmo(bool hasInputAuthority, int ammoConsumed)
     {
+        if (!hasInputAuthority) return;
         ammoInClipCount = (ammoInClipCount - ammoConsumed >= 0) ? ammoInClipCount - ammoConsumed : 0;
-        GameUIViewController.Instance.SetAmmoInfo(ammoInClipCount, ammoCount, clipSize);
+        GameUIViewController.Instance.SetAmmoInfo(hasInputAuthority, ammoInClipCount, ammoCount, clipSize);
     }
 }
 

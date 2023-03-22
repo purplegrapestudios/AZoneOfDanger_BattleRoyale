@@ -36,8 +36,9 @@ public class GameUIViewController : MonoBehaviour
         return m_crosshair;
     }
 
-    public void SetAmmoInfo(int ammoInClip, int ammoRemaining, int clipSize)
+    public void SetAmmoInfo(bool hasInputAuthority, int ammoInClip, int ammoRemaining, int clipSize)
     {
+        if (!hasInputAuthority) return;
         m_ammoInClipTxt.text = ammoInClip.ToString();
         m_ammoRemainingTxt.text = ammoRemaining.ToString();
         m_clipSizeTxt.text = clipSize.ToString();

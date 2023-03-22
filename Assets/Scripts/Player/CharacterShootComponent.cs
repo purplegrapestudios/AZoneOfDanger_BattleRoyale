@@ -222,7 +222,7 @@ public class CharacterShootComponent : NetworkBehaviour
             }
 
             yield return new WaitForSeconds(0.5f);
-            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ReloadAmmo();
+            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ReloadAmmo(Object.HasInputAuthority);
             NetworkedReload = false;
         }
         StopCoroutine(ReloadCoroutine);
@@ -238,7 +238,7 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (!NetworkedFire) return;
         if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
-        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(1);
+        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
 
         var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
         var dir = rot * Vector3.forward;
@@ -289,7 +289,7 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (!NetworkedFire) return;
         if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
-        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(1);
+        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
 
         var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
         var dir = rot * Vector3.forward;

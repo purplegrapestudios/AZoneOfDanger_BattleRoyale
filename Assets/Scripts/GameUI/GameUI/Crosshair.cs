@@ -50,6 +50,8 @@ public class Crosshair : MonoBehaviour
 
     public void SetWeaponCrosshair(CharacterShootComponent characterShoot)
     {
+        if (!characterShoot.Object.HasInputAuthority) return;
+
         if (characterShoot.NetworkedCurrWeaponID == 0)
         {
             m_crosshairImage.sprite = m_crosshairAR;

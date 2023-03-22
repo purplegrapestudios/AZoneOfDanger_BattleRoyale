@@ -53,6 +53,7 @@ public class CharacterHealthComponent : NetworkBehaviour
         {
             Debug.Log($"{m_character.Player.Name} couldn't make it");
             NetworkedIsAlive = false;
+            NetworkedRespawn = true;
             NetworkedDeaths += 1;
 
             if (instigator != null)
@@ -146,8 +147,8 @@ public class CharacterHealthComponent : NetworkBehaviour
     private IEnumerator RespawnCO(CharacterHealthComponent changedBehaviour)
     {
         Debug.Log("Waiting to respawn");
-        NetworkedRespawn = false;
-        
+        yield return new WaitForSeconds(.5f);
+        changedBehaviour.NetworkedRespawn = false;
         yield return new WaitForSeconds(5);
         
         m_characterModel.SetActive(false);
