@@ -58,8 +58,10 @@ public class CharacterWeapons : MonoBehaviour
 {
     [SerializeField] private GameObject m_AR_01;
     [SerializeField] private GameObject m_Shotgun_01;
+    [SerializeField] private GameObject m_GL_01;
     public GameObject Weapon_0 => m_AR_01;
     public GameObject Weapon_1 => m_Shotgun_01;
+    public GameObject Weapon_2 => m_GL_01;
 
     private List<Weapon> m_weapons;
     public List<Weapon> Weapons => m_weapons;
@@ -69,7 +71,8 @@ public class CharacterWeapons : MonoBehaviour
     {
         m_weapons = new List<Weapon> {
             new Weapon(0, Weapon_0, clipSize: 30, maxAmmo: 999, ammoCount: 200, ammoInClipCount: 30, shotAudio: EAudioClip.FireAR, reloadAudio: EAudioClip.ReloadAR, reloadEmptyAudio: EAudioClip.ReloadAREmpty, EAudioClip.None, EAudioClip.None),
-            new Weapon(1, Weapon_1, clipSize: 4, maxAmmo: 500, ammoCount: 50, ammoInClipCount: 4, shotAudio: EAudioClip.FireShotgun, reloadAudio: EAudioClip.ReloadShotgun, reloadEmptyAudio: EAudioClip.None, shotgunOpenAudio: EAudioClip.ShotgunOpen, shotgunCloseAudio: EAudioClip.ShotgunClose)
+            new Weapon(1, Weapon_1, clipSize: 4, maxAmmo: 500, ammoCount: 50, ammoInClipCount: 4, shotAudio: EAudioClip.FireShotgun, reloadAudio: EAudioClip.ReloadShotgun, reloadEmptyAudio: EAudioClip.None, shotgunOpenAudio: EAudioClip.ShotgunOpen, shotgunCloseAudio: EAudioClip.ShotgunClose),
+            new Weapon(2, Weapon_2, clipSize: 10, maxAmmo: 100, ammoCount: 50, ammoInClipCount: 4, shotAudio: EAudioClip.FireShotgun, reloadAudio: EAudioClip.ReloadShotgun, reloadEmptyAudio: EAudioClip.None, shotgunOpenAudio: EAudioClip.ShotgunOpen, shotgunCloseAudio: EAudioClip.ShotgunClose)
         };
     }
 

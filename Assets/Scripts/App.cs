@@ -369,6 +369,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		_data.ButtonFlags |= Input.GetKey(KeyCode.R) ? ButtonFlag.RELOAD : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha1) ? ButtonFlag.WEAPON_00 : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha2) ? ButtonFlag.WEAPON_01 : 0;
+		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha3) ? ButtonFlag.WEAPON_02 : 0;
 		_data.aimDirection = new Vector2(Input.GetAxis("Mouse X") * Time.deltaTime, Input.GetAxis("Mouse Y") * Time.deltaTime);
 		//if (aimDirQueue.Count < 2)
 		//{

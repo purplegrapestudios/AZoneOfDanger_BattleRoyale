@@ -89,6 +89,10 @@ public class CharacterShootComponent : NetworkBehaviour
             {
                 SwitchWeapon(1);
             }
+            else if (data.GetButton(ButtonFlag.WEAPON_02))
+            {
+                SwitchWeapon(2);
+            }
             else
             {
                 NetworkedSwitchWeapon = false;

@@ -16,6 +16,7 @@ public enum ButtonFlag
 	RELOAD = 1 << 9,
 	WEAPON_00 = 1 << 10,
 	WEAPON_01 = 1 << 11,
+	WEAPON_02 = 1 << 12,
 }
 
 public struct InputData : INetworkInput
