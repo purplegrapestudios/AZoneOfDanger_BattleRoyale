@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4742348811577898604}
   - component: {fileID: 4743032376823541614}
   - component: {fileID: 2173299452980108224}
-  - component: {fileID: -8140419225828497254}
   m_Layer: 8
   m_Name: P_LPSP_WEP_Flash
   m_TagString: Untagged
@@ -4826,25 +4825,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selfDestructTime: 1
-  destroyFXType: 0
---- !u!114 &-8140419225828497254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4834526503407549940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06a095e627b1e564da1890284ffbb065, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_damagableLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294966775
-  rayCastDistance: 5
-  bulletSpeed: 0
-  targetPosition: {x: 0, y: 0, z: 0}
+  destroyFXType: 3
 --- !u!1001 &8434350575686313213
 PrefabInstance:
   m_ObjectHideFlags: 0

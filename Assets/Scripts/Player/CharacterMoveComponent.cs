@@ -44,7 +44,7 @@ public struct GroundCheckData
 
 }
 
-public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
+public class CharacterMoveComponent : NetworkBehaviour
 {
     [Header("Layers for Groundcheck (Player / Flight Runner)")] public LayerMask RayCastLayersToHit;
     [Header("Character Move Data")] public CharacterMoveData m_moveData;
@@ -114,7 +114,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
 
     #region Character Movement Update
 
-    private void UpdateMovement(InputData data)
+    private void UpdateMovement()
     {
         //OnRotate();                 // 1) Rotate Player along Y Axis
 
@@ -129,11 +129,11 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
             if (m_moveData.V_IsLanded == false)
                 m_moveData.V_IsLanded = true;
             m_moveData.V_IsJumping = false;
-            OnGroundMove(data);
+            OnGroundMove();
         }
         else if (!m_moveData.V_IsGrounded)
         {
-            OnAirMove(data, m_moveData.V_WishDirectionCollision);
+            OnAirMove(m_moveData.V_WishDirectionCollision);
         }
 
         OnLimitSpeed();
@@ -149,40 +149,39 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         NetworkedVelocity = m_moveData.V_PlayerVelocity;
     }
 
-    void IBeforeUpdate.BeforeUpdate()
-    {
-        if (!m_initialized) return;
-        if (!m_characterHealthComponent.NetworkedIsAlive) return;
-
-        m_moveData.V_RotationY += m_character.GetAimDirection().x * (m_moveData.V_MouseSensitivity * 1f) * Time.timeScale;
-        OnRotate();
-        if (!(m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))) return;
-
-    }
-
     public override void FixedUpdateNetwork()
     {
         if (!m_initialized) return;
         if (!m_characterHealthComponent.NetworkedIsAlive) return;
 
         ResetRigidBodyState();
-        if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
+        if (m_character.Player && m_character.Player.InputEnabled)
         {
-            UpdateMovement(data);
+            m_moveData.V_RotationY += m_character.FixedAimDirDelta.x * m_moveData.V_MouseSensitivity * Time.timeScale;
+            OnRotate(m_moveData.V_RotationY);
+
+            UpdateMovement();
             ResetRigidBodyState();
             Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * m_character.Runner.DeltaTime);// Time.fixedDeltaTime);
-            m_moveData.V_AimDirection = data.aimDirection;
         }
     }
 
+    public override void Render()
+    {
+        if (m_character.Player && m_character.Player.InputEnabled)
+        {
+            m_moveData.V_RotationY += m_character.CachedAimDirDelta.x;
+            OnRotate(m_moveData.V_RotationY);
+        }
+    }
 
     #endregion Character Movement Update
 
     #region Character Movement Functions
 
-    private void OnRotate()
+    private void OnRotate(float rotationY)
     {
-        Transform.rotation = Quaternion.Euler(0, m_moveData.V_RotationY, 0);
+        Transform.rotation = Quaternion.Euler(0, rotationY, 0);
     }
 
     private void OnCollisionWall(float dist) {
@@ -349,7 +348,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         }
     }
 
-    private void OnSetMovementDir(InputData data)
+    private void OnSetMovementDir()
     {
         if (m_moveData.V_IsSliding) return;
 
@@ -497,7 +496,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         m_crouchCameraCallback(NetworkedIsCrouched ? new Vector3(1, 0, -2).normalized : new Vector3(1, 1, -2).normalized);
     }
 
-    private void OnGroundMove(InputData data)
+    private void OnGroundMove()
     {
         Vector3 wishdir;
 
@@ -523,7 +522,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
 
         float scale = m_moveData.CmdScale();
 
-        OnSetMovementDir(data);
+        OnSetMovementDir();
 
         wishdir = new Vector3(m_moveData.moveCmd.RightMove, 0, m_moveData.moveCmd.ForwardMove);
         wishdir = Transform.TransformDirection(wishdir);
@@ -550,7 +549,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         }
     }
 
-    private void OnAirMove(InputData data, Vector3 collisionWishDir)
+    private void OnAirMove(Vector3 collisionWishDir)
     {
         Vector3 wishdir;
         float wishvel = m_moveData.P_AirAcceleration;
@@ -561,7 +560,7 @@ public class CharacterMoveComponent : NetworkBehaviour, IBeforeUpdate
         m_moveData.V_KnockBackOverride = false;
         m_moveData.V_IsBoosted = false;
 
-        OnSetMovementDir(data);
+        OnSetMovementDir();
 
         wishdir = new Vector3(m_moveData.moveCmd.RightMove, 0, m_moveData.moveCmd.ForwardMove);
 

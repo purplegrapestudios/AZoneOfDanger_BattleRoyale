@@ -2,7 +2,7 @@ using UnityEngine;
 using Fusion;
 using System.Collections;
 
-public class BulletTrailBehavior : MonoBehaviour
+public class BulletBehavior : MonoBehaviour
 {
 
     Coroutine CoroutineMoveFromTo;
@@ -31,21 +31,39 @@ public class BulletTrailBehavior : MonoBehaviour
         lastPosition = tr.position;
         bulletHits = new RaycastHit[255];
         m_app = App.FindInstance();
-        secondsElapsed = 0;
-        t = 0;
     }
-
-    float t;
-    int secondsElapsed;
+    bool ret;
     public void OnBulletFixedUpdate()
     {
-        if (m_app == null) return;
+        if (ret) return;
+
+        if (m_app ?? null == null)
+        {
+            Debug.Log("No App");
+            ret = true;
+        }
+        if (m_app?.Session ?? null == null)
+        {
+            Debug.Log("No Session");
+            ret = true;
+        }
+        if (m_app?.Session?.Runner ?? null == null)
+        {
+            Debug.Log("No Session Runner");
+            ret = true;
+        }
+        if (m_app?.Session?.Object ?? null == null)
+        {
+            Debug.Log("No Session Object");
+            ret = true;
+        }
+
         if (!m_ownerRef.IsValid) return;
 
         //Debug.LogWarning($"Bullet {name}, OwnerID: {m_ownerRef.PlayerId}, deltaTime= {m_app.Session.Runner.DeltaTime}");
         ray = new Ray(lastPosition, direction);
 
-        m_app.Session.Runner.LagCompensation.Raycast(origin: lastPosition, direction: direction, 100, player: m_app.Session.Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
+        m_app.Session.Runner.LagCompensation.Raycast(origin: lastPosition, direction: direction, transform.localScale.z + bulletSpeed * Time.deltaTime, player: m_app.Session.Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
 
         float hitDistance = 100;
         if (hitInfo.Distance > 0)
@@ -66,42 +84,6 @@ public class BulletTrailBehavior : MonoBehaviour
             tr.position += direction.normalized * bulletSpeed * m_app.Session.Runner.DeltaTime;
         }
         lastPosition = tr.position;
-
-        //if (Physics.RaycastNonAlloc(ray, bulletHits, rayCastDistance, m_damagableLayerMask) > 0)
-        //{
-        //    foreach (RaycastHit hit in bulletHits)
-        //    {
-        //        if (hit.collider == null) continue;
-        //
-        //        hitTransform = hit.transform;
-        //        if (hitTransform.CompareTag("Player"))
-        //        {
-        //            if (hitTransform.GetComponent<PlayerRef>() == null) continue;
-        //
-        //            if (hitTransform.GetComponent<PlayerRef>().PlayerId != m_ownerRef.PlayerId)
-        //            {
-        //                ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(OnBulletFixedUpdate);
-        //                ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.bulletList);
-        //                return;
-        //            }
-        //            else
-        //            {
-        //                tr.position += direction.normalized * bulletSpeed * m_app.Session.Runner.DeltaTime;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(OnBulletFixedUpdate);
-        //            ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.bulletList);
-        //            return;
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    tr.position += direction.normalized * bulletSpeed * m_app.Session.Runner.DeltaTime;
-        //}
-        //lastPosition = tr.position;
     }
 
     private void DestroyBulletTrail()
@@ -119,7 +101,7 @@ public class BulletTrailBehavior : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(OnBulletFixedUpdate);
-        ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.bulletList);
+        ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.projectileList);
     }
 
     public void SetBulletDirection(Vector3 dir)

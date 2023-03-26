@@ -22,7 +22,7 @@ public enum ButtonFlag
 public struct InputData : INetworkInput
 {
 	public ButtonFlag ButtonFlags;
-	public Vector2 aimDirection;
+	public Vector2 aimDirectionDelta;
 	public Vector2 moveDirection;
 	public Vector3 cameraForward;
 

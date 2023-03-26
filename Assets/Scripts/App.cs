@@ -63,6 +63,8 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 	private Session _session;
 	private string _lobbyId;
 	private bool _allowInput;
+	public bool ResetCachedInput { get { return m_resetCachedInput; } set { m_resetCachedInput = value; }}
+	private bool m_resetCachedInput;
 
 	public static App FindInstance()
 	{
@@ -76,7 +78,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	public bool AllowInput
 	{
-		get => _allowInput && Session != null && Session.PostLoadCountDown.Expired(Session.Runner);
+		get => _allowInput && Session != null && Session.PostLoadCountDown.Expired(Session.Runner) && Cursor.lockState == CursorLockMode.Locked && !Cursor.visible;
 		set => _allowInput = value;
 	} 
 
@@ -358,6 +360,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		if (!AllowInput)
 			return;
 
+		float DeltaTime = runner.DeltaTime;
 		// Persistent button flags like GetKey should be read when needed so they always have the actual state for this tick
 		_data.ButtonFlags |= Input.GetKey( KeyCode.W ) ? ButtonFlag.FORWARD : 0;
 		_data.ButtonFlags |= Input.GetKey( KeyCode.A ) ? ButtonFlag.LEFT : 0;
@@ -370,7 +373,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha1) ? ButtonFlag.WEAPON_00 : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha2) ? ButtonFlag.WEAPON_01 : 0;
 		_data.ButtonFlags |= Input.GetKey(KeyCode.Alpha3) ? ButtonFlag.WEAPON_02 : 0;
-		_data.aimDirection = new Vector2(Input.GetAxis("Mouse X") * Time.deltaTime, Input.GetAxis("Mouse Y") * Time.deltaTime);
+		_data.aimDirectionDelta = new Vector2(Input.GetAxis("Mouse X") * DeltaTime, Input.GetAxis("Mouse Y") * DeltaTime);
 		//if (aimDirQueue.Count < 2)
 		//{
 		//	aimDirQueue.Enqueue(new Vector2(Input.GetAxis("Mouse X") * Time.deltaTime, Input.GetAxis("Mouse Y") * Time.deltaTime));
@@ -392,6 +395,8 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 		// Clear the flags so they don't spill over into the next tick unless they're still valid input.
 		_data.ButtonFlags = 0;
+
+		m_resetCachedInput = true;
 	}
 
 	public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)

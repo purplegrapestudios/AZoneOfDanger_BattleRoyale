@@ -20,7 +20,7 @@ namespace InfimaGames.LowPolyShooterPack.Legacy
 		private void Start()
 		{
 			// Start the despawn timer
-			StartCoroutine(DespawnTimer());
+			//StartCoroutine(DespawnTimer());
 
 			//Get a random impact sound from the array
 			audioSource.clip = impactSounds

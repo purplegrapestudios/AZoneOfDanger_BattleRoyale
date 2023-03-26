@@ -10,7 +10,7 @@ using TMPro;
 /// </summary>
 
 [RequireComponent(typeof(CharacterMoveComponent))]
-public class Character : NetworkBehaviour
+public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 {
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
@@ -44,8 +44,17 @@ public class Character : NetworkBehaviour
 	public bool m_inputJump { get; set; }
 	public bool m_inputCrouch { get; set; }
 
+	public Vector2 RenderAimDirDelta => m_renderAimDirDelta;
+	private Vector2 m_renderAimDirDelta;
+	public Vector2 CachedAimDirDelta => m_cachedAimDirDelta;
+	private Vector2 m_cachedAimDirDelta;
+	public Vector2 FixedAimDirDelta => m_fixedAimDirDelta;
+	private Vector2 m_fixedAimDirDelta;
+	private Vector2 m_lastKnownAimDir;
+
+
 	[Networked] public Player Player { get; set; }
-	[Networked] Vector2 m_aimDirection { get; set; }
+	[Networked] Vector2 m_aimDirectionDelta { get; set; }
 
 	private void Awake()
     {
@@ -116,6 +125,37 @@ public class Character : NetworkBehaviour
 		}
 	}
 
+	void IBeforeTick.BeforeTick()
+	{
+		if (!m_characterHealth.NetworkedIsAlive) return;
+
+		m_fixedAimDirDelta = m_lastKnownAimDir;
+		if (PlayerInputEnabled() && GetInput(out InputData data))
+		{
+			m_fixedAimDirDelta = data.aimDirectionDelta;
+			m_lastKnownAimDir = m_fixedAimDirDelta;
+		}
+
+	}
+
+    void IBeforeUpdate.BeforeUpdate()
+    {
+		if (PlayerInputEnabled() && Runner.LocalPlayer == Object.InputAuthority)
+		{
+			float DeltaTime = Runner.DeltaTime;
+			m_renderAimDirDelta = new Vector2(Input.GetAxis("Mouse X") * DeltaTime, Input.GetAxis("Mouse Y") * DeltaTime);
+			Debug.Log($"RenderAimData: {m_renderAimDirDelta}");
+			m_cachedAimDirDelta += m_renderAimDirDelta;
+
+			if (_app.ResetCachedInput)
+			{
+				_app.ResetCachedInput = false;
+				m_cachedAimDirDelta = Vector2.zero;
+				m_renderAimDirDelta = Vector2.zero;
+			}
+		}
+	}
+
 	public override void FixedUpdateNetwork()
 	{
 		if (PlayerInputEnabled() && GetInput(out InputData data))
@@ -159,7 +199,7 @@ public class Character : NetworkBehaviour
 				m_inputCrouch = false;
 			}
 
-			m_aimDirection = data.aimDirection;
+			m_aimDirectionDelta = data.aimDirectionDelta;
 		}
 	}
 
@@ -168,8 +208,8 @@ public class Character : NetworkBehaviour
 		return (Player && Player.InputEnabled);
     }
 
-	public Vector2 GetAimDirection()
+	public Vector2 GetAimDirectionDelta()
     {
-		return m_aimDirection;
+		return m_aimDirectionDelta;
 	}
 }

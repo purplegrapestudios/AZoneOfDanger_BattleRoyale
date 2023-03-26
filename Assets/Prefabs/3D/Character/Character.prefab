@@ -1630,7 +1630,7 @@ MonoBehaviour:
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   Hitboxes:
   - {fileID: 7583859236934500013}
-  - {fileID: 4020108428156526796}
+  - {fileID: 7603572363961648215}
 --- !u!114 &3603544302567930862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1677,6 +1677,7 @@ MonoBehaviour:
   m_AR_01: {fileID: 2501277403646313056}
   m_Shotgun_01: {fileID: 2371394055783547379}
   m_GL_01: {fileID: 3799479757494846968}
+  m_gLProjectile: {fileID: 0}
 --- !u!1 &4610285446649690712
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,7 +2297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 2
-  SphereRadius: 0.3
+  SphereRadius: 0.4
   BoxExtents: {x: 0, y: 0, z: 0}
   Offset: {x: 0, y: 0, z: 0}
   Root: {fileID: 4881344522585289108}

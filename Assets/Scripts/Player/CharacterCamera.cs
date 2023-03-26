@@ -46,24 +46,25 @@ public class CharacterCamera : NetworkBehaviour
         if (!m_character) return;
         if (!m_initialized) return;
 
-        if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
+        if (m_character.Player && m_character.Player.InputEnabled)
         {
             rotAverageY = 0f;
             
-            NetworkedRotationY += data.aimDirection.y * (m_characterMoveComponent.m_moveData.V_MouseSensitivity * 1f) * Time.timeScale;
+            NetworkedRotationY += m_character.FixedAimDirDelta.y * (m_characterMoveComponent.m_moveData.V_MouseSensitivity) * Time.timeScale;
             
             NetworkedRotationY = Mathf.Clamp(NetworkedRotationY, m_minimumY, m_maximumY);
-            rotArrayY.Add(NetworkedRotationY);
-
-            if (rotArrayY.Count > m_framesOfSmoothing)
-                rotArrayY.RemoveAt(0);
-
-            for (int j = 0; j < rotArrayY.Count; j++)
-            {
-                rotAverageY += rotArrayY[j];
-            }
-            rotAverageY /= rotArrayY.Count;
-            rotAverageY = m_framesOfSmoothing > 0 ? rotAverageY / rotArrayY.Count : NetworkedRotationY;
+            //rotArrayY.Add(NetworkedRotationY);
+            //
+            //if (rotArrayY.Count > m_framesOfSmoothing)
+            //    rotArrayY.RemoveAt(0);
+            //
+            //for (int j = 0; j < rotArrayY.Count; j++)
+            //{
+            //    rotAverageY += rotArrayY[j];
+            //}
+            //rotAverageY /= rotArrayY.Count;
+            //rotAverageY = m_framesOfSmoothing > 0 ? rotAverageY / rotArrayY.Count : NetworkedRotationY;
+            //RotateCamera(NetworkedRotationY);
         }
     }
 
@@ -71,10 +72,16 @@ public class CharacterCamera : NetworkBehaviour
     {
         if (!m_character) return;
         if (!m_initialized) return;
+        //float renderRotationY = Mathf.Clamp((NetworkedRotationY + m_character.CachedAimDirDelta.y * m_characterMoveComponent.m_moveData.V_MouseSensitivity * Time.timeScale), m_minimumY, m_maximumY);
+        //float lerpedRotationY = Mathf.Lerp(NetworkedRotationY, renderRotationY, Time.deltaTime);
 
-        Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
+        RotateCamera(NetworkedRotationY + m_character.CachedAimDirDelta.y);
+    }
+
+    private void RotateCamera(float rotationAlongX)
+    {
+        Quaternion yQuaternion = Quaternion.AngleAxis(rotationAlongX, Vector3.left);
         transform.localRotation = originalRotation * yQuaternion;
-        //NetworkedPosition = transform.position;
     }
 
     public void LateUpdate()

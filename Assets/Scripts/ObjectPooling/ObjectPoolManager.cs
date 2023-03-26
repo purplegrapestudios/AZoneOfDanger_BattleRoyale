@@ -14,11 +14,11 @@ public class ObjectPoolManager : NetworkBehaviour
 {
     public static ObjectPoolManager Instance;
 
-    public GameObject BulletPrefab, BulletImpactPrefab, MuzzleFlashPrefab, BloodSplatterPrefab;
-    [HideInInspector] public List<GameObject> bulletList, bulletImpactList, muzzleFlashList, bloodSplatterList;
+    public GameObject ProjectilePrefab, BulletImpactPrefab, MuzzleFlashPrefab, BloodSplatterPrefab;
+    [SerializeField] public List<GameObject> projectileList, bulletImpactList, muzzleFlashList, bloodSplatterList;
     public List<GameObject> liveBulletList;
 
-    private List<GameObject> tempList;
+    [SerializeField] private List<GameObject> tempList;
 
     public System.Action Callback_ProjectileUpdate;
 
@@ -34,9 +34,10 @@ public class ObjectPoolManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
-        PoolPrefab(250, MuzzleFlashPrefab, "muzzle", out muzzleFlashList);
-        PoolPrefab(250, BulletPrefab, "projectile", out bulletList);
+        liveBulletList = new List<GameObject>();
+        PoolPrefab(250, ProjectilePrefab, "projectile", out projectileList);
         PoolPrefab(250, BulletImpactPrefab, "impact", out bulletImpactList);
+        PoolPrefab(250, MuzzleFlashPrefab, "muzzle", out muzzleFlashList);
         PoolPrefab(250, BloodSplatterPrefab, "blood", out bloodSplatterList);
     }
 
@@ -76,20 +77,22 @@ public class ObjectPoolManager : NetworkBehaviour
         return list;
     }
 
-    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Transform weaponHand)
+    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character ownerCharacter, Transform weaponHand, System.Action<float, CharacterHealthComponent> damageCallback)
     {
-        if (BulletPrefab != null)
+        if (ProjectilePrefab != null)
         {
             GameObject currentBullet;
-            GetFXPrefab(bulletList, out currentBullet);
+            GetFXPrefab(projectileList, out currentBullet);
             if (currentBullet == null)
                 return;
             currentBullet.transform.rotation = Quaternion.LookRotation(endPos - startPos);
             currentBullet.transform.position = startPos;
-            currentBullet.transform.parent = weaponHand;
-            currentBullet.GetComponent<ParticleSystem>().Play();
-            currentBullet.GetComponent<BulletTrailBehavior>().SetBulletDirection(endPos - startPos);
-            currentBullet.GetComponent<BulletTrailBehavior>().SetOwner(ownerRef);
+            //currentBullet.transform.parent = weaponHand;
+            //currentBullet.GetComponent<ParticleSystem>().Play();
+            currentBullet.GetComponent<ProjectileBehavior>().SetRunner(Runner);
+            currentBullet.GetComponent<ProjectileBehavior>().SetBulletDirection(endPos - startPos);
+            currentBullet.GetComponent<ProjectileBehavior>().SetOwner(ownerRef, ownerCharacter);
+            currentBullet.GetComponent<ProjectileBehavior>().SetDamageCallback(damageCallback);
         }
         if (BulletImpactPrefab != null && hitTarget == HitTargets.Environment)
         {

@@ -3,7 +3,7 @@ using System.Collections;
 
 public enum DestroyFXType
 {
-    Bullet,
+    Projectile,
     BulletImpact,
     BloodSplatter,
     MuzzleFlash,
@@ -42,12 +42,12 @@ public class ObjectPoolItem : MonoBehaviour
     IEnumerator DestroyFX_CO()
     {
         yield return new WaitForSeconds(selfDestructTime);
-        if (destroyFXType == DestroyFXType.Bullet)
+        if (destroyFXType == DestroyFXType.Projectile)
         {
-            if (GetComponent<BulletTrailBehavior>())
+            if (GetComponent<ProjectileBehavior>())
             {
-                ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(GetComponent<BulletTrailBehavior>().OnBulletFixedUpdate);
-                ObjectPoolManager.Instance.bulletList = ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.bulletList);
+                ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(GetComponent<ProjectileBehavior>().OnProjectileFixedUpdate);
+                ObjectPoolManager.Instance.projectileList = ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.projectileList);
             }
         }
         else if (destroyFXType == DestroyFXType.BulletImpact)

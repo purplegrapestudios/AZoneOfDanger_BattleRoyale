@@ -152,6 +152,10 @@ public class CharacterShootComponent : NetworkBehaviour
             {
                 FireShotgunSpread();
                 yield return new WaitForSeconds(1f);
+            }else if (NetworkedWeaponID == 2)
+            {
+                SpawnProjectile();
+                yield return new WaitForSeconds(1f);
             }
         }
         StopFireCoroutine();
@@ -246,7 +250,7 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void SpawnProjectile()
     {
-        ObjectPoolManager.Instance.SpawnProjectile(m_muzzleFlash.transform.position + m_characterCamera.transform.forward, transform.position + m_characterCamera.transform.forward * 100, HitTargets.Player, Runner.LocalPlayer, m_muzzleFlash.transform);
+        ObjectPoolManager.Instance.SpawnProjectile(m_characterCamera.transform.position + m_characterCamera.transform.forward, transform.position + m_characterCamera.transform.forward * 100, HitTargets.Player, ownerRef: Object.InputAuthority, ownerCharacter: m_character, weaponHand: m_muzzleFlash.transform, damageCallback: m_takeDamageCallback);
     }
 
     private void FireHitScanWeapon()

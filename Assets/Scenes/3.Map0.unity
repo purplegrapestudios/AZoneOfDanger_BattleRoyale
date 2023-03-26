@@ -12603,15 +12603,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  BulletPrefab: {fileID: 4834526503407549940, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
+  ProjectilePrefab: {fileID: 1093011080150972619, guid: d34749ffe076b7641ac1ab34ae63ffcd, type: 3}
   BulletImpactPrefab: {fileID: 1067471869909948, guid: 5e02303289b3c494e8e185be0fbbd405, type: 3}
   MuzzleFlashPrefab: {fileID: 4834526503407549940, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
   BloodSplatterPrefab: {fileID: 1036925697551712, guid: a845e59c374ae0240812749e46f13033, type: 3}
-  bulletList: []
+  projectileList: []
   bulletImpactList: []
   muzzleFlashList: []
   bloodSplatterList: []
   liveBulletList: []
+  tempList: []
 --- !u!114 &1963835527
 MonoBehaviour:
   m_ObjectHideFlags: 0
