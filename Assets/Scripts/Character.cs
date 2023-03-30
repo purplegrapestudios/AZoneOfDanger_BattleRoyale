@@ -28,6 +28,8 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private CharacterAudioComponent m_characterAudio;
 	public CharacterAnimation CharacterAnimation => m_characterAnimation;
 	[SerializeField] private CharacterAnimation m_characterAnimation;
+	public RenderedShotDolly CharacterMuzzleDolly => m_characterMuzzleDolly;
+	[SerializeField] private RenderedShotDolly m_characterMuzzleDolly;
 
 	[SerializeField] private TMP_Text _name;
 	[SerializeField] private MeshRenderer _mesh;
@@ -95,7 +97,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		transform.rotation = Quaternion.identity;
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
 		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
-
+		m_characterMuzzleDolly.Initialize(this, m_components.PlayerCamera.GetComponent<CharacterCamera>());
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();

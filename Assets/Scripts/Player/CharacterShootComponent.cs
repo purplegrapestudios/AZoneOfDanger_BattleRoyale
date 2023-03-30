@@ -250,7 +250,20 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void SpawnProjectile()
     {
-        ObjectPoolManager.Instance.SpawnProjectile(m_characterCamera.NetworkedPosition, m_characterCamera.NetworkedPosition + m_characterCamera.NetworkedForwward * 100, HitTargets.Player, ownerRef: Object.InputAuthority, owner: m_character, muzzleComponent: m_character.CharacterMuzzle, damageCallback: m_takeDamageCallback);
+        var forwardDir = GetForwardDirection();
+        var firePosCameraOffset = GetFirePosCameraOffset(2f);
+        var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
+        
+        ObjectPoolManager.Instance.SpawnProjectile(startPos: orig,
+            endPos: forwardDir.normalized,
+            hitTarget: HitTargets.Player,
+            ownerRef: Object.InputAuthority,
+            owner: m_character,
+            muzzlePos: m_character.CharacterMuzzleDolly.NetworkedRenderedShotPosition,
+            damageCallback: m_takeDamageCallback
+            );
+        
+        //ObjectPoolManager.Instance.SpawnProjectile(m_characterCamera.NetworkedPosition + camToMuzzle, m_characterCamera.NetworkedPosition + m_characterCamera.NetworkedForwward * 100, HitTargets.Player, ownerRef: Object.InputAuthority, owner: m_character, muzzlePos: m_character.CharacterMuzzle.NetworkedMuzzlePosition, damageCallback: m_takeDamageCallback);
         m_audioCallback(EAudioClip.FireGL);
     }
 
@@ -260,13 +273,12 @@ public class CharacterShootComponent : NetworkBehaviour
         if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
         m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
 
-        var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
-        var dir = rot * Vector3.forward;
-        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.NetworkedMuzzlePosition, m_characterCamera.NetworkedPosition);
-        distFromCamToMuzzle = Mathf.Min(distFromCamToMuzzle, m_character.transform.localScale.x * 1.5f);
-        var orig = m_characterCamera.NetworkedPosition + dir * distFromCamToMuzzle;
-        Runner.LagCompensation.Raycast(origin: orig, direction: dir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
-        Debug.DrawRay(orig, dir * 100, Color.red, 0.1f);
+        var forwardDir = GetForwardDirection();
+        var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
+
+        var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
+        Runner.LagCompensation.Raycast(origin: orig, direction: forwardDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
+        //Debug.DrawRay(orig, forwardDir * 100, Color.red, 0.1f);
 
         float hitDistance = 100;
         if (hitInfo.Distance > 0)
@@ -306,17 +318,16 @@ public class CharacterShootComponent : NetworkBehaviour
         if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
         m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
 
-        var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
-        var dir = rot * Vector3.forward;
-        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.transform.position, m_characterCamera.NetworkedPosition);
-        distFromCamToMuzzle = Mathf.Min(distFromCamToMuzzle, m_character.transform.localScale.x * 1.5f);
-        var orig = m_characterCamera.NetworkedPosition + dir * distFromCamToMuzzle;
+        var forwardDir = GetForwardDirection();
+        var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
 
-        for (int i=0;i< 10; i++)
+        var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
+
+        for (int i = 0; i < 10; i++)
         {
             float angleX = Random.Range(-180, 180) * Mathf.Deg2Rad;
             float angleZ = Random.Range(-180, 180) * Mathf.Deg2Rad;
-            Vector3 spreadDir = Quaternion.Euler(0f, angleX, angleZ) * dir;
+            Vector3 spreadDir = Quaternion.Euler(0f, angleX, angleZ) * forwardDir;
             Runner.LagCompensation.Raycast(origin: orig, direction: spreadDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
             Debug.DrawRay(orig, spreadDir * 100, Color.red, 0.1f);
 
@@ -354,9 +365,20 @@ public class CharacterShootComponent : NetworkBehaviour
             }
 
         }
-            m_audioCallback(EAudioClip.FireShotgun);
-        //m_fireWeaponAudioCallback(EAudioClip.FireShotgun);
+        m_audioCallback(EAudioClip.FireShotgun);
+    }
 
+    private float GetFirePosCameraOffset(float minOffsetFactor = 1.5f)
+    {
+        //This is because the Third Person camera is behind the player, so we need to calculate it's firing posiiton with an offset.
+        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.NetworkedMuzzlePosition, m_characterCamera.NetworkedPosition);
+        return Mathf.Min(distFromCamToMuzzle, m_character.transform.localScale.x * minOffsetFactor);
 
+    }
+
+    private Vector3 GetForwardDirection()
+    {
+        var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
+        return rot * Vector3.forward;
     }
 }

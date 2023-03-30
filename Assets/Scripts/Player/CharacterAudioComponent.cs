@@ -30,9 +30,11 @@ public class CharacterAudioComponent : NetworkBehaviour
     private Dictionary<EAudioClip, AudioClip> m_audioDictionary = new Dictionary<EAudioClip, AudioClip>();
     [SerializeField] private AudioSource m_audioSource;
     private bool m_isInitialized;
+    private App m_app;
 
     private void Awake()
     {
+        m_app = App.FindInstance();
         foreach (var kvp in m_audioList)
         {
             m_audioDictionary[kvp.key] = kvp.clip;
@@ -48,6 +50,7 @@ public class CharacterAudioComponent : NetworkBehaviour
     public void OnPlayClip(EAudioClip clipKey)
     {
         if (!m_isInitialized) return;
+        if (m_app.IsServerMode() && HasStateAuthority) return;
         m_audioSource.volume = 0;
         m_audioSource.Stop();
 

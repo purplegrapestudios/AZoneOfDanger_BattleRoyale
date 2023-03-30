@@ -53,7 +53,7 @@ MonoBehaviour:
   m_damagableLayerMask:
     serializedVersion: 2
     m_Bits: 4294966745
-  m_interpolationDuration: 0.01
+  m_interpolationDuration: 0.3
 --- !u!82 &4854287975035703319
 AudioSource:
   m_ObjectHideFlags: 0

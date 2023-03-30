@@ -40,9 +40,8 @@ public class CharacterCameraDolly : NetworkBehaviour
         tr = GetComponent<Transform>();
         m_cameraTr = m_characterCam.transform;
         tr.localPosition = new Vector3(1, 1, -2);
-        dollyDir = new Vector3(1, 1, -2).normalized;// tr.localPosition.normalized;
+        dollyDir = new Vector3(1, 1, -2).normalized;
         distance = tr.localPosition.magnitude;
-        //playerAnimation.playerCameraView = PlayerCameraView.FirstPerson;
 
         RestDollyPosition();
         m_cameraTr.localPosition = new Vector3(modXPos, modYPos, modZPos);
@@ -52,16 +51,6 @@ public class CharacterCameraDolly : NetworkBehaviour
         m_initailized = true;
         m_characterCam.Initialize(character);
 
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (!m_initailized) return;
-        if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
-        {
-            //NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
-            //NetworkedDollyOffset = dollyDir * distance;
-        }
     }
 
     public override void Render()
@@ -110,17 +99,11 @@ public class CharacterCameraDolly : NetworkBehaviour
 
 
         tr.localPosition = Vector3.Lerp(tr.localPosition, NetworkedDollyOffset, Runner.DeltaTime * smooth);
-
-        //if (Input.GetKeyDown(KeyCode.Return))
-        //    UnityEditor.EditorApplication.isPaused = true;
-
     }
 
 
     private void LateUpdate()
     {
-        //NetworkedCameraOffset = Vector3.Lerp(m_cameraTr.localPosition, new Vector3(modXPos, modYPos, modZPos), Runner.DeltaTime * smooth);
-        //NetworkedDollyOffset = Vector3.Lerp(tr.localPosition, dollyDir * distance, Runner.DeltaTime * smooth);
         if (Object.HasStateAuthority)
         {
             NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);

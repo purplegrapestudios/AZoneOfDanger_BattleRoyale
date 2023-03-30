@@ -34,9 +34,12 @@ public class ObjectPoolManager : NetworkBehaviour
         FixedUpdateProjectileCallback -= callbackToUnsub;
     }
 
+    private App m_app;
+
     private void Awake()
     {
         Instance = this;
+        m_app = App.FindInstance();
         liveBulletList = new List<GameObject>();
         PoolPrefab(250, ProjectilePrefab, parentContainer: ProjectileContainer, "projectile", out projectileList);
         PoolPrefab(250, BulletImpactPrefab, parentContainer: BulletImpactContainer, "impact", out bulletImpactList);
@@ -81,7 +84,7 @@ public class ObjectPoolManager : NetworkBehaviour
         return list;
     }
 
-    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character owner, CharacterMuzzleComponent muzzleComponent, System.Action<float, CharacterHealthComponent> damageCallback)
+    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character owner, Vector3 muzzlePos, System.Action<float, CharacterHealthComponent> damageCallback)
     {
         if (ProjectilePrefab != null)
         {
@@ -94,26 +97,32 @@ public class ObjectPoolManager : NetworkBehaviour
             //currentBullet.GetComponent<ParticleSystem>().Play();
 
             var projectile = currentBullet.GetComponent<ProjectileBehavior>();
-            projectile.SetProjectileData(runner: Runner, instigator: ownerRef, owner, startingTick: Runner.Tick, firePosition: startPos, muzzlePosition: muzzleComponent.NetworkedMuzzlePosition, fireVelocity: (endPos - startPos).normalized * projectile.StartSpeed);
+            //Debug.DrawRay(startPos, endPos, Color.yellow, 0.1f);
+            projectile.SetProjectileData(runner: Runner, instigator: ownerRef, owner, startingTick: Runner.Tick, firePosition: startPos, endPosition: endPos, muzzlePosition: muzzlePos, speed: projectile.StartSpeed);
+            if (m_app.IsServerMode() && HasStateAuthority)
+            {
+                if (projectile.GetComponent<AudioSource>())
+                    projectile.GetComponent<AudioSource>().enabled = false;
+            }
         }
-        if (BulletImpactPrefab != null && hitTarget == HitTargets.Environment)
-        {
-            GameObject currentBulletImpact;
-            GetFXPrefab(bulletImpactList, out currentBulletImpact);
-            if (currentBulletImpact == null)
-                return;
-            currentBulletImpact.transform.rotation = Quaternion.LookRotation(endPos - startPos);
-            currentBulletImpact.transform.position = endPos;
-        }
-        if (BloodSplatterPrefab != null && hitTarget == HitTargets.Player)
-        {
-            GameObject currentBloodSplatter;
-            GetFXPrefab(bloodSplatterList, out currentBloodSplatter);
-            if (currentBloodSplatter == null)
-                return;
-            currentBloodSplatter.transform.rotation = Quaternion.LookRotation(endPos - startPos);
-            currentBloodSplatter.transform.position = endPos;
-        }
+        //if (BulletImpactPrefab != null && hitTarget == HitTargets.Environment)
+        //{
+        //    GameObject currentBulletImpact;
+        //    GetFXPrefab(bulletImpactList, out currentBulletImpact);
+        //    if (currentBulletImpact == null)
+        //        return;
+        //    currentBulletImpact.transform.rotation = Quaternion.LookRotation(endPos - startPos);
+        //    currentBulletImpact.transform.position = endPos;
+        //}
+        //if (BloodSplatterPrefab != null && hitTarget == HitTargets.Player)
+        //{
+        //    GameObject currentBloodSplatter;
+        //    GetFXPrefab(bloodSplatterList, out currentBloodSplatter);
+        //    if (currentBloodSplatter == null)
+        //        return;
+        //    currentBloodSplatter.transform.rotation = Quaternion.LookRotation(endPos - startPos);
+        //    currentBloodSplatter.transform.position = endPos;
+        //}
     }
 
     public void SpawnImpact(Vector3 impactPos, Vector3 lookDirection, HitTargets hitTarget)
@@ -126,6 +135,12 @@ public class ObjectPoolManager : NetworkBehaviour
                 return;
             currentBloodSplatter.transform.rotation = Quaternion.LookRotation(lookDirection);
             currentBloodSplatter.transform.position = impactPos;
+
+            if(m_app.IsServerMode() && HasStateAuthority)
+            {
+                if (currentBloodSplatter.GetComponent<AudioSource>())
+                    currentBloodSplatter.GetComponent<AudioSource>().enabled = false;
+            }
         }
         else if(hitTarget.Equals(HitTargets.Environment))
         {
@@ -136,6 +151,11 @@ public class ObjectPoolManager : NetworkBehaviour
                 return;
             currentBulletImpact.transform.rotation = Quaternion.LookRotation(lookDirection);
             currentBulletImpact.transform.position = impactPos;
+            if (m_app.IsServerMode() && HasStateAuthority)
+            {
+                if (currentBulletImpact.GetComponent<AudioSource>())
+                    currentBulletImpact.GetComponent<AudioSource>().enabled = false;
+            }
         }
         else if (hitTarget.Equals(HitTargets.Explosive_1))
         {
@@ -146,6 +166,11 @@ public class ObjectPoolManager : NetworkBehaviour
                 return;
             currentRPGImpact.transform.rotation = Quaternion.LookRotation(lookDirection);
             currentRPGImpact.transform.position = impactPos;
+            if (m_app.IsServerMode() && HasStateAuthority)
+            {
+                if (currentRPGImpact.GetComponent<AudioSource>())
+                    currentRPGImpact.GetComponent<AudioSource>().enabled = false;
+            }
         }
     }
 

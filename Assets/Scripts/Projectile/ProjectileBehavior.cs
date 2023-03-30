@@ -7,8 +7,9 @@ public struct ProjectileData : INetworkStruct
 {
     public int StartingTick;
     public Vector3 FirePosition;
+    public Vector3 Direction; 
     public Vector3 MuzzlePosition;
-    public Vector3 FireVelocity;
+    public float Speed;
     public bool IsDestroyed;
     public bool HasFiredImpact;
     [Accuracy(0.01f)] public Vector3 ImpactPosition { get; set; }
@@ -25,7 +26,6 @@ public class ProjectileBehavior : MonoBehaviour
     private NetworkRunner m_runner;
     private PlayerRef m_instigator;
     private Character m_owner;
-    private CharacterMuzzleComponent m_characterMuzzle;
 
     public float InstigatorImmunityFactor => m_InstigatorImmunityFactor;
     [Range(0f, 1f)] [SerializeField] private float m_InstigatorImmunityFactor = 0.9f;
@@ -212,20 +212,18 @@ public class ProjectileBehavior : MonoBehaviour
         var targetPosition = GetRenderPosition(m_runner.Tick);
         float interpolationProgress = 0f;
 
-        if (targetPosition == m_projectileData.FirePosition)
+        if (m_runner.Tick - m_projectileData.StartingTick <= 0)
         {
             m_currentInterpolationTime = 0f;
-            m_currentInterpolationOffset = m_characterMuzzle.NetworkedMuzzlePosition - m_projectileData.FirePosition;
+            m_currentInterpolationOffset = m_projectileData.MuzzlePosition - m_projectileData.FirePosition;
         }
         else
         {
             m_currentInterpolationTime += Time.deltaTime;
-
-            //We'll use InterpolationTime Squared for the interpolation progress
-            interpolationProgress = Mathf.Clamp01((m_currentInterpolationTime * m_currentInterpolationTime) / m_interpolationDuration);
+            interpolationProgress = Mathf.Clamp01(m_currentInterpolationTime / m_interpolationDuration);
         }
         var offset = Vector3.Lerp(m_currentInterpolationOffset, Vector3.zero, interpolationProgress);
-        var nextPos = targetPosition + offset;
+        var nextPos = targetPosition;// + offset;
         var curPos = tr.position;
         var interpolationDirection = nextPos - curPos;
 
@@ -240,13 +238,13 @@ public class ProjectileBehavior : MonoBehaviour
     private Vector3 GetFixedPosition(int currentTick)
     {
         var elapsedTicks = currentTick - m_projectileData.StartingTick;
-        return (elapsedTicks <= 0) ? m_projectileData.FirePosition : m_projectileData.FirePosition + m_projectileData.FireVelocity * elapsedTicks * m_runner.DeltaTime;
+        return (elapsedTicks <= 0) ? m_projectileData.FirePosition : m_projectileData.FirePosition + (m_projectileData.Direction * m_projectileData.Speed) * elapsedTicks * m_runner.DeltaTime;
     }
 
     private Vector3 GetRenderPosition(int currentTick)
     {
         var elapsedTicks = currentTick - m_projectileData.StartingTick;
-        return (elapsedTicks <= 0) ? m_projectileData.MuzzlePosition : m_projectileData.MuzzlePosition + m_projectileData.FireVelocity * elapsedTicks * m_runner.DeltaTime;
+        return (elapsedTicks <= 0) ? m_projectileData.MuzzlePosition : m_projectileData.MuzzlePosition + (m_projectileData.Direction * m_projectileData.Speed) * elapsedTicks * m_runner.DeltaTime;
     }
 
     private void DestroyProjectile(float time)
@@ -282,19 +280,22 @@ public class ProjectileBehavior : MonoBehaviour
 
     }
 
-    public void SetProjectileData(NetworkRunner runner, PlayerRef instigator, Character owner, int startingTick, Vector3 firePosition, Vector3 muzzlePosition, Vector3 fireVelocity)
+    public void SetProjectileData(NetworkRunner runner, PlayerRef instigator, Character owner, int startingTick, Vector3 firePosition, Vector3 endPosition, Vector3 muzzlePosition, float speed)
     {
         m_runner = runner;
         m_instigator = instigator;
         m_owner = owner;
-        m_characterMuzzle = m_owner.CharacterMuzzle;
         m_projectileData.StartingTick = startingTick;
         m_projectileData.FirePosition = firePosition;
-        m_projectileData.MuzzlePosition = m_characterMuzzle.NetworkedMuzzlePosition;// muzzlePosition;
+        m_projectileData.Direction = endPosition;
+        m_projectileData.MuzzlePosition = muzzlePosition;
         m_projectileData.HasFiredImpact = false;
         m_projectileData.IsDestroyed = false;
 
-        m_projectileData.FireVelocity = fireVelocity;
+        m_projectileData.Speed = speed;
+
+        m_currentInterpolationOffset = Vector3.zero;
+
         ObjectPoolManager.Instance.SubscribeToProjectileUpdate(OnFixedUpdateProjectile);
         ObjectPoolManager.Instance.SubscribeToProjectileUpdate(OnRenderProjectile);
     }
