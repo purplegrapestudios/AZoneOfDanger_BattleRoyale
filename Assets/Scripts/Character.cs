@@ -14,13 +14,21 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 {
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
+	public CharacterMoveComponent CharacterMoveComponent => m_characterMoveComponent;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
+	public CharacterHealthComponent CharacterHealth => m_characterHealth;
 	[SerializeField] private CharacterHealthComponent m_characterHealth;
+	public CharacterShootComponent CharacterShoot => m_characterShoot;
 	[SerializeField] private CharacterShootComponent m_characterShoot;
+	public CharacterWeapons CharacterWeapons => m_characterWeapons;
 	[SerializeField] private CharacterWeapons m_characterWeapons;
+	public CharacterMuzzleComponent CharacterMuzzle => m_characterMuzzle;
 	[SerializeField] private CharacterMuzzleComponent m_characterMuzzle;
+	public CharacterAudioComponent CharacterAudio => m_characterAudio;
 	[SerializeField] private CharacterAudioComponent m_characterAudio;
+	public CharacterAnimation CharacterAnimation => m_characterAnimation;
 	[SerializeField] private CharacterAnimation m_characterAnimation;
+
 	[SerializeField] private TMP_Text _name;
 	[SerializeField] private MeshRenderer _mesh;
 	[SerializeField] private GameObject m_characterModel;
@@ -144,7 +152,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		{
 			float DeltaTime = Runner.DeltaTime;
 			m_renderAimDirDelta = new Vector2(Input.GetAxis("Mouse X") * DeltaTime, Input.GetAxis("Mouse Y") * DeltaTime);
-			Debug.Log($"RenderAimData: {m_renderAimDirDelta}");
+			//Debug.Log($"RenderAimData: {m_renderAimDirDelta}");
 			m_cachedAimDirDelta += m_renderAimDirDelta;
 
 			if (_app.ResetCachedInput)

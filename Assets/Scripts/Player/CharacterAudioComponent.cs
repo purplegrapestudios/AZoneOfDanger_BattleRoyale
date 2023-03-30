@@ -14,6 +14,7 @@ public enum EAudioClip
     ReloadShotgun,
     ShotgunOpen,
     ShotgunClose,
+    FireGL,
 }
 
 [Serializable]

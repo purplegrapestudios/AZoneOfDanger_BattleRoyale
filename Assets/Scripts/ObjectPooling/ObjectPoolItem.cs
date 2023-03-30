@@ -5,6 +5,7 @@ public enum DestroyFXType
 {
     Projectile,
     BulletImpact,
+    RPGImpact,
     BloodSplatter,
     MuzzleFlash,
 }
@@ -46,10 +47,12 @@ public class ObjectPoolItem : MonoBehaviour
         {
             if (GetComponent<ProjectileBehavior>())
             {
-                ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(GetComponent<ProjectileBehavior>().OnProjectileFixedUpdate);
+                ObjectPoolManager.Instance.UnsubscribeFromProjectileUpdate(GetComponent<ProjectileBehavior>().OnFixedUpdateProjectile);
                 ObjectPoolManager.Instance.projectileList = ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.projectileList);
             }
         }
+        else if (destroyFXType == DestroyFXType.RPGImpact)
+            ObjectPoolManager.Instance.rpgImpactList = ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.rpgImpactList);
         else if (destroyFXType == DestroyFXType.BulletImpact)
             ObjectPoolManager.Instance.bulletImpactList = ObjectPoolManager.Instance.DestroyFXPrefab(gameObject, ObjectPoolManager.Instance.bulletImpactList);
         else if (destroyFXType == DestroyFXType.MuzzleFlash)

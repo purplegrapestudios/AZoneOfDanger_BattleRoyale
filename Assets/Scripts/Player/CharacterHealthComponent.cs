@@ -58,7 +58,6 @@ public class CharacterHealthComponent : NetworkBehaviour
 
             if (instigator != null)
             {
-                Debug.Log($"Instigator updated kill to: {instigator.NetworkedKills}");
                 instigator.UpdateKillCount();
             }
         }
@@ -132,6 +131,7 @@ public class CharacterHealthComponent : NetworkBehaviour
     private void UpdateKillCount()
     {
         NetworkedKills += 1;
+        Debug.Log($"Instigator updated kill to: {NetworkedKills}");
     }
 
     private void Respawn(CharacterHealthComponent changedBehaviour)

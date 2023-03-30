@@ -104,7 +104,7 @@ public class CharacterAnimation : NetworkBehaviour
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat(ref Param_Speed, m_characterMoveComponent.NetworkedVelocity.magnitude, smooth: .5f);
+            SetStateFloat(ref Param_Speed, m_characterMoveComponent.NetworkedVelocity.magnitude);
             SetStateFloat(ref Param_3rdPerson_AimAngle, m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
             SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
             SetStateInt(ref Param_ReloadInt, m_characterShootComponent.NetworkedReload ? 1 : 0);

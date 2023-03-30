@@ -41,7 +41,7 @@ public class CharacterShootComponent : NetworkBehaviour
         m_muzzleFlash = muzzleFlash;
         m_characterCamera = characterCamera;
         m_characterMuzzle = characterMuzzle;
-        m_characterMuzzle.Initialize(this, m_muzzleFlash);
+        m_characterMuzzle.Initialize(m_character, m_muzzleFlash);
 
         NetworkedHasAmmo = false;
         NetworkedFire = false;
@@ -250,7 +250,8 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void SpawnProjectile()
     {
-        ObjectPoolManager.Instance.SpawnProjectile(m_characterCamera.transform.position + m_characterCamera.transform.forward, transform.position + m_characterCamera.transform.forward * 100, HitTargets.Player, ownerRef: Object.InputAuthority, ownerCharacter: m_character, weaponHand: m_muzzleFlash.transform, damageCallback: m_takeDamageCallback);
+        ObjectPoolManager.Instance.SpawnProjectile(m_characterCamera.NetworkedPosition, m_characterCamera.NetworkedPosition + m_characterCamera.NetworkedForwward * 100, HitTargets.Player, ownerRef: Object.InputAuthority, owner: m_character, muzzleComponent: m_character.CharacterMuzzle, damageCallback: m_takeDamageCallback);
+        m_audioCallback(EAudioClip.FireGL);
     }
 
     private void FireHitScanWeapon()
@@ -261,7 +262,7 @@ public class CharacterShootComponent : NetworkBehaviour
 
         var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
         var dir = rot * Vector3.forward;
-        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.transform.position, m_characterCamera.NetworkedPosition);
+        var distFromCamToMuzzle = Vector3.Distance(m_characterMuzzle.NetworkedMuzzlePosition, m_characterCamera.NetworkedPosition);
         distFromCamToMuzzle = Mathf.Min(distFromCamToMuzzle, m_character.transform.localScale.x * 1.5f);
         var orig = m_characterCamera.NetworkedPosition + dir * distFromCamToMuzzle;
         Runner.LagCompensation.Raycast(origin: orig, direction: dir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
@@ -275,17 +276,12 @@ public class CharacterShootComponent : NetworkBehaviour
         {
             if (hitInfo.Hitbox.Root.GetComponent<Character>().Object.Id != m_character.Object.Id)
             {
-        
                 //Debug.Log($"We hit a HitBox Object: {hitInfo.Hitbox.transform.root.name}, Pos: {hitInfo.Point}");
                 ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Player);
 
                 if (HasStateAuthority)
                 {
-                    Debug.Log($"{m_character.Player.Name} took {5} damage");
-                    if (hitInfo.Hitbox.HitboxIndex == 0)
-                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(25, GetComponent<CharacterHealthComponent>());
-                    else
-                        hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(50, GetComponent<CharacterHealthComponent>());
+                    hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(hitInfo.Hitbox.HitboxIndex == 0 ? 25 : 50, m_character.CharacterHealth);
                 }
 
                 //Change localPlayer's crosshair only

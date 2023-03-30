@@ -6,25 +6,38 @@ using UnityEngine;
 public class CharacterMuzzleComponent : NetworkBehaviour
 {
     [Networked] public Vector3 NetworkedMuzzlePosition { get; set; }
-    private CharacterShootComponent m_characterShoot;
+    private Transform tr;
+    private Character m_character;
     private ParticleSystem m_muzzleFlash;
-    private bool isInitialized;
-    public void Initialize(CharacterShootComponent characterShootComponent, ParticleSystem muzzleFlash)
+    private bool m_isInitialized;
+    public void Initialize(Character character, ParticleSystem muzzleFlash)
     {
-        m_characterShoot = characterShootComponent;
+        tr = GetComponent<Transform>();
+        m_character = character;
         m_muzzleFlash = muzzleFlash;
-        isInitialized = true;
+        m_isInitialized = true;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!m_isInitialized) return;
+        if (!m_character.CharacterHealth.NetworkedIsAlive) return;
+
+        if (m_character.PlayerInputEnabled() && GetInput(out InputData data))
+        {
+            NetworkedMuzzlePosition = transform.position;
+        }
     }
 
     private void LateUpdate()
     {
-        if (!isInitialized) return;
+        if (!m_isInitialized) return;
         MuzzleFlashUpdate();
     }
 
     private void MuzzleFlashUpdate()
     {
-        if (m_characterShoot.NetworkedFire)
+        if (m_character.CharacterShoot.NetworkedFire)
         {
             if (!m_muzzleFlash.isPlaying)
                 m_muzzleFlash.Play();

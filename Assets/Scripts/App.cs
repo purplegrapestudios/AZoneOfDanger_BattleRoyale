@@ -78,7 +78,7 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	public bool AllowInput
 	{
-		get => _allowInput && Session != null && Session.PostLoadCountDown.Expired(Session.Runner) && Cursor.lockState == CursorLockMode.Locked && !Cursor.visible;
+		get => _allowInput && Session != null && Session.PostLoadCountDown.Expired(Session.Runner);// && Cursor.lockState == CursorLockMode.Locked && !Cursor.visible;
 		set => _allowInput = value;
 	} 
 

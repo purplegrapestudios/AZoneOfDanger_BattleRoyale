@@ -7,6 +7,7 @@ public class CharacterCamera : NetworkBehaviour
     //Networked Variables
     [SerializeField] [Networked] public float NetworkedRotationY { get; set; }
     [SerializeField] [Networked] public Vector3 NetworkedPosition { get; set; }
+    [SerializeField] [Networked] public Vector3 NetworkedForwward { get; set; }
 
     //Public Variables
     public float FieldOfView => m_camera.fieldOfView;
@@ -66,6 +67,9 @@ public class CharacterCamera : NetworkBehaviour
             //rotAverageY = m_framesOfSmoothing > 0 ? rotAverageY / rotArrayY.Count : NetworkedRotationY;
             //RotateCamera(NetworkedRotationY);
         }
+        NetworkedPosition = transform.position;
+        NetworkedForwward = transform.forward;
+
     }
 
     public override void Render()
@@ -86,7 +90,8 @@ public class CharacterCamera : NetworkBehaviour
 
     public void LateUpdate()
     {
-        NetworkedPosition = transform.position;
+        //NetworkedPosition = transform.position;
+        //NetworkedForwward = transform.forward;
     }
 
     public float GetCameraRotationY()

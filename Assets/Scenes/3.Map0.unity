@@ -12603,12 +12603,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  ProjectilePrefab: {fileID: 1093011080150972619, guid: d34749ffe076b7641ac1ab34ae63ffcd, type: 3}
-  BulletImpactPrefab: {fileID: 1067471869909948, guid: 5e02303289b3c494e8e185be0fbbd405, type: 3}
-  MuzzleFlashPrefab: {fileID: 4834526503407549940, guid: 2735bebe54c1f5a4096f5134a96f7e77, type: 3}
-  BloodSplatterPrefab: {fileID: 1036925697551712, guid: a845e59c374ae0240812749e46f13033, type: 3}
+  ProjectilePrefab: {fileID: 1136185925408250480, guid: fdb85de835c1ddf4a8047fd1fc850c84, type: 3}
+  BulletImpactPrefab: {fileID: 1067471869909948, guid: 5ee628e2ef20ea64394f5e3b87f39c7d, type: 3}
+  RPGImpactPrefab: {fileID: 1427962332153456, guid: 301583a5af63a494298d60cd9f296909, type: 3}
+  MuzzleFlashPrefab: {fileID: 919132149155446097, guid: e0a4d47de02590541b55caeca1717525, type: 3}
+  BloodSplatterPrefab: {fileID: 1036925697551712, guid: 03149e6ff9946124ea314b39d22c28a4, type: 3}
+  ProjectileContainer: {fileID: 0}
+  BulletImpactContainer: {fileID: 0}
+  RPGImpactContainer: {fileID: 0}
+  MuzzleFlashContainer: {fileID: 0}
+  BloodSplatterContainer: {fileID: 0}
   projectileList: []
   bulletImpactList: []
+  rpgImpactList: []
   muzzleFlashList: []
   bloodSplatterList: []
   liveBulletList: []

@@ -137,9 +137,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
 
         OnLimitSpeed();
-
-        //Used for animation
-        UpdateNetworkedVariables();
+        UpdateNetworkedVariables(); //Used for animation
     }
 
     private void UpdateNetworkedVariables()
@@ -155,7 +153,8 @@ public class CharacterMoveComponent : NetworkBehaviour
         if (!m_characterHealthComponent.NetworkedIsAlive) return;
 
         ResetRigidBodyState();
-        if (m_character.Player && m_character.Player.InputEnabled)
+
+        if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
             m_moveData.V_RotationY += m_character.FixedAimDirDelta.x * m_moveData.V_MouseSensitivity * Time.timeScale;
             OnRotate(m_moveData.V_RotationY);

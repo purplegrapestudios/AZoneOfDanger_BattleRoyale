@@ -7,46 +7,50 @@ public enum HitTargets
 {
     Nothing,
     Player,
-    Environment
+    Environment,
+    Explosive_1,
 }
 
 public class ObjectPoolManager : NetworkBehaviour
 {
     public static ObjectPoolManager Instance;
 
-    public GameObject ProjectilePrefab, BulletImpactPrefab, MuzzleFlashPrefab, BloodSplatterPrefab;
-    [SerializeField] public List<GameObject> projectileList, bulletImpactList, muzzleFlashList, bloodSplatterList;
+    public GameObject ProjectilePrefab, BulletImpactPrefab, RPGImpactPrefab, MuzzleFlashPrefab, BloodSplatterPrefab;
+    public Transform ProjectileContainer, BulletImpactContainer, RPGImpactContainer, MuzzleFlashContainer, BloodSplatterContainer;
+    [SerializeField] public List<GameObject> projectileList, bulletImpactList, rpgImpactList, muzzleFlashList, bloodSplatterList;
     public List<GameObject> liveBulletList;
 
     [SerializeField] private List<GameObject> tempList;
 
-    public System.Action Callback_ProjectileUpdate;
+    public System.Action FixedUpdateProjectileCallback;
+    public System.Action RenderProjectileCallback;
 
     public void SubscribeToProjectileUpdate(System.Action callback)
     {
-        Callback_ProjectileUpdate += callback;
+        FixedUpdateProjectileCallback += callback;
     }
     public void UnsubscribeFromProjectileUpdate(System.Action callbackToUnsub)
     {
-        Callback_ProjectileUpdate -= callbackToUnsub;
+        FixedUpdateProjectileCallback -= callbackToUnsub;
     }
 
     private void Awake()
     {
         Instance = this;
         liveBulletList = new List<GameObject>();
-        PoolPrefab(250, ProjectilePrefab, "projectile", out projectileList);
-        PoolPrefab(250, BulletImpactPrefab, "impact", out bulletImpactList);
-        PoolPrefab(250, MuzzleFlashPrefab, "muzzle", out muzzleFlashList);
-        PoolPrefab(250, BloodSplatterPrefab, "blood", out bloodSplatterList);
+        PoolPrefab(250, ProjectilePrefab, parentContainer: ProjectileContainer, "projectile", out projectileList);
+        PoolPrefab(250, BulletImpactPrefab, parentContainer: BulletImpactContainer, "impact", out bulletImpactList);
+        PoolPrefab(250, RPGImpactPrefab, parentContainer: RPGImpactContainer, "rpg_impact", out rpgImpactList);
+        PoolPrefab(250, MuzzleFlashPrefab, parentContainer: MuzzleFlashContainer, "muzzle", out muzzleFlashList);
+        PoolPrefab(250, BloodSplatterPrefab, parentContainer: BloodSplatterContainer, "blood", out bloodSplatterList);
     }
 
-    public void PoolPrefab(int size, GameObject prefab, string baseName, out List<GameObject> list)
+    public void PoolPrefab(int size, GameObject prefab, Transform parentContainer, string baseName, out List<GameObject> list)
     {
         list = new List<GameObject>();
         for (int i = 0; i < size; i++)
         {
-            GameObject obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            GameObject obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity, parent: parentContainer);
             obj.name = baseName + "_" + i;
             obj.SetActive(false);
             list.Add(obj);
@@ -77,7 +81,7 @@ public class ObjectPoolManager : NetworkBehaviour
         return list;
     }
 
-    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character ownerCharacter, Transform weaponHand, System.Action<float, CharacterHealthComponent> damageCallback)
+    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character owner, CharacterMuzzleComponent muzzleComponent, System.Action<float, CharacterHealthComponent> damageCallback)
     {
         if (ProjectilePrefab != null)
         {
@@ -87,12 +91,10 @@ public class ObjectPoolManager : NetworkBehaviour
                 return;
             currentBullet.transform.rotation = Quaternion.LookRotation(endPos - startPos);
             currentBullet.transform.position = startPos;
-            //currentBullet.transform.parent = weaponHand;
             //currentBullet.GetComponent<ParticleSystem>().Play();
-            currentBullet.GetComponent<ProjectileBehavior>().SetRunner(Runner);
-            currentBullet.GetComponent<ProjectileBehavior>().SetBulletDirection(endPos - startPos);
-            currentBullet.GetComponent<ProjectileBehavior>().SetOwner(ownerRef, ownerCharacter);
-            currentBullet.GetComponent<ProjectileBehavior>().SetDamageCallback(damageCallback);
+
+            var projectile = currentBullet.GetComponent<ProjectileBehavior>();
+            projectile.SetProjectileData(runner: Runner, instigator: ownerRef, owner, startingTick: Runner.Tick, firePosition: startPos, muzzlePosition: muzzleComponent.NetworkedMuzzlePosition, fireVelocity: (endPos - startPos).normalized * projectile.StartSpeed);
         }
         if (BulletImpactPrefab != null && hitTarget == HitTargets.Environment)
         {
@@ -135,14 +137,29 @@ public class ObjectPoolManager : NetworkBehaviour
             currentBulletImpact.transform.rotation = Quaternion.LookRotation(lookDirection);
             currentBulletImpact.transform.position = impactPos;
         }
+        else if (hitTarget.Equals(HitTargets.Explosive_1))
+        {
+            if (RPGImpactPrefab == null) return;
+            GameObject currentRPGImpact;
+            GetFXPrefab(rpgImpactList, out currentRPGImpact);
+            if (currentRPGImpact == null)
+                return;
+            currentRPGImpact.transform.rotation = Quaternion.LookRotation(lookDirection);
+            currentRPGImpact.transform.position = impactPos;
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
         if (Instance == null) return;
-        if (!HasStateAuthority) return;
 
-        if (Callback_ProjectileUpdate != null)
-            Callback_ProjectileUpdate();
+        FixedUpdateProjectileCallback?.Invoke();
+    }
+
+    public override void Render()
+    {
+        if (Instance == null) return;
+
+        RenderProjectileCallback?.Invoke();
     }
 }
