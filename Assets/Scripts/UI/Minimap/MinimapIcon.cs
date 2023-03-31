@@ -6,11 +6,11 @@ using TMPro;
 
 public class MinimapIcon : MonoBehaviour
 {
-    public PhotonView pv;
+    //public Character m_character;
     public Image IconImage;
     public TextMeshProUGUI IconText;
-    public RectTransform PrefabRectTransform;
-    public RectTransform IconRectTransform;
+    public RectTransform m_minimapRT;
+    public RectTransform m_iconRT;
     public bool isLocalMinimapPlayer;
 
 

@@ -2,18 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
-public class Minimap : MonoBehaviour
+public class Minimap : SimulationBehaviour
 {
     public static Minimap Instance;
-
-    public RectTransform MinimapContents;
 
     [SerializeField]
     Vector2 realMapDimensions;
 
-    [SerializeField]
-    RectTransform scrollViewRectTransform;
+    //[SerializeField]
+    //RectTransform scrollViewRectTransform;
 
     [SerializeField]
     RectTransform contentRectTransform;
@@ -28,45 +27,77 @@ public class Minimap : MonoBehaviour
     Vector2 currentPlayerIconPosition;
     public Dictionary<MinimapWorldObject, MinimapIcon> minimapWorldObjectDictrionary = new Dictionary<MinimapWorldObject, MinimapIcon>();
 
-    public Dictionary<MinimapWorldObject, MinimapIcon> minimapOFFScreenObjectDictionary = new Dictionary<MinimapWorldObject, MinimapIcon>();
+    public Dictionary<MinimapWorldObject, MinimapIcon> offScreenMinimapObjectDictionary = new Dictionary<MinimapWorldObject, MinimapIcon>();
+
+    private List<MinimapIcon> m_minimapIconsToDestroy = new List<MinimapIcon>();
+    private List<MinimapIcon> m_offScreenMinimapIconsToDestroy = new List<MinimapIcon>();
+    private List<MinimapWorldObject> m_worldObjToRemove = new List<MinimapWorldObject>();
+    private List<MinimapWorldObject> m_offScreenWorldObjToRemove = new List<MinimapWorldObject>();
 
     [SerializeField]
     public Vector2 OutOfBoundsDimension;
 
+    private App m_app;
+    private bool m_initialized = false;
     private void Awake()
     {
         Instance = this;
+        m_app = App.FindInstance();
     }
 
-    private void Start()
+    public void Init()
     {
         CalculateTransformationMatrix();
+        m_initialized = true;
+    }
+
+    private void OnEnable()
+    {
+        if (m_initialized) CalculateTransformationMatrix();
     }
 
     private void Update()
     {
+        if (m_app.AllowInput)
+        {
+            if (!m_initialized)
+            {
+                Init();
+            }
+        }
+        else
+        {
+            return;
+        }
+
+        if (!m_initialized) return;
         UpdateMinimapIcons();
     }
 
+    //For each game instance, All Players will call this. 
     public void RegisterMinimapWorldObject(MinimapWorldObject minimapWorldObject, Color offScreenColor)
     {
-        var minimapIcon = Instantiate(minimapIconPrefab);
-        minimapIcon.transform.SetParent(contentRectTransform);
-
-        Random.InitState((int)System.DateTime.Now.Ticks * 256);
-        Color c = Random.ColorHSV();
-        c = new Color(
-            Mathf.Min(255f / 255f, c.r) + 150f / 255f,
-            Mathf.Min(100f / 255f, c.g) + 50f / 255f,
-            Mathf.Min(100f / 255f, c.b) + 50f / 255f,
-            1f);
-        
-
         if (!minimapWorldObjectDictrionary.ContainsKey(minimapWorldObject))
         {
+            var minimapIcon = Instantiate(minimapIconPrefab);
+            minimapIcon.transform.SetParent(contentRectTransform);
+
+            Random.InitState((int)System.DateTime.Now.Ticks * 256);
+            Color c = Random.ColorHSV();
+            c = new Color(
+                Mathf.Min(255f / 255f, c.r) + 150f / 255f,
+                Mathf.Min(100f / 255f, c.g) + 50f / 255f,
+                Mathf.Min(100f / 255f, c.b) + 50f / 255f,
+                1f);
+        
             minimapIcon.SetIcon(minimapWorldObject.Icon);
-            if (minimapWorldObject.pv.viewID != GameManager.Instance.MyPlayerID)
+            //if (minimapWorldObject.m_character.Object.InputAuthority != Object.Runner.LocalPlayer)
+            if (minimapWorldObject.isLocalMinimapPlayer)
+            {
+                //Minimap Local Player Set
+                Debug.Log($"Minimap Local Player Set");
                 minimapIcon.SetColor(new Color(c.r, c.g, c.b, c.a));
+            }
             else
             {
                 minimapIcon.SetColor(new Color(184f / 255f, 255 / 255f, 100 / 255f, 1f));
@@ -74,35 +105,39 @@ public class Minimap : MonoBehaviour
             }
             minimapIcon.SetText(minimapWorldObject.Text);
             minimapIcon.SetTextSize(minimapWorldObject.TextSize);
-            minimapIcon.PrefabRectTransform.localScale = Vector3.one;
+            minimapIcon.m_minimapRT.localScale = Vector3.one;
             minimapIcon.SetIsLocalMinimapPlayer(minimapWorldObject.isLocalMinimapPlayer);
 
             minimapWorldObjectDictrionary.Add(minimapWorldObject, minimapIcon);
         }
         else
         {
-            Debug.Log("Icon: " + minimapWorldObject.pv.viewID + " is already in the dictioary");
+            Debug.Log("Icon: " + minimapWorldObject.PlayerID + " is already in the dictioary");
         }
-        if(minimapWorldObject.pv.viewID == GameManager.Instance.MyPlayerID)
+        if(minimapWorldObject.m_character.Object.InputAuthority == Object.Runner.LocalPlayer)
         {
             LocalPlayerIconPosltion = -WorldPositionToMapPosition(minimapWorldObject.transform.position);
-            tempMinimapIcon.SetText("#" + StatManager.Instance.GetPlayerStats(minimapWorldObject.pv.viewID, StatType.Rank));
-            Debug.Log("Labeling Player Icon Text: " + "#" + StatManager.Instance.GetPlayerStats(minimapWorldObject.pv.viewID, StatType.Rank));
         }
         else
         {
             tempMinimapIcon = Instantiate(tempMinimapIconPrefab);
             tempMinimapIcon.transform.SetParent(contentRectTransform);
             tempMinimapIcon.SetIcon(minimapSpriteOffScreen);
-            Random.InitState((int)Time.time);
+            Random.InitState((int)System.DateTime.Now.Ticks * 256);
+            Color c = Random.ColorHSV();
+            c = new Color(
+                Mathf.Min(255f / 255f, c.r) + 150f / 255f,
+                Mathf.Min(100f / 255f, c.g) + 50f / 255f,
+                Mathf.Min(100f / 255f, c.b) + 50f / 255f,
+                1f);
             tempMinimapIcon.SetColor(new Color(c.r, c.g, c.b, c.a));
 
             //tempMinimapIcon.SetText("P" + minimapWorldObject.pv.viewID + ": " + StatManager.Instance.GetPlayerStats(minimapWorldObject.pv.viewID, StatType.Rank));
-            tempMinimapIcon.SetText("#" + StatManager.Instance.GetPlayerStats(minimapWorldObject.pv.viewID, StatType.Rank));
+            tempMinimapIcon.SetText($"PLR# {minimapWorldObject.PlayerID}");
             tempMinimapIcon.SetTextSize(minimapWorldObject.TextSize);
-            tempMinimapIcon.PrefabRectTransform.localScale = Vector3.one;
+            tempMinimapIcon.m_minimapRT.localScale = Vector3.one;
             
-            minimapOFFScreenObjectDictionary.Add(minimapWorldObject, tempMinimapIcon);
+            offScreenMinimapObjectDictionary.Add(minimapWorldObject, tempMinimapIcon);
         }
     }
 
@@ -118,7 +153,11 @@ public class Minimap : MonoBehaviour
     private Vector2 LocalPlayerIconPosltion;
     private void UpdateMinimapIcons()
     {
-        foreach(var keyValuePair in minimapWorldObjectDictrionary)
+        if (!m_app.AllowInput) return;
+
+        RemoveOldWorldObjectAndIcons(m_minimapIconsToDestroy, m_offScreenMinimapIconsToDestroy, m_worldObjToRemove, m_offScreenWorldObjToRemove);
+
+        foreach (var keyValuePair in minimapWorldObjectDictrionary)
         {
             var minimapWorldObject = keyValuePair.Key;
             var minimapIcon = keyValuePair.Value;
@@ -126,93 +165,104 @@ public class Minimap : MonoBehaviour
             var mapPosition = Vector2.zero;
             if (minimapWorldObject)
             {
+                if (minimapWorldObject.m_character?.Object?.InputAuthority.IsNone ?? true)
+                {
+                    //This player is no longer in the game. Let's remove the kvp and destroy the player's object
+                    m_minimapIconsToDestroy.Add(minimapIcon);
+                    m_worldObjToRemove.Add(minimapWorldObject);
+
+                    m_offScreenMinimapIconsToDestroy.Add(offScreenMinimapObjectDictionary[minimapWorldObject]);
+                    m_offScreenWorldObjToRemove.Add(minimapWorldObject);
+                    continue;
+                }
+
                 mapPosition = -WorldPositionToMapPosition(minimapWorldObject.transform.position);
 
-                if (minimapWorldObject.pv.viewID == GameManager.Instance.MyPlayerID)
+                if (minimapWorldObject.m_character.Object.InputAuthority == Object.Runner.LocalPlayer)
                 {
                     currentPlayerIconPosition = mapPosition;
                     mapCenterDistance = CalculateLocalPlayerCenterDistance(mapPosition);
                     contentRectTransform.anchoredPosition = mapCenterDistance;
                 }
 
-                minimapIcon.PrefabRectTransform.anchoredPosition = mapPosition;
+                minimapIcon.m_minimapRT.anchoredPosition = mapPosition;
 
-                if (minimapWorldObject.pv.viewID != GameManager.Instance.MyPlayerID)
+                if (minimapWorldObject.m_character.Object.InputAuthority != Object.Runner.LocalPlayer)
                 {
                     //Not Local Player, so if otherPlayers distX > dx, and/or distY > dy shift it to the outside border on edge of minimap to be visible still.
                     //var DistanceToPlayer = CalculateDistanceToLocalPlayer(mapPosition);
                     if (currentPlayerIconPosition.x - mapPosition.x > OutOfBoundsDimension.x && mapPosition.y - currentPlayerIconPosition.y > OutOfBoundsDimension.y)
                     {
                         //Icon set to TOP LEFT, as it is to the Left of the player
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x - OutOfBoundsDimension.x; 
                         tempY = currentPlayerIconPosition.y + OutOfBoundsDimension.y;
                     }
                     else if (mapPosition.x - currentPlayerIconPosition.x > OutOfBoundsDimension.x && mapPosition.y - currentPlayerIconPosition.y > OutOfBoundsDimension.y)
                     {
                         //Icon set to TOP RIGHT
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x + OutOfBoundsDimension.x;
                         tempY = currentPlayerIconPosition.y + OutOfBoundsDimension.y;
                     }
                     else if (mapPosition.x - currentPlayerIconPosition.x > OutOfBoundsDimension.x && currentPlayerIconPosition.y - mapPosition.y > OutOfBoundsDimension.y)
                     {
                         //Icon set to BOTTOM RIGHT (bottom as it is below player)
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x + OutOfBoundsDimension.x;
                         tempY = currentPlayerIconPosition.y - OutOfBoundsDimension.y;
                     }
                     else if (currentPlayerIconPosition.x - mapPosition.x > OutOfBoundsDimension.x && currentPlayerIconPosition.y - mapPosition.y > OutOfBoundsDimension.y)
                     {
                         //Icon set to BOTTOM LEFT
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x - OutOfBoundsDimension.x;
                         tempY = currentPlayerIconPosition.y - OutOfBoundsDimension.y;
                     }
                     else if (currentPlayerIconPosition.x - mapPosition.x > OutOfBoundsDimension.x && Mathf.Abs(currentPlayerIconPosition.y - mapPosition.y) < OutOfBoundsDimension.y)
                     {
                         //Icon set to LEFT
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x - OutOfBoundsDimension.x;
                         tempY = mapPosition.y;
                     }
                     else if (mapPosition.x - currentPlayerIconPosition.x > OutOfBoundsDimension.x && Mathf.Abs(currentPlayerIconPosition.y - mapPosition.y) < OutOfBoundsDimension.y)
                     {
                         //Icon set to RIGHT
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = currentPlayerIconPosition.x + OutOfBoundsDimension.x;
                         tempY = mapPosition.y;
                     }
                     else if (mapPosition.y - currentPlayerIconPosition.y > OutOfBoundsDimension.y && Mathf.Abs(currentPlayerIconPosition.x - mapPosition.x) < OutOfBoundsDimension.x)
                     {
                         //Icon set to TOP
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = mapPosition.x;
                         tempY = currentPlayerIconPosition.y + OutOfBoundsDimension.y;
                     }
                     else if (currentPlayerIconPosition.y - mapPosition.y > OutOfBoundsDimension.y && Mathf.Abs(currentPlayerIconPosition.x - mapPosition.x) < OutOfBoundsDimension.x)
                     {
                         //Icon set to BOTTOM
-                        if (!minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
+                        if (!offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(true);
                         tempX = mapPosition.x;
                         tempY = currentPlayerIconPosition.y - OutOfBoundsDimension.y;
                     }
                     else
                     {
-                        if (minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf) minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.SetActive(false);
+                        if (offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf) offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.SetActive(false);
                     }
 
                     tempPos = new Vector2(tempX, tempY);
-                    if (minimapOFFScreenObjectDictionary[minimapWorldObject].gameObject.activeSelf)
-                        minimapOFFScreenObjectDictionary[minimapWorldObject].PrefabRectTransform.anchoredPosition = Vector2.Lerp(minimapOFFScreenObjectDictionary[minimapWorldObject].PrefabRectTransform.anchoredPosition, tempPos, 0.5f);
+                    if (offScreenMinimapObjectDictionary[minimapWorldObject].gameObject.activeSelf)
+                        offScreenMinimapObjectDictionary[minimapWorldObject].m_minimapRT.anchoredPosition = Vector2.Lerp(offScreenMinimapObjectDictionary[minimapWorldObject].m_minimapRT.anchoredPosition, tempPos, 0.5f);
                     else
-                        minimapOFFScreenObjectDictionary[minimapWorldObject].PrefabRectTransform.anchoredPosition = tempPos;
+                        offScreenMinimapObjectDictionary[minimapWorldObject].m_minimapRT.anchoredPosition = tempPos;
                 }
 
-                var rotation = minimapWorldObject.GetComponent<PlayerContainer>().HeadingTransform.rotation.eulerAngles;
+                var rotation = minimapWorldObject.m_character.GetComponent<NetworkRigidbody>().ReadRotation().eulerAngles;
                 //Rotating the play occurs along Y axis (Negative because of Unity's Left Hand Coordinate System. Rotating the minimap Icon occurs along the Z axis.
 
-                minimapIcon.IconRectTransform.localRotation = Quaternion.AngleAxis(-rotation.y, Vector3.forward);
+                minimapIcon.m_iconRT.localRotation = Quaternion.AngleAxis(-rotation.y, Vector3.forward);
             }
         }
 
@@ -222,6 +272,26 @@ public class Minimap : MonoBehaviour
     {
         var pos = new Vector2(worldPos.x, worldPos.z);
         return transformationMaxtrix.MultiplyPoint3x4(pos);
+    }
+
+    private void RemoveOldWorldObjectAndIcons(List<MinimapIcon> minimapIconsToDestroy, List<MinimapIcon> offScreenMinimapIconsToDestroy, List<MinimapWorldObject> worldObjsToRemove, List<MinimapWorldObject> offScreenWorldObjsToRemove)
+    {
+        if (minimapIconsToDestroy.Count > 0)
+        {
+            foreach (var icon in minimapIconsToDestroy) if (icon) Destroy(icon.gameObject);
+        }
+        if (offScreenMinimapIconsToDestroy.Count > 0)
+        {
+            foreach (var icon in offScreenMinimapIconsToDestroy) if (icon) Destroy(icon.gameObject);
+        }
+        if (worldObjsToRemove.Count > 0)
+        {
+            foreach (var worldObj in worldObjsToRemove) if (worldObj) minimapWorldObjectDictrionary.Remove(worldObj);
+        }
+        if (offScreenWorldObjsToRemove.Count > 0)
+        {
+            foreach (var worldObj in offScreenWorldObjsToRemove) if (worldObj) offScreenMinimapObjectDictionary.Remove(worldObj);
+        }
     }
 
     public bool matrixCalculated;

@@ -30,6 +30,8 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private CharacterAnimation m_characterAnimation;
 	public RenderedShotDolly CharacterMuzzleDolly => m_characterMuzzleDolly;
 	[SerializeField] private RenderedShotDolly m_characterMuzzleDolly;
+	public MinimapWorldObject MinimapWorldObj => m_minimapWorldObj;
+	[SerializeField] private MinimapWorldObject m_minimapWorldObj;
 
 	[SerializeField] private TMP_Text _name;
 	[SerializeField] private MeshRenderer _mesh;
@@ -98,6 +100,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
 		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
 		m_characterMuzzleDolly.Initialize(this, m_components.PlayerCamera.GetComponent<CharacterCamera>());
+		m_minimapWorldObj.Init(this);
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
 			//App.FindInstance().ShowPlayerSetup();

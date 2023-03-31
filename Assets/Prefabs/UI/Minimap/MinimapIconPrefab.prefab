@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4323716514553087271}
-  - component: {fileID: 4323716514553087270}
+  - component: {fileID: 6425084940482724845}
   m_Layer: 5
   m_Name: MinimapIconPrefab
   m_TagString: Untagged
@@ -27,6 +27,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4323716516248445338}
   - {fileID: 4323716514634370644}
@@ -38,7 +39,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4323716514553087270
+--- !u!114 &6425084940482724845
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,13 +48,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4323716514553087272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f296856c772fa84da29963dcef84a0e, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d99e58d62d72c841803a7fea3850381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   IconImage: {fileID: 4323716516248445337}
   IconText: {fileID: 4323716514634370643}
-  PrefabRectTransform: {fileID: 4323716514553087271}
-  IconRectTransform: {fileID: 4323716516248445338}
+  m_minimapRT: {fileID: 4323716514553087271}
+  m_iconRT: {fileID: 4323716516248445338}
   isLocalMinimapPlayer: 0
 --- !u!1 &4323716514634370645
 GameObject:
@@ -83,6 +84,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4323716514553087271}
   m_RootOrder: 1
@@ -217,6 +219,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4323716514553087271}
   m_RootOrder: 0

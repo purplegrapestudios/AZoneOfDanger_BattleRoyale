@@ -1397,6 +1397,7 @@ GameObject:
   - component: {fileID: 4881344522585289108}
   - component: {fileID: 3603544302567930862}
   - component: {fileID: 5284636580471302795}
+  - component: {fileID: -5610665582328564497}
   m_Layer: 3
   m_Name: Character
   m_TagString: Player
@@ -1442,6 +1443,7 @@ MonoBehaviour:
   m_characterAudio: {fileID: 3603544302567930862}
   m_characterAnimation: {fileID: 7695338927694559921}
   m_characterMuzzleDolly: {fileID: 6193562556498965499}
+  m_minimapWorldObj: {fileID: -5610665582328564497}
   _name: {fileID: 8000666693784294418}
   _mesh: {fileID: 8382996144721734541}
   m_characterModel: {fileID: 2041647188875555748}
@@ -1764,6 +1766,25 @@ MonoBehaviour:
   m_AR_01: {fileID: 2501277403646313056}
   m_Shotgun_01: {fileID: 2371394055783547379}
   m_GL_01: {fileID: 3799479757494846968}
+--- !u!114 &-5610665582328564497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4610285444781331945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859919c84b7a889489610ea4b37b21c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_character: {fileID: 4610285444781331942}
+  Icon: {fileID: 0}
+  IconColor: {r: 1, g: 1, b: 1, a: 1}
+  Text: 
+  TextSize: 10
+  isLocalMinimapPlayer: 0
+  OffScreenColor: {r: 1, g: 0.30588236, b: 0.7137255, a: 1}
 --- !u!1 &4610285446649690712
 GameObject:
   m_ObjectHideFlags: 0
