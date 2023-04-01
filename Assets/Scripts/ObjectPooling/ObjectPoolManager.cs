@@ -11,7 +11,7 @@ public enum HitTargets
     Explosive_1,
 }
 
-public class ObjectPoolManager : NetworkBehaviour
+public class ObjectPoolManager : SimulationBehaviour
 {
     public static ObjectPoolManager Instance;
 
