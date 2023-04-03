@@ -98,7 +98,6 @@ public class CharacterMoveComponent : NetworkBehaviour
         m_initialized = true;
     }
 
-    [SerializeField] private float kDamper = .95f;
     [SerializeField] private Vector3 m_directionVector;
     private Vector3 CrossResult;
     private float DotResult;

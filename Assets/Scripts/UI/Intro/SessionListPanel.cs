@@ -22,8 +22,6 @@ namespace GameUI.Intro
 		private Dictionary<string, (SessionListItem, float)> m_sessionDict;
 		private PlayMode _playMode;
 		private App _app;
-		private int m_sessionCount;
-
 
         private void Awake()
         {
@@ -32,7 +30,6 @@ namespace GameUI.Intro
 				Debug.Log($"Destroying Child from scrollView");
 				Destroy(m_scrollView.content.GetChild(i).gameObject);
             }
-			m_sessionCount = 0;
 			m_buttonRefreshServerList.onClick.AddListener(async () => { await RefreshServerList(); });
 		}
 

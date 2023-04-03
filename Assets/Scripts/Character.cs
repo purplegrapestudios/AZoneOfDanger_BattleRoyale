@@ -38,17 +38,6 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private GameObject m_characterModel;
 	[SerializeField] public Transform m_headingTransform;
 
-	[SerializeField] private float sensitivityX = 15f;
-	[SerializeField] private float sensitivityY = 15f;
-	[SerializeField] private float minimumX = -360F;
-	[SerializeField] private float maximumX = 360F;
-	[SerializeField] private float minimumY = -60F;
-	[SerializeField] private float maximumY = 60F;
-	[SerializeField] private float rotationX = 0f;
-	[SerializeField] private float rotationY = 0f;
-	[SerializeField] private float m_baseSpeed = 25f;
-	[SerializeField] private LayerMask m_localPlayerLayerMask;
-
 	public bool m_inputForward { get; set; }
 	public bool m_inputBack { get; set; }
 	public bool m_inputRight { get; set; }
