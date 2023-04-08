@@ -9,7 +9,8 @@ using UnityEngine;
 public class Session : NetworkBehaviour
 {
 	[Networked] public TickTimer PostLoadCountDown { get; set; }
-	
+	public int LoadCountDownTime => m_loadCountDownTime;
+	[SerializeField] private int m_loadCountDownTime = 3;
 	public SessionProps Props => new SessionProps(Runner.SessionInfo.Properties);
 	public SessionInfo Info => Runner.SessionInfo;
 	
@@ -52,7 +53,7 @@ public class Session : NetworkBehaviour
 		
 		if ( done >= total && !PostLoadCountDown.Expired(Runner))
 		{
-			PostLoadCountDown = TickTimer.CreateFromSeconds(Runner, 1);
+			PostLoadCountDown = TickTimer.CreateFromSeconds(Runner, m_loadCountDownTime);
 		}
 		return default;
 	}

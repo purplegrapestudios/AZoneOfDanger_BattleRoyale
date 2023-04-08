@@ -9,8 +9,6 @@ using TMPro;
 /// </summary>
 public class Map : SimulationBehaviour, ISpawned
 {
-	[SerializeField] private TMP_Text m_countdownLabel;
-	[SerializeField] private TMP_Text m_timerLabel;
 	[SerializeField] private Transform[] _spawnPoints;
 	private bool _sendMapLoadedMessage;
 	private App _app;
@@ -21,7 +19,7 @@ public class Map : SimulationBehaviour, ISpawned
 		_sendMapLoadedMessage = true;
 		_app = App.FindInstance();
 		
-		m_countdownLabel.gameObject.SetActive(true);
+		GameUIViewController.Instance.InitGameStateLabel($"Battle Begins In {_app.Session.LoadCountDownTime} Seconds!");
 	}
 	
 	public override void FixedUpdateNetwork()
@@ -45,18 +43,17 @@ public class Map : SimulationBehaviour, ISpawned
 				Debug.Log($"RPC failed trying again later");
 		}
 		if (!session.PostLoadCountDown.Expired(Runner))
-			m_countdownLabel.text = Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0).ToString();
+			GameUIViewController.Instance.SetGameStateLabel($"Battle Begins In {Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0)}");
 		else
 		{
-			m_countdownLabel.gameObject.SetActive(false);
+			//GameUIViewController.Instance.DeactivateGameStateLabel();
+			GameUIViewController.Instance.SetGameStateLabel("Storm is commencing soon");
+			GameLogicManager.Instance.StartStormPhase(44, 10);
+			GameUIViewController.Instance.SetGameStateTimer(Mathf.FloorToInt(GameLogicManager.Instance.StormTimer.RemainingTime(Runner) ?? 0).ToString());
+			GameLogicManager.Instance.StartGameLogic();
 			_app.AllowInput = true;
 		}
 	}
-
-	public void SetCountDownText(string text)
-    {
-		m_countdownLabel.text = text;
-    }
 
 	/// <summary>
 	/// UI hooks

@@ -13,13 +13,21 @@ public class GameUIViewController : MonoBehaviour
     [SerializeField] private TMP_Text m_clipSizeTxt;
     [SerializeField] private TMP_Text m_ammoRemainingTxt;
 
+    [SerializeField] private TMP_Text m_gameStateLabel;
+    [SerializeField] private TMP_Text m_timerToNextStateTxt;
+    [SerializeField] private TMP_Text m_timerTxt;
+
     [SerializeField] private GameObject m_crosshairObject;
     private Crosshair m_crosshair;
+    private App m_app;
+    private float m_tickRate;
 
     private void Awake()
     {
         Instance = this;
+        m_app = App.FindInstance();
         m_crosshair = m_crosshairObject.GetComponent<Crosshair>();
+        m_tickRate = 1 / m_app.Session.Runner.DeltaTime;
     }
 
     public void UpdateHealthText(string value) => m_healthTxt.text = value;
@@ -43,4 +51,42 @@ public class GameUIViewController : MonoBehaviour
         m_ammoRemainingTxt.text = ammoRemaining.ToString();
         m_clipSizeTxt.text = clipSize.ToString();
     }
+    public void InitGameStateLabel(string txt)
+    {
+        m_gameStateLabel.gameObject.SetActive(true);
+        SetGameStateLabel(txt);
+    }
+
+    public void SetGameStateLabel(string txt)
+    {
+        m_gameStateLabel.text = txt;
+    }
+
+    public void SetGameStateTimer(string txt)
+    {
+        if (GameLogicManager.Instance.StormTimer.IsRunning)
+            m_timerToNextStateTxt.text = txt;
+        else
+            m_timerToNextStateTxt.text = string.Empty;
+    }
+
+    public void DeactivateGameStateLabel()
+    {
+        m_gameStateLabel.gameObject.SetActive(false);
+        SetGameStateLabel(string.Empty);
+    }
+
+    public void FixedUpdateMinimapTime()
+    {
+        float timeInSecElapsed = (m_app.Session.Runner.Tick - GameLogicManager.Instance.NetworkedGameStartTick) / m_tickRate;
+        float minElapsed = Mathf.FloorToInt(timeInSecElapsed / 60);
+        float secondsRemain = Mathf.FloorToInt(timeInSecElapsed - (minElapsed * 60));
+        m_timerTxt.text = $"{(minElapsed < 10 ? "0" + minElapsed : minElapsed)}:{(secondsRemain < 10 ? "0" + secondsRemain : secondsRemain)}";
+
+        if (GameLogicManager.Instance.StormTimer.IsRunning)
+            m_timerToNextStateTxt.text = Mathf.FloorToInt(GameLogicManager.Instance.StormTimer.RemainingTime(m_app.Session.Runner) ?? 0).ToString();
+        else
+            m_timerToNextStateTxt.text = string.Empty;
+    }
+
 }
