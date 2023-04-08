@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_TP_Camo_001_001
-  m_Shader: {fileID: 10705, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: StormMaterial
+  m_Shader: {fileID: 4800000, guid: 153fd1ec83747424f880660b516e8135, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -41,8 +41,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 11eb1f16b01c62547b36d44e52659ac7, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 2e561b8c55a25ab4792bcee2d7d8e139, type: 3}
+        m_Scale: {x: 2000, y: 2000}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -58,30 +58,34 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BandingDensity: 18.86
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FoamIntensity: 0.589
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Shininess: 0.078125
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _Time: 0
     - _UVSec: 0
-    - _WaterLevel: 5
-    - _WaveHeight: 5
+    - _WaterLevel: 2000
+    - _WaveHeight: 2000
     - _ZWrite: 1
     m_Colors:
+    - _BandingColor: {r: 0, g: 0.14480352, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepColor: {r: 0, g: 0, b: 1, a: 1}
+    - _DeepColor: {r: 0, g: 0.55040026, b: 1, a: 0.5294118}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ShallowColor: {r: 0, g: 0.5, b: 1, a: 1}
-    - _WaveSpeed: {r: 1, g: 1, b: 1, a: 1}
+    - _FoamColor: {r: 1, g: 0.77239305, b: 0, a: 1}
+    - _ShallowColor: {r: 0.40003014, g: 0, b: 1, a: 0.5294118}
+    - _WaterColor: {r: 0, g: 0, b: 1, a: 1}
+    - _WaveSpeed: {r: 0.1, g: 0.1, b: 20, a: 9999}
   m_BuildTextureStacks: []

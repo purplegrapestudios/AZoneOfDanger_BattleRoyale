@@ -89,12 +89,12 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	public bool IsHostMode()
     {
-		return Session.Runner.GameMode == GameMode.Host;
+		return Session == null ? false : Session.Runner.GameMode == GameMode.Host;
     }
 
 	public bool IsServerMode()
 	{
-		return Session.Runner.GameMode == GameMode.Server;
+		return Session == null ? false : Session.Runner.GameMode == GameMode.Server;
 	}
 
 	private void Awake()

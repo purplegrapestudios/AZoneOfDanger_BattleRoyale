@@ -52,7 +52,7 @@ public class Session : NetworkBehaviour
 		
 		if ( done >= total && !PostLoadCountDown.Expired(Runner))
 		{
-			PostLoadCountDown = TickTimer.CreateFromSeconds(Runner,3);
+			PostLoadCountDown = TickTimer.CreateFromSeconds(Runner, 1);
 		}
 		return default;
 	}

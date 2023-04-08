@@ -15,6 +15,7 @@ public class Crosshair : MonoBehaviour
     private void Awake()
     {
         m_crosshairImage = GetComponent<MPImage>();
+        m_crosshairImage.color = new Color(1, 1, 1, 0);
     }
 
     public void ShowNormalCrosshair()
@@ -52,6 +53,7 @@ public class Crosshair : MonoBehaviour
     {
         if (!characterShoot.Object.HasInputAuthority) return;
 
+        m_crosshairImage.color = Color.white;
         if (characterShoot.NetworkedCurrWeaponID == 0)
         {
             m_crosshairImage.sprite = m_crosshairAR;

@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// The Map represents the network aspects of a game scene. It is itself spawned as part of the scene
@@ -8,7 +9,8 @@ using UnityEngine.UI;
 /// </summary>
 public class Map : SimulationBehaviour, ISpawned
 {
-	[SerializeField] private Text _countdownMessage;
+	[SerializeField] private TMP_Text m_countdownLabel;
+	[SerializeField] private TMP_Text m_timerLabel;
 	[SerializeField] private Transform[] _spawnPoints;
 	private bool _sendMapLoadedMessage;
 	private App _app;
@@ -19,7 +21,7 @@ public class Map : SimulationBehaviour, ISpawned
 		_sendMapLoadedMessage = true;
 		_app = App.FindInstance();
 		
-		_countdownMessage.gameObject.SetActive(true);
+		m_countdownLabel.gameObject.SetActive(true);
 	}
 	
 	public override void FixedUpdateNetwork()
@@ -43,13 +45,18 @@ public class Map : SimulationBehaviour, ISpawned
 				Debug.Log($"RPC failed trying again later");
 		}
 		if (!session.PostLoadCountDown.Expired(Runner))
-			_countdownMessage.text = Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0).ToString();
+			m_countdownLabel.text = Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0).ToString();
 		else
 		{
-			_countdownMessage.gameObject.SetActive(false);
+			m_countdownLabel.gameObject.SetActive(false);
 			_app.AllowInput = true;
 		}
 	}
+
+	public void SetCountDownText(string text)
+    {
+		m_countdownLabel.text = text;
+    }
 
 	/// <summary>
 	/// UI hooks

@@ -17,7 +17,7 @@ public class Player : NetworkBehaviour
 	[Networked] public NetworkBool Ready { get; set; }
 	[Networked] public NetworkBool DoneLoading { get; set; }
 
-	public bool InputEnabled => _app.AllowInput;
+	public bool InputEnabled => _app?.AllowInput ?? false;
 
 	[SerializeField] Transform playerModel;
 	private Character _character;

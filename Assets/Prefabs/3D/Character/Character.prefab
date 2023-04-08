@@ -335,18 +335,6 @@ MonoBehaviour:
   _mesh: {fileID: 8382996144721734541}
   m_characterModel: {fileID: 2041647188875555748}
   m_headingTransform: {fileID: 4568515329382100830}
-  sensitivityX: 15
-  sensitivityY: 15
-  minimumX: -360
-  maximumX: 360
-  minimumY: -60
-  maximumY: 60
-  rotationX: 0
-  rotationY: 0
-  m_baseSpeed: 25
-  m_localPlayerLayerMask:
-    serializedVersion: 2
-    m_Bits: 4
   _Player: {fileID: 0}
 --- !u!114 &4610285444781331943
 MonoBehaviour:
@@ -496,7 +484,6 @@ MonoBehaviour:
   _NetworkedIsCrouched:
     _value: 0
   _NetworkedVelocity: {x: 0, y: 0, z: 0}
-  kDamper: 0.95
   m_directionVector: {x: 0, y: 0, z: 0}
 --- !u!114 &2667292606099183080
 MonoBehaviour:
@@ -1162,7 +1149,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 2000
+  far clip plane: 3000
   field of view: 100
   orthographic: 0
   orthographic size: 5
@@ -1205,7 +1192,6 @@ MonoBehaviour:
   _NetworkedRotationY: 0
   _NetworkedPosition: {x: 0, y: 0, z: 0}
   _NetworkedForwward: {x: 0, y: 0, z: 0}
-  m_framesOfSmoothing: 1
   m_minimumY: -80
   m_maximumY: 80
 --- !u!82 &8497798227659855997
