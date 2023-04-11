@@ -221,7 +221,7 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (ReloadCoroutine != null)
         {
-            Debug.Log("Still Reloading");
+            //Debug.Log("Still Reloading");
             return;
         }
         ReloadCoroutine = ReloadCO();

@@ -6,7 +6,6 @@ using Fusion;
 public class GameLogicManager : SimulationBehaviour
 {
     public static GameLogicManager Instance;
-    [Networked] public TickTimer StormTimer { get; set; }
     public bool GameIsRunning => m_gameIsRunning;
     [SerializeField] private bool m_gameIsRunning;
     [Networked] public int NetworkedGameStartTick { get; set; }
@@ -80,11 +79,4 @@ public class GameLogicManager : SimulationBehaviour
     //StormBehavior
     //Damage Players who are not within the zone. So it'll need to hold list of all players, which say the App can store for now.
 
-    public bool StartStormPhase(int timeStartStorm, int timeStormClose)
-    {
-        if (StormTimer.IsRunning) return false;
-
-        StormTimer = TickTimer.CreateFromSeconds(Runner, timeStartStorm);
-        return true;
-    }
 }

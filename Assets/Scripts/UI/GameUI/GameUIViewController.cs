@@ -62,10 +62,7 @@ public class GameUIViewController : MonoBehaviour
 
     public void SetGameStateTimer(string txt)
     {
-        if (GameLogicManager.Instance.StormTimer.IsRunning)
-            m_timerToNextStateTxt.text = txt;
-        else
-            m_timerToNextStateTxt.text = string.Empty;
+        m_timerToNextStateTxt.text = txt;
     }
 
     public void DeactivateGameStateLabel()

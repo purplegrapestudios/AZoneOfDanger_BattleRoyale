@@ -196,7 +196,7 @@ public class ProjectileBehavior : MonoBehaviour
                     var radiusSquare = 10f * 10;
                     var maxDamage = 100f * (splashHitCharacter.Object.InputAuthority == m_instigator ? (1f - m_InstigatorImmunityFactor) : 1f);
                     var splashDamage = Mathf.Max(0f, ((radiusSquare - sqrMagnitudeDist) / radiusSquare) * maxDamage);
-                    Debug.Log($"We Hit {splashHitCharacter} with Dmg: {splashDamage}. sqrDist {sqrMagnitudeDist}");
+                    //Debug.Log($"We Hit {splashHitCharacter} with Dmg: {splashDamage}. sqrDist {sqrMagnitudeDist}");
                     m_damageCallback = splashHitCharacter.CharacterHealth.OnTakeDamage;
                     m_damageCallback(splashDamage, m_owner.CharacterHealth);   //callback(float dmg, CharacterHealth Instigator)
                 }
