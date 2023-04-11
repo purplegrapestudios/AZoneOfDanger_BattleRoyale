@@ -3,8 +3,8 @@ Shader "Custom/WaterWithFoam"
     Properties{
         _FoamColor("Foam Color", Color) = (1, 1, 1, 1)
         _WaveSpeed("Wave Speed", Vector) = (1, 1, 1)
-        _WaveHeight("Wave Height", Range(0, 20000)) = 5
-        _WaterLevel("Water Level", Range(0, 20000)) = 5
+        _WaveHeight("Wave Height", Range(0, 30)) = 5
+        _WaterLevel("Water Level", Range(0, 2000)) = 5
         _ShallowColor("Shallow Color", Color) = (0, 0.5, 1, 1)
         _DeepColor("Banding Color", Color) = (0, 0, 1, 1)
     }

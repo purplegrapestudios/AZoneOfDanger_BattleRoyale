@@ -117,8 +117,7 @@ public class CharacterMoveComponent : NetworkBehaviour
     {
         //OnRotate();                 // 1) Rotate Player along Y Axis
 
-        OnCollisionWall(2.5f);      // 2) Detect Collision Against Wall
-        OnGroundCheck(transform.localScale.y + .01f);        // 3) Detect Collision Against Ground
+        OnGroundCheck(transform.localScale.y + .01f * transform.localScale.y);        // 3) Detect Collision Against Ground
         OnCeilingCheck();           // 4) Detect Collision Against Ceiling
         OnQueueJump();              // 5) Check Jump Input
         OnToggleCrouch();                 // 6) Crouching
@@ -132,9 +131,10 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
         else if (!m_moveData.V_IsGrounded)
         {
-            OnAirMove(m_moveData.V_WishDirectionCollision);
+            OnAirMove();
         }
 
+        OnCollisionWall(2.5f);      // 2) Detect Collision Against Wall
         OnLimitSpeed();
         UpdateNetworkedVariables(); //Used for animation
     }
@@ -160,7 +160,30 @@ public class CharacterMoveComponent : NetworkBehaviour
 
             UpdateMovement();
             ResetRigidBodyState();
-            Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * m_character.Runner.DeltaTime);// Time.fixedDeltaTime);
+
+            if (m_slopeRayDist > 0 && m_moveData.V_IsGrounded)
+            {
+                //Walking on Walkable Surface
+                var vel = m_moveData.V_PlayerVelocity;
+                var moveVel = new Vector3(vel.x, 0, vel.z);
+                var yVel = new Vector3(0, vel.y, 0);
+                var projectedMoveVel = Vector3.ProjectOnPlane(moveVel, m_moveData.V_SlopeHit.normal);
+                var combinedVel = (projectedMoveVel + yVel);
+                Rigidbody.MovePosition(Rigidbody.position + combinedVel * m_character.Runner.DeltaTime);
+            }
+            else if (m_slopeRayDist == 0)
+            {
+                //Slope Too Steep
+                m_moveData.V_PlayerVelocity = new Vector3(0, m_moveData.V_PlayerVelocity.y, 0);
+                var projectedMoveVel = Vector3.ProjectOnPlane(m_moveData.V_PlayerVelocity, m_moveData.V_SlopeHit.normal);
+                Rigidbody.MovePosition(Rigidbody.position + projectedMoveVel * m_character.Runner.DeltaTime);
+            }
+            else
+            {
+                //Air Move
+                Rigidbody.MovePosition(Rigidbody.position + m_moveData.V_PlayerVelocity * m_character.Runner.DeltaTime);
+            }
+
         }
     }
 
@@ -189,6 +212,7 @@ public class CharacterMoveComponent : NetworkBehaviour
 
         if (Physics.RaycastNonAlloc(m_moveData.V_Ray_Velocity, m_moveData.V_WallHits, dist, RayCastLayersToHit) > 0)
         {
+            Debug.DrawRay(transform.position, m_moveData.V_PlayerVelocity, Color.red);
             foreach (RaycastHit collisionHit in m_moveData.V_WallHits)
             {
                 if (collisionHit.collider == null) return;
@@ -207,11 +231,12 @@ public class CharacterMoveComponent : NetworkBehaviour
 
                     //We are not Modifying the Rotation here, rather the m_directionVector is used to Calculate Movement Direction. So player would move sideways along wall, if he ran into it.
                     //Using state.DirectionVector here, will change and synchronize the values across the network. But we do NOT want it to change in this situation.
-                    m_moveData.V_PlayerVelocity = CorrectedDirection.normalized;
-
+                    var yCorrectionVel = new Vector3(0, m_moveData.V_PlayerVelocity.y, 0);
+                    m_moveData.V_PlayerVelocity = CorrectedDirection + yCorrectionVel;
+                    Debug.DrawRay(transform.position, m_moveData.V_PlayerVelocity, Color.blue);
                     float speedDotResult = Vector3.Dot(transform.forward, m_moveData.V_WallHits[0].normal);
-                    m_moveData.V_PlayerVelocity = speedDotResult < 0 ? m_moveData.V_PlayerVelocity *= 1 + speedDotResult : m_moveData.V_PlayerVelocity;
-                    m_moveData.V_WishDirectionCollision = m_moveData.V_PlayerVelocity.normalized;
+                    //m_moveData.V_PlayerVelocity = speedDotResult < 0 ? m_moveData.V_PlayerVelocity *= 1 + speedDotResult : m_moveData.V_PlayerVelocity;
+                    //m_moveData.V_WishDirectionCollision = m_moveData.V_PlayerVelocity.normalized;
                 }
 
                 if (collisionHit.transform.CompareTag(kTagBouncePad))
@@ -242,6 +267,9 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     }
 
+    [SerializeField] private float m_maxSlopeAngle = 80;
+    [SerializeField] private float m_maxSlopeRayDist;
+    [SerializeField] private float m_slopeRayDist;
     private void OnGroundCheck(float distance)
     {
         if (m_moveData.V_KnockBackOverride)
@@ -259,6 +287,33 @@ public class CharacterMoveComponent : NetworkBehaviour
         m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.right, -Transform.up);
         m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.right, -Transform.up);
         //DO NOT WANT NOT BEING ABLE TO JUMP UNEXPECTEDLY. MUST RAYCAST AT LEAST >= PLAYER HEIGHT=4
+
+        //scan an additional height of (between 0 - 1 * PlayerHeight) depending on MaxAngle of traversable slope;
+        m_maxSlopeRayDist = distance + Mathf.Sin(m_maxSlopeAngle * Mathf.PI / 180) * transform.localScale.y;
+        m_slopeRayDist = Mathf.Infinity;
+        foreach (Ray ray in m_moveData.V_Rays_Ground)
+        {
+            if (Physics.Raycast(ray, out m_moveData.V_SlopeHit, m_maxSlopeRayDist, RayCastLayersToHit)) {
+                float slopeAngle = Vector3.Angle(transform.up, m_moveData.V_SlopeHit.normal);
+                if (slopeAngle < m_maxSlopeAngle)
+                {
+                    m_moveData.V_Rays_Ground[0] = new Ray(Transform.position, -m_moveData.V_SlopeHit.normal);
+                    m_moveData.V_Rays_Ground[1] = new Ray(Transform.position + Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
+                    m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
+                    m_moveData.V_Rays_Ground[2] = new Ray(Transform.position - Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
+                    m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
+                    Debug.DrawRay(Transform.position, -m_moveData.V_SlopeHit.normal * 100, Color.blue);
+                    distance += Mathf.Sin(slopeAngle * Mathf.PI / 180) * transform.localScale.y;
+                    m_slopeRayDist = distance;
+                    break;
+                }
+                else
+                {
+                    m_slopeRayDist = 0;
+                }
+
+            }
+        }
 
         if (!GroundRayCast(m_moveData.V_Rays_Ground, distance))
         {
@@ -279,6 +334,7 @@ public class CharacterMoveComponent : NetworkBehaviour
             {
                 foreach (RaycastHit hit in m_moveData.V_GroundHits)
                 {
+                    Debug.DrawRay(Transform.position, -Transform.up * dist, Color.red, 0.1f);
 
                     m_moveData.V_IsFloorDetected = true;
                     m_moveData.V_GroundHit = hit;
@@ -310,7 +366,7 @@ public class CharacterMoveComponent : NetworkBehaviour
                     }
                     else
                     {
-                        if (!m_moveData.V_IsBouncePadWallDetected)
+                        if (!m_moveData.V_IsBouncePadWallDetected && m_slopeRayDist > 0)
                         {
                             m_moveData.V_IsBoosted = false;
                             m_moveData.V_IsGrounded = true;
@@ -547,7 +603,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         }
     }
 
-    private void OnAirMove(Vector3 collisionWishDir)
+    private void OnAirMove()
     {
         Vector3 wishdir;
         float wishvel = m_moveData.P_AirAcceleration;
@@ -561,8 +617,6 @@ public class CharacterMoveComponent : NetworkBehaviour
         OnSetMovementDir();
 
         wishdir = new Vector3(m_moveData.moveCmd.RightMove, 0, m_moveData.moveCmd.ForwardMove);
-
-        wishdir = collisionWishDir != Vector3.zero ? collisionWishDir : wishdir;
         wishdir = Transform.TransformDirection(wishdir);
 
         float wishspeed = wishdir.magnitude;

@@ -485,6 +485,9 @@ MonoBehaviour:
     _value: 0
   _NetworkedVelocity: {x: 0, y: 0, z: 0}
   m_directionVector: {x: 0, y: 0, z: 0}
+  m_maxSlopeAngle: 60
+  m_maxSlopeRayDist: 0
+  m_slopeRayDist: 0
 --- !u!114 &2667292606099183080
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -18,37 +18,6 @@ public class Crosshair : MonoBehaviour
         m_crosshairImage.color = new Color(1, 1, 1, 0);
     }
 
-    public void ShowNormalCrosshair()
-    {
-        m_crosshairNormal.SetActive(true);
-        m_crosshairDamage.SetActive(false);
-    }
-
-    public void ShowDamageCrosshair()
-    {
-        if (DamageCrosshairCoroutine != null)
-        {
-            StopDamageCrosshairCoroutine();
-        }
-        DamageCrosshairCoroutine = DamageCrosshairCO();
-        StartCoroutine(DamageCrosshairCoroutine);
-    }
-
-    private IEnumerator DamageCrosshairCoroutine;
-    private IEnumerator DamageCrosshairCO()
-    {
-        m_crosshairNormal.SetActive(false);
-        m_crosshairDamage.SetActive(true);
-        yield return new WaitForSeconds(0.1f);
-        ShowNormalCrosshair();
-    }
-
-    private void StopDamageCrosshairCoroutine()
-    {
-        StopCoroutine(DamageCrosshairCoroutine);
-        DamageCrosshairCoroutine = null;
-    }
-
     public void SetWeaponCrosshair(CharacterShootComponent characterShoot)
     {
         if (!characterShoot.Object.HasInputAuthority) return;

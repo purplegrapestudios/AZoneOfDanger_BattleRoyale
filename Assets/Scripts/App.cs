@@ -191,9 +191,11 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 		StartGameResult result = await _runner.StartGame(startGameArgs);
 		if(!result.Ok)
 			SetConnectionStatus(ConnectionStatus.Failed, result.ShutdownReason.ToString());
-		
-		if(result.Ok)
+
+		if (result.Ok)
+		{
 			Debug.LogWarning($"{_runner.AuthenticationValues.UserId}, {(_runner.Simulation == null ? "null" : "simulation exists")} started on connectionType {_runner.CurrentConnectionType} in {(Time.realtimeSinceStartup):0.00}s");
+		}
 	}
 
 	public async Task EnterLobby(string lobbyId, Action<List<SessionInfo>> onSessionListUpdated)

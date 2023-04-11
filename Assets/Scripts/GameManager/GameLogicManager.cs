@@ -21,8 +21,6 @@ public class GameLogicManager : SimulationBehaviour
     private void Awake()
     {
         Instance = this;
-        m_app = App.FindInstance();
-        m_map = m_app.Session.Map;
     }
 
     public void StartGameLogic()
@@ -40,6 +38,13 @@ public class GameLogicManager : SimulationBehaviour
 
     public override void FixedUpdateNetwork()
     {
+
+        if (!m_app)
+        {
+            m_app = App.FindInstance();
+            m_map = m_app.Session.Map;
+            return;
+        }
         if (!m_gameIsRunning) return;
         GameUIViewController.Instance.FixedUpdateMinimapTime();
     }
@@ -61,9 +66,19 @@ public class GameLogicManager : SimulationBehaviour
     //End Game Condition
     //When 1 player remains
     //Show Winner Cam
-    //Display Winner
-    //Display Game Stats
+    //Winner Gets UI display of Victory Royale
+    //Winner Display Game Stats
 
+    //Those who die early (and in the first phase of the game with respawns) Create a Spectate Cam, starting at last instigator. And toggle back / forward throughout entire playerlist
+    //Also show stats
+
+    //Server waits like 15 seconds for Winner to check his stats etc, and the ShutsDown the Fusion Network, and finally return back to Starting Scene.
+
+    //UI Minimap: Players remaining.
+
+
+    //StormBehavior
+    //Damage Players who are not within the zone. So it'll need to hold list of all players, which say the App can store for now.
 
     public bool StartStormPhase(int timeStartStorm, int timeStormClose)
     {

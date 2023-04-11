@@ -85,6 +85,7 @@ public class CharacterMoveData
     [HideInInspector] public RaycastHit[] V_WallHits;
     [HideInInspector] public RaycastHit[] V_GroundHits;
     [HideInInspector] public RaycastHit V_GroundHit;
+    [HideInInspector] public RaycastHit V_SlopeHit;
     [HideInInspector] public Vector3 V_SpeedReduction;
     [HideInInspector] public Transform V_GroundHitTransform;
     [HideInInspector] public float V_TempJumpSpeed;

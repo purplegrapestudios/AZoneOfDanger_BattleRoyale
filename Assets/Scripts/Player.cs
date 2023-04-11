@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour
 	public bool InputEnabled => _app?.AllowInput ?? false;
 
 	[SerializeField] Transform playerModel;
+	public Character Character => _character;
 	private Character _character;
 	private App _app;
 

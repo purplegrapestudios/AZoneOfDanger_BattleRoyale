@@ -295,11 +295,6 @@ public class CharacterShootComponent : NetworkBehaviour
                 {
                     hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(hitInfo.Hitbox.HitboxIndex == 0 ? 25 : 50, m_character.CharacterHealth);
                 }
-
-                //Change localPlayer's crosshair only
-                if (m_character.Object.HasInputAuthority)
-                    GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshair();
-
             }
         }
         else if (hitInfo.Collider != null)
@@ -351,11 +346,6 @@ public class CharacterShootComponent : NetworkBehaviour
                         else
                             hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(15, GetComponent<CharacterHealthComponent>());
                     }
-
-                    //Change localPlayer's crosshair only
-                    if (m_character.Object.HasInputAuthority)
-                        GameUIViewController.Instance.GetCrosshair().ShowDamageCrosshair();
-
                 }
             }
             else if (hitInfo.Collider != null)

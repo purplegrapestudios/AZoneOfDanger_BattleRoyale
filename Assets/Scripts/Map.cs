@@ -48,7 +48,6 @@ public class Map : SimulationBehaviour, ISpawned
 		{
 			//GameUIViewController.Instance.DeactivateGameStateLabel();
 			GameUIViewController.Instance.SetGameStateLabel("Storm is commencing soon");
-			GameLogicManager.Instance.StartStormPhase(44, 10);
 			GameUIViewController.Instance.SetGameStateTimer(Mathf.FloorToInt(GameLogicManager.Instance.StormTimer.RemainingTime(Runner) ?? 0).ToString());
 			GameLogicManager.Instance.StartGameLogic();
 			_app.AllowInput = true;
