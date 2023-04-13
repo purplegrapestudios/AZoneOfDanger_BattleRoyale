@@ -22556,7 +22556,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c067be75d26724b409e0e9e0068d40ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_gameIsRunning: 0
+  _interpolationDataSource: 0
+  _NetworkedGameIsRunning:
+    _value: 0
+  _NetworkedGameStartTick: 0
   m_minPlayersToStart: 1
 --- !u!4 &1127762131
 Transform:
@@ -22594,9 +22597,9 @@ MonoBehaviour:
   NetworkGuid:
     RawGuidValue: 462244ca815e4a328f9e20394cd47ac9
   NestedObjects: []
-  NetworkedBehaviours: []
-  SimulationBehaviours:
+  NetworkedBehaviours:
   - {fileID: 1127762130}
+  SimulationBehaviours: []
 --- !u!64 &1128731048
 MeshCollider:
   m_ObjectHideFlags: 0

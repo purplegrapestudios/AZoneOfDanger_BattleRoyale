@@ -71,7 +71,7 @@ public class GameUIViewController : MonoBehaviour
         SetGameStateLabel(string.Empty);
     }
 
-    public void FixedUpdateMinimapTime()
+    public void FixedUpdateMinimapTime(float GameStartTick)
     {
         if (!m_app)
         {
@@ -80,7 +80,7 @@ public class GameUIViewController : MonoBehaviour
             return;
         }
 
-        float timeInSecElapsed = (m_app.Session.Runner.Tick - GameLogicManager.Instance.NetworkedGameStartTick) / m_tickRate;
+        float timeInSecElapsed = (m_app.Session.Runner.Tick - GameStartTick) / m_tickRate;
         float minElapsed = Mathf.FloorToInt(timeInSecElapsed / 60);
         float secondsRemain = Mathf.FloorToInt(timeInSecElapsed - (minElapsed * 60));
         m_timerTxt.text = $"{(minElapsed < 10 ? "0" + minElapsed : minElapsed)}:{(secondsRemain < 10 ? "0" + secondsRemain : secondsRemain)}";

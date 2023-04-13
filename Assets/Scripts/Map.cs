@@ -18,8 +18,6 @@ public class Map : SimulationBehaviour, ISpawned
 		Debug.Log("Map spawned");
 		_sendMapLoadedMessage = true;
 		_app = App.FindInstance();
-		
-		GameUIViewController.Instance.InitGameStateLabel($"Battle Begins In {_app.Session.LoadCountDownTime} Seconds!");
 	}
 	
 	public override void FixedUpdateNetwork()

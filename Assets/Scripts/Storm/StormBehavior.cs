@@ -35,6 +35,7 @@ public class StormBehavior : NetworkBehaviour
     public StormData[] m_stormDatas;
     private List<LagCompensatedHit> m_stormHits;
     [SerializeField] private LayerMask m_playerLayerMask;
+    [Networked] public TickTimer GameTimer { get; set; }
     [Networked] public TickTimer StormPauseTimer { get; set; }
     [Networked] public TickTimer StormCloseTimer { get; set; }
     [Networked] public TickTimer StackingPhaseTimer { get; set; }
@@ -62,10 +63,20 @@ public class StormBehavior : NetworkBehaviour
         NetworkedPosition = Vector3.positiveInfinity;
     }
 
+    public bool TickCheck()
+    {
+        return (Runner.Tick == GameLogicManager.Instance.NetworkedGameStartTick);
+    }
+
+    public int NetGameStartTick()
+    {
+        return GameLogicManager.Instance.NetworkedGameStartTick;
+    }
+
     public override void FixedUpdateNetwork()
     {
         if (!m_app.AllowInput) return;
-        ScanForPlayers(() => DamagePlayersOutsideArea());
+        if (Runner.IsServer) ScanForPlayers(() => DamagePlayersOutsideArea());
 
         if (Runner.Tick == GameLogicManager.Instance.NetworkedGameStartTick)
         {
@@ -74,7 +85,6 @@ public class StormBehavior : NetworkBehaviour
         else if (Runner.Tick >= GameLogicManager.Instance.NetworkedGameStartTick + m_tickRate * m_stackingTime)
         {
             ShrinkToDataPoint(ref m_stormDatas[NetworkedStormPhase]);
-            //else SimulateShrinkData(m_stormDatas[NetworkedStormPhase]);
         }
         else
         {
@@ -85,34 +95,28 @@ public class StormBehavior : NetworkBehaviour
 
     public void DamagePlayersOutsideArea()
     {
-        if (Runner.IsServer)
+        m_app.ForEachPlayer(ply =>
         {
-            m_app.ForEachPlayer(ply =>
+            if (!m_playersInZone.ContainsKey(ply))
             {
-                if (!m_playersInZone.ContainsKey(ply))
-                {
                     //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
                     ply.Character.CharacterHealth.OnTakeDamage(1, instigator: null);
-                }
-            });
-        }
+            }
+        });
     }
 
     public void ScanForPlayers(System.Action damagePlayersCallback)
     {
-        if (Runner.IsServer)
-        {
-            if (m_stormDamageTickTimer.ExpiredOrNotRunning(Runner)) m_stormDamageTickTimer = TickTimer.CreateFromTicks(Runner, (int)m_tickRate);
-            if (m_stormDamageTickTimer.RemainingTicks(Runner) != m_tickRate) return;
-        }
+        if (m_stormDamageTickTimer.ExpiredOrNotRunning(Runner)) m_stormDamageTickTimer = TickTimer.CreateFromTicks(Runner, (int)m_tickRate);
+        if (m_stormDamageTickTimer.RemainingTicks(Runner) != m_tickRate) return;
 
         if (m_playersInZone != null) m_playersInZone.Clear();
-        if (Runner.LagCompensation.OverlapSphere(transform.position, Mathf.Round(transform.localScale.x/2), player: Object.InputAuthority, m_stormHits, m_playerLayerMask, HitOptions.SubtickAccuracy) > 0)
+        if (Runner.LagCompensation.OverlapSphere(transform.position, Mathf.Round(transform.localScale.x / 2), player: Object.InputAuthority, m_stormHits, m_playerLayerMask, HitOptions.SubtickAccuracy) > 0)
         {
             foreach (LagCompensatedHit stormHit in m_stormHits)
             {
                 var stormHitRoot = stormHit.Hitbox.Root;
-                
+
                 if (stormHit.Hitbox.HitboxIndex > 0) continue;
 
                 if (stormHitRoot.GetComponent<Character>())
@@ -188,18 +192,5 @@ public class StormBehavior : NetworkBehaviour
                     NetworkedStormPhase++;
             }
         }
-    }
-
-    private void SimulateShrinkData(StormData data)
-    {
-        var curProg = data.ElapsedStormTicks / data.TimeStormClose;
-        transform.position = Vector3.Lerp(data.StartPos, data.EndPos, curProg);
-        transform.localScale = Vector3.Lerp(new Vector3(data.StartScale, data.StartScale, data.StartScale), new Vector3(data.EndSize, data.EndSize, data.EndSize), curProg);
-
-        if (curProg >= 1)
-        {
-            NetworkedStormPhase++;
-        }
-
     }
 }

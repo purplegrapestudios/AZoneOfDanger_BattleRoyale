@@ -1,51 +1,42 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
-public class GameLogicManager : SimulationBehaviour
+public class GameLogicManager : NetworkBehaviour
 {
     public static GameLogicManager Instance;
-    public bool GameIsRunning => m_gameIsRunning;
-    [SerializeField] private bool m_gameIsRunning;
+    [Networked] public NetworkBool NetworkedGameIsRunning { get; set; }
     [Networked] public int NetworkedGameStartTick { get; set; }
-
     public int MinPlayersToStart => m_minPlayersToStart;
     [SerializeField] private int m_minPlayersToStart = 2;
     private App m_app;
-    private Map m_map;
-
-
 
     private void Awake()
     {
         Instance = this;
     }
 
+    public override void Spawned()
+    {
+        m_app = App.FindInstance();
+    }
+
     public void StartGameLogic()
     {
-        if (m_gameIsRunning) return;
         //if (m_app.Session.Info.PlayerCount - (m_app.IsServerMode() ? 0 : 0) < m_minPlayersToStart) return;
+        if (NetworkedGameIsRunning) return;
 
-        NetworkedGameStartTick = m_app.Session.Runner.Tick;
-        m_gameIsRunning = true;
-        //GameUIViewController.S
-        //m_map.SetCountDownText(m_stormTimer.);
-        //Setup Game for Starting Conditions i.e) players to respawn into spawn spots, Count Down Starts, and Rules for K/D etc.. apply
-
+        if (Runner.IsServer)
+        {
+            NetworkedGameStartTick = m_app.Session.Runner.Tick;
+            NetworkedGameIsRunning = true;
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
-
-        if (!m_app)
-        {
-            m_app = App.FindInstance();
-            m_map = m_app.Session.Map;
-            return;
-        }
-        if (!m_gameIsRunning) return;
-        GameUIViewController.Instance.FixedUpdateMinimapTime();
+        if (!m_app.AllowInput) return;
+        if (!NetworkedGameIsRunning) return;
+        GameUIViewController.Instance.FixedUpdateMinimapTime(NetworkedGameStartTick);
     }
 
     //Initiate the Start Battle Royal Match (Requirement Say 10 -> To make it so you can Press Return to Force Start > 1 player):
