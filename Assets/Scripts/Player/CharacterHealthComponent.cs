@@ -136,8 +136,8 @@ public class CharacterHealthComponent : NetworkBehaviour
 
     private void Respawn(CharacterHealthComponent changedBehaviour)
     {
-        if(RespawnCoroutine != null)
-            return;
+        if (!GameLogicManager.Instance.NetworkedRespawnAllowed) return;
+        if (RespawnCoroutine != null) return;
 
         RespawnCoroutine = RespawnCO(changedBehaviour);
         StartCoroutine(RespawnCoroutine);

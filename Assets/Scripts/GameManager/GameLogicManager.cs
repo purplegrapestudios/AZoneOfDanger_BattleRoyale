@@ -6,6 +6,7 @@ public class GameLogicManager : NetworkBehaviour
     public static GameLogicManager Instance;
     [Networked] public NetworkBool NetworkedGameIsRunning { get; set; }
     [Networked] public int NetworkedGameStartTick { get; set; }
+    [Networked] public NetworkBool NetworkedRespawnAllowed { get; set; }
     public int MinPlayersToStart => m_minPlayersToStart;
     [SerializeField] private int m_minPlayersToStart = 2;
     private App m_app;
@@ -23,13 +24,11 @@ public class GameLogicManager : NetworkBehaviour
     public void StartGameLogic()
     {
         //if (m_app.Session.Info.PlayerCount - (m_app.IsServerMode() ? 0 : 0) < m_minPlayersToStart) return;
+        if (!Runner.IsServer) return;
         if (NetworkedGameIsRunning) return;
 
-        if (Runner.IsServer)
-        {
-            NetworkedGameStartTick = m_app.Session.Runner.Tick;
-            NetworkedGameIsRunning = true;
-        }
+        NetworkedGameStartTick = m_app.Session.Runner.Tick;
+        NetworkedGameIsRunning = true;
     }
 
     public override void FixedUpdateNetwork()
@@ -37,6 +36,7 @@ public class GameLogicManager : NetworkBehaviour
         if (!m_app.AllowInput) return;
         if (!NetworkedGameIsRunning) return;
         GameUIViewController.Instance.FixedUpdateMinimapTime(NetworkedGameStartTick);
+        NetworkedRespawnAllowed = !StormBehavior.Instance.IsStackingPhaseComplete();
     }
 
     //Initiate the Start Battle Royal Match (Requirement Say 10 -> To make it so you can Press Return to Force Start > 1 player):
@@ -69,5 +69,4 @@ public class GameLogicManager : NetworkBehaviour
 
     //StormBehavior
     //Damage Players who are not within the zone. So it'll need to hold list of all players, which say the App can store for now.
-
 }

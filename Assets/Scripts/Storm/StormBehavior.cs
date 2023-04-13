@@ -82,7 +82,7 @@ public class StormBehavior : NetworkBehaviour
         {
             if (Runner.IsServer) StackingPhaseTimer = TickTimer.CreateFromSeconds(Runner, m_stackingTime);
         }
-        else if (Runner.Tick >= GameLogicManager.Instance.NetworkedGameStartTick + m_tickRate * m_stackingTime)
+        else if (IsStackingPhaseComplete())
         {
             ShrinkToDataPoint(ref m_stormDatas[NetworkedStormPhase]);
         }
@@ -93,20 +93,27 @@ public class StormBehavior : NetworkBehaviour
         }
     }
 
-    public void DamagePlayersOutsideArea()
+    public bool IsStackingPhaseComplete()
+    {
+        return (Runner.Tick >= GameLogicManager.Instance.NetworkedGameStartTick + m_tickRate * m_stackingTime);
+    }
+
+    private void DamagePlayersOutsideArea()
     {
         m_app.ForEachPlayer(ply =>
         {
             if (!m_playersInZone.ContainsKey(ply))
             {
-                    //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
-                    ply.Character.CharacterHealth.OnTakeDamage(1, instigator: null);
+                //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
+                ply.Character.CharacterHealth.OnTakeDamage(1, instigator: null);
             }
         });
     }
 
-    public void ScanForPlayers(System.Action damagePlayersCallback)
+    private void ScanForPlayers(System.Action damagePlayersCallback)
     {
+        if (!Runner.IsServer) return;
+
         if (m_stormDamageTickTimer.ExpiredOrNotRunning(Runner)) m_stormDamageTickTimer = TickTimer.CreateFromTicks(Runner, (int)m_tickRate);
         if (m_stormDamageTickTimer.RemainingTicks(Runner) != m_tickRate) return;
 
