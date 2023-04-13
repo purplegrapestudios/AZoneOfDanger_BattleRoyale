@@ -11,7 +11,7 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
 	[SerializeField] public Character CharacterPrefab;
-	
+
 	[Networked] public NetworkString<_32> Name { get; set; }
 	[Networked] public Color Color { get; set; }
 	[Networked] public NetworkBool Ready { get; set; }
@@ -20,8 +20,7 @@ public class Player : NetworkBehaviour
 	public bool InputEnabled => _app?.AllowInput ?? false;
 
 	[SerializeField] Transform playerModel;
-	public Character Character => _character;
-	private Character _character;
+	[Networked] public Character NetworkedCharacter { get; set; }
 	private App _app;
 
 	public override void Spawned()
@@ -33,16 +32,15 @@ public class Player : NetworkBehaviour
 
 	public override void FixedUpdateNetwork()
 	{
-		if (HasStateAuthority && _character == null && _app!=null && _app.Session!=null && _app.Session.Map)
+		if (HasStateAuthority && NetworkedCharacter == null && _app!=null && _app.Session!=null && _app.Session.Map)
 		{
 			Debug.Log($"Spawning avatar for player {Name} with input auth {Object.InputAuthority}");
 			Transform t = _app.Session.Map.GetSpawnPoint(Object.InputAuthority);
-			_character = Runner.Spawn(CharacterPrefab, t.position, t.rotation, Object.InputAuthority, (runner, o) =>
+			var c = Runner.Spawn(CharacterPrefab, t.position, t.rotation, Object.InputAuthority, (runner, o) =>
 			{
-				Character character = o.GetComponent<Character>();
-				Debug.Log($"Created Character for Player {Name} @ {t.position} & character pos = {character.transform.position}");
-				character.Player = this;
-				//UnityEditor.EditorApplication.isPaused = true;
+				NetworkedCharacter = o.GetComponent<Character>();
+				Debug.Log($"Created Character for Player {Name} @ {t.position} & character pos = {NetworkedCharacter.transform.position}");
+				NetworkedCharacter.Player = this;
 			});
 		}
 	}
@@ -51,10 +49,10 @@ public class Player : NetworkBehaviour
 	{
 		if (HasStateAuthority)
 		{
-			if (_character != null)
+			if (NetworkedCharacter != null)
 			{
-				Runner.Despawn(_character.Object);
-				_character = null;
+				Runner.Despawn(NetworkedCharacter.Object);
+				NetworkedCharacter = null;
 			}
 			Runner.Despawn(Object);
 		}

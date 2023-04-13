@@ -14,7 +14,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 {
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
-	public CharacterMoveComponent CharacterMoveComponent => m_characterMoveComponent;
+	public CharacterMoveComponent CharacterMove => m_characterMoveComponent;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
 	public CharacterHealthComponent CharacterHealth => m_characterHealth;
 	[SerializeField] private CharacterHealthComponent m_characterHealth;
@@ -30,6 +30,17 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private CharacterAnimation m_characterAnimation;
 	public RenderedShotDolly CharacterMuzzleDolly => m_characterMuzzleDolly;
 	[SerializeField] private RenderedShotDolly m_characterMuzzleDolly;
+	public CharacterCameraDolly CharacterCameraDolly => m_characterCameraDolly;
+	[SerializeField] private CharacterCameraDolly m_characterCameraDolly;
+	public CharacterCamera CharacterCamera => m_characterCamera;
+	[SerializeField] private CharacterCamera m_characterCamera;
+	public ParticleSystem CharacterMuzzleFlash => m_muzzleFlash;
+	[SerializeField] private ParticleSystem m_muzzleFlash;
+	public Animator CharacterAnimator3rd => m_characterAnimator3rd;
+	[SerializeField] private Animator m_characterAnimator3rd;
+	public Animator CharacterAnimator1st => m_characterAnimator1st;
+	[SerializeField] private Animator m_characterAnimator1st;
+
 	public MinimapWorldObject MinimapWorldObj => m_minimapWorldObj;
 	[SerializeField] private MinimapWorldObject m_minimapWorldObj;
 
@@ -67,28 +78,27 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
-		SceneCamera.instance.SetSceneCameraActive(false);
-
-		m_characterMoveComponent.InitCharacterMovement(m_characterHealth, (relativeDollyPos) => { m_components.Dolly.GetComponent<CharacterCameraDolly>().SetDollyDir(relativeDollyPos); });
+		SceneCamera.Instance.SetSceneCameraActive(false);
+		m_characterMoveComponent.InitCharacterMovement(m_characterHealth, (relativeDollyPos) => { m_characterCameraDolly.SetDollyDir(relativeDollyPos); });
 		m_characterHealth.Initialize(this, m_characterModel);
-		m_characterAudio.Initialize(m_components.PlayerCamera.GetComponent<AudioSource>());
+		m_characterAudio.Initialize(m_characterCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
 			character: this,
 			characterHealth: m_characterHealth,
-			characterCamera: m_components.PlayerCamera.GetComponent<CharacterCamera>(),
+			characterCamera: m_characterCamera,
 			characterWeapons: m_characterWeapons,
 			characterMuzzle: m_characterMuzzle,
-			muzzleFlash: m_components.MuzzleFlash,
+			muzzleFlash: m_muzzleFlash,
 			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
 			audioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
 			ammoCounterCallback: (ammoRemaining, maxAmmoRemaining, clipSize) => { GameUIViewController.Instance.SetAmmoInfo(Object.HasInputAuthority, ammoRemaining, maxAmmoRemaining, clipSize); },
 			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); },
-			aimCallback: (fov) => { m_components.PlayerCamera.GetComponent<CharacterCamera>().SetCameraFOV(fov); });
-		m_characterAnimation.Initialize();
+			aimCallback: (fov) => { m_characterCamera.SetCameraFOV(fov); });
+		m_characterAnimation.Initialize(this);
 		transform.rotation = Quaternion.identity;
 		InterpolationDataSource = InterpolationDataSources.NoInterpolation;
-		m_components.Dolly.GetComponent<CharacterCameraDolly>().Initialize(this);
-		m_characterMuzzleDolly.Initialize(this, m_components.PlayerCamera.GetComponent<CharacterCamera>());
+		m_characterCameraDolly.Initialize(this);
+		m_characterMuzzleDolly.Initialize(this, m_characterCamera);
 		m_minimapWorldObj.Init(this);
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
@@ -113,17 +123,18 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 
 		// This is a little brute-force, but it gets the job done.
 		// Could use an OnChanged listener on the properties instead.
-		_name.text = Player.Name.Value;
-		_mesh.material.color = Player.Color;
+		//////_name.text = Player.Name.Value;
+		//////_mesh.material.color = Player.Color;
 	}
 
 
 	private void Update()
 	{
+		if (!HasInputAuthority) return;
+
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{
-			Cursor.lockState = Cursor.lockState == CursorLockMode.None ? CursorLockMode.Locked : CursorLockMode.None;
-			Cursor.visible = Cursor.visible ? false : true;
+			SwitchCursorMode(shouldUnlock: Cursor.lockState == CursorLockMode.Locked);
 		}
 	}
 
@@ -203,6 +214,13 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 
 			m_aimDirectionDelta = data.aimDirectionDelta;
 		}
+	}
+
+	public void SwitchCursorMode(bool shouldUnlock)
+    {
+		Cursor.lockState = shouldUnlock ? CursorLockMode.None : CursorLockMode.Locked;
+		Cursor.visible = shouldUnlock ? true : false;
+
 	}
 
 	public bool PlayerInputEnabled()

@@ -1,7 +1,9 @@
+using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
-public class GameLogicManager : NetworkBehaviour
+public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 {
     public static GameLogicManager Instance;
     [Networked] public NetworkBool NetworkedGameIsRunning { get; set; }
@@ -9,7 +11,17 @@ public class GameLogicManager : NetworkBehaviour
     [Networked] public NetworkBool NetworkedRespawnAllowed { get; set; }
     public int MinPlayersToStart => m_minPlayersToStart;
     [SerializeField] private int m_minPlayersToStart = 2;
+
+    public int SpectatePlayerIndex => m_spectatePlayerIndex;
+    [SerializeField] private int m_spectatePlayerIndex;
+    public Player PlayerCurrentlySpectating;
+    [SerializeField] private Player m_playerCurrentlySpectating;
+
+    public int SpecCamCountDebug;
+    [Networked, Capacity(200)] public NetworkDictionary<int, PlayerRef> NetworkedPlayerDictionary => default;
     private App m_app;
+    public bool Initialized => m_initialized;
+    private bool m_initialized;
 
     private void Awake()
     {
@@ -19,6 +31,34 @@ public class GameLogicManager : NetworkBehaviour
     public override void Spawned()
     {
         m_app = App.FindInstance();
+        GameUIViewController.Instance.InitSpectatePlayerButtons(m_app);
+        m_initialized = true;
+
+        if (!Runner.IsServer) return;
+
+        //Pre-populate this dictionary at the beginning;
+        foreach (PlayerRef plyRef in Runner.ActivePlayers)
+        {
+            if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) continue;
+            NetworkedPlayerDictionary.Add(plyRef.PlayerId, plyRef);
+            Debug.Log($"Player: {plyRef.PlayerId} added to PlayerDictionary. (Already in the game)");
+        }
+    }
+
+    void IPlayerJoined.PlayerJoined(PlayerRef plyRef)
+    {
+        if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) return;
+
+        NetworkedPlayerDictionary.Add(plyRef.PlayerId, plyRef);
+        Debug.Log($"Player: {plyRef.PlayerId} joined the game");
+    }
+
+    void IPlayerLeft.PlayerLeft(PlayerRef plyRef)
+    {
+        if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) return;
+
+        NetworkedPlayerDictionary.Remove(plyRef);
+        Debug.Log($"Player: {plyRef.PlayerId} left the game");
     }
 
     public void StartGameLogic()
@@ -37,36 +77,43 @@ public class GameLogicManager : NetworkBehaviour
         if (!NetworkedGameIsRunning) return;
         GameUIViewController.Instance.FixedUpdateMinimapTime(NetworkedGameStartTick);
         NetworkedRespawnAllowed = !StormBehavior.Instance.IsStackingPhaseComplete();
+
+        SpecCamCountDebug = NetworkedPlayerDictionary.Count;
     }
 
-    //Initiate the Start Battle Royal Match (Requirement Say 10 -> To make it so you can Press Return to Force Start > 1 player):
-    // - All players respawn at random positions (Ideally a drop off but just respawn for now)
-    // - Display GameStateLabel (Center Screen text: 3,2,1, Begin)
+    public Player GetSpectatePlayer(int spectatePlayerIndex, Player localPlayer, int fetchAttempts = 0, bool fetchPrevIfLocalUser = false)
+    {
+        m_spectatePlayerIndex = ClampSpectatePlayerIndex(spectatePlayerIndex);
 
-    //We want the Timer logic to be as such: (30 seconds wait + 30 seconds closing = 1 min)
-    //1) Display GameStateLabel to Initiate Storm (Center Screen text: Storm Starting in 30 seconds)
-    //  -> Meanwhile the CountDownLabel (Counter Text: 30, 29,...)
-    //2) Display GameStateLabel Storm Closing state (Center Screen text: Storm is closing!)
-    //3) Display GameStateLabel Storm Count Down (Counter Text: 30, 29,...)
+        m_playerCurrentlySpectating = Runner.GetPlayerObject(NetworkedPlayerDictionary.ElementAt(m_spectatePlayerIndex).Value).GetComponent<Player>();
 
-    //Store Circle Position / Size Logic. (7 Zone sizes each 1 minute = 7 Total Minutes) + Say the first 3 minutes of ffa
-    //1) Position: Storm Circle must be within game map bounds. (Origin + radius) must be within bounds.
-    //2) Size: Storm Size is 100% -> 75% -> 50% -> 25% -> 10% -> 5% -> 0%
+        if (fetchAttempts > 0) return m_playerCurrentlySpectating;
+        if (m_playerCurrentlySpectating == localPlayer) 
+            GetSpectatePlayer(fetchPrevIfLocalUser ? m_spectatePlayerIndex - 1 : m_spectatePlayerIndex + 1, localPlayer, fetchAttempts++);
 
-    //End Game Condition
-    //When 1 player remains
-    //Show Winner Cam
-    //Winner Gets UI display of Victory Royale
-    //Winner Display Game Stats
+        return m_playerCurrentlySpectating;
+    }
 
-    //Those who die early (and in the first phase of the game with respawns) Create a Spectate Cam, starting at last instigator. And toggle back / forward throughout entire playerlist
-    //Also show stats
+    public void GetSpectatePlayerNext(Player localPlayer)
+    {
+        m_spectatePlayerIndex++;
+        m_spectatePlayerIndex = ClampSpectatePlayerIndex(m_spectatePlayerIndex);
+        var p = GetSpectatePlayer(m_spectatePlayerIndex, localPlayer);
+        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Id}");
+    }
 
-    //Server waits like 15 seconds for Winner to check his stats etc, and the ShutsDown the Fusion Network, and finally return back to Starting Scene.
+    public void GetSpectatePlayerPrev(Player localPlayer)
+    {
+        m_spectatePlayerIndex--;
+        m_spectatePlayerIndex = ClampSpectatePlayerIndex(m_spectatePlayerIndex);
+        var p = GetSpectatePlayer(m_spectatePlayerIndex, localPlayer, fetchPrevIfLocalUser: true);
+        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Id}");
+    }
 
-    //UI Minimap: Players remaining.
-
-
-    //StormBehavior
-    //Damage Players who are not within the zone. So it'll need to hold list of all players, which say the App can store for now.
+    private int ClampSpectatePlayerIndex(int spectateIndex)
+    {
+        if (spectateIndex > NetworkedPlayerDictionary.Count - 1) spectateIndex = 0;
+        if (spectateIndex < 0) spectateIndex = NetworkedPlayerDictionary.Count - 1;
+        return spectateIndex;
+    }
 }

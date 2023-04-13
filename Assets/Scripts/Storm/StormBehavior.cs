@@ -27,6 +27,31 @@ public struct StormData : INetworkStruct
     && (Tick)(TimeStormPause / runner.DeltaTime) <= runner.Simulation.Tick;
 }
 
+/// <summary> Storm Behavior Summary </summary>
+/// 
+/// Stacking Phase: Say 60 Seconds at the start of the game where respawns are allowed, and players stack their armor.
+/// 
+/// 
+/// Storm Timer logic will follow this format: (say 30 seconds wait + 30 seconds closing = 1 min)
+/// 1) Display GameStateLabel to Initiate Storm (Minimap Info: Storm Starting in 30 seconds)
+/// -> The MinimapCountDownLabel will start counting down.
+/// 
+/// 2) Display GameStateLabel Storm Closing state (Minimap Info: Storm is closing!)
+/// -> The MinimapCountDownLabel will start counting down.
+/// 
+/// Store Circle Position / Size Logic. (7 Zone sizes each 1 minute = 7 Total Minutes) + Say the first 3 minutes of ffa
+/// 1) Position: Storm Circle must be within game map bounds. (Origin + radius) must be within bounds.
+/// 2) Size: Storm Size is 100% -> 75% -> 50% -> 25% -> 10% -> 5% -> 0%
+/// 
+/// End Game Condition
+/// When 1 player remains
+/// Show Winner Cam
+/// Winner Gets UI display of Victory Royale
+/// Winner Display Game Stats
+/// Those who die early will be spectating
+/// Show stats
+/// Server waits like 15 seconds for Winner to check his stats etc, and the ShutsDown the Fusion Network, and finally return back to Starting Scene.
+
 public class StormBehavior : NetworkBehaviour
 {
     [Networked] Vector3 NetworkedPosition { get; set; }
@@ -105,7 +130,7 @@ public class StormBehavior : NetworkBehaviour
             if (!m_playersInZone.ContainsKey(ply))
             {
                 //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
-                ply.Character.CharacterHealth.OnTakeDamage(1, instigator: null);
+                ply.NetworkedCharacter.CharacterHealth.OnTakeDamage(1, instigator: null);
             }
         });
     }

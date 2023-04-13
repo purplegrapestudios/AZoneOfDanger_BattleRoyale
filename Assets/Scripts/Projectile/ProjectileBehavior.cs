@@ -184,7 +184,7 @@ public class ProjectileBehavior : MonoBehaviour
                 if (splashHitRoot.GetComponent<Character>())
                 {
                     var splashHitCharacter = splashHitRoot.GetComponent<Character>();
-                    var splashHitMoveComp = splashHitCharacter.CharacterMoveComponent;
+                    var splashHitMoveComp = splashHitCharacter.CharacterMove;
                     var splashDir = (impactPos - splashHitCharacter.transform.position) * -1;
                     var oldVel = splashHitMoveComp.m_moveData.V_PlayerVelocity;
                     ref Vector3 refVelocity = ref splashHitMoveComp.m_moveData.V_PlayerVelocity;

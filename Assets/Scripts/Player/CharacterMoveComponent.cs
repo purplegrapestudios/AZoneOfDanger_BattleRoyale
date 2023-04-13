@@ -88,7 +88,7 @@ public class CharacterMoveComponent : NetworkBehaviour
         Transform = GetComponent<Transform>();
         Rigidbody.rotation = Quaternion.identity;
         PlayerObjectComponents = GetComponent<CharacterComponents>();
-        MainCameraTransform = PlayerObjectComponents.PlayerCamera.transform;
+        MainCameraTransform = m_character.CharacterCamera.transform;
         PlayerAnimation = GetComponent<CharacterAnimation>();
 
         m_moveData.moveCmd = new CharacterMoveData.MoveCmd();
@@ -189,6 +189,9 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     public override void Render()
     {
+        if (!m_initialized) return;
+        if (!m_characterHealthComponent.NetworkedIsAlive) return;
+
         if (m_character.Player && m_character.Player.InputEnabled)
         {
             m_moveData.V_RotationY += m_character.CachedAimDirDelta.x;

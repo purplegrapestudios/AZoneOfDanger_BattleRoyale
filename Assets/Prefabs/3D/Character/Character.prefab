@@ -330,6 +330,11 @@ MonoBehaviour:
   m_characterAudio: {fileID: 3603544302567930862}
   m_characterAnimation: {fileID: 7695338927694559921}
   m_characterMuzzleDolly: {fileID: 6193562556498965499}
+  m_characterCameraDolly: {fileID: 5430595632381695508}
+  m_characterCamera: {fileID: 1881865336939130476}
+  m_muzzleFlash: {fileID: 4732257256374533423}
+  m_characterAnimator3rd: {fileID: 4755413306638316388}
+  m_characterAnimator1st: {fileID: 0}
   m_minimapWorldObj: {fileID: -5610665582328564497}
   _name: {fileID: 8000666693784294418}
   _mesh: {fileID: 8382996144721734541}
@@ -500,20 +505,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c05fcd4dff68541960991d81131377, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MuzzleFlash: {fileID: 4732257256374533423}
-  CharacterCollider: {fileID: 0}
-  CameraContainerTransform: {fileID: 0}
-  Dolly: {fileID: 542054619012127791}
-  PlayerCamera: {fileID: 8577374848904345177}
-  DeathCamera: {fileID: 0}
-  ThirdPersonPlayer: {fileID: 0}
-  FirstPersonPlayer: {fileID: 0}
-  BumperCar: {fileID: 0}
-  PlayerLight: {fileID: 0}
-  DustPrefab: {fileID: 0}
-  MiniMapCammera: {fileID: 0}
-  animator1: {fileID: 0}
-  animator3: {fileID: 4755413306638316388}
 --- !u!114 &7695338927694559921
 MonoBehaviour:
   m_ObjectHideFlags: 0

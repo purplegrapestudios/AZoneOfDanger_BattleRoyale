@@ -28,7 +28,7 @@ public class CharacterHealthComponent : NetworkBehaviour
         NetworkedHealth = m_baseHealth;
         NetworkedDeaths = 0;
         NetworkedKills = 0;
-        
+
         if (m_character.Object.HasInputAuthority)
         {
             GameUIViewController.Instance.UpdateHealthText($"{Mathf.RoundToInt(NetworkedHealth)} HP");
@@ -65,6 +65,10 @@ public class CharacterHealthComponent : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!isInitialized) return;
+        if (!m_app.AllowInput) return;
+        if (!NetworkedIsAlive) return;
+
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
             if (data.GetButton(ButtonFlag.RESPAWN))
@@ -136,8 +140,14 @@ public class CharacterHealthComponent : NetworkBehaviour
 
     private void Respawn(CharacterHealthComponent changedBehaviour)
     {
-        if (!GameLogicManager.Instance.NetworkedRespawnAllowed) return;
+        EnableSpectateMode(true);
         if (RespawnCoroutine != null) return;
+        if (!GameLogicManager.Instance.NetworkedRespawnAllowed)
+        {
+            if (!NetworkedIsAlive)
+                GameLogicManager.Instance.NetworkedPlayerDictionary.Remove(m_character.Player.Object.InputAuthority);
+            return;
+        }
 
         RespawnCoroutine = RespawnCO(changedBehaviour);
         StartCoroutine(RespawnCoroutine);
@@ -150,16 +160,22 @@ public class CharacterHealthComponent : NetworkBehaviour
         yield return new WaitForSeconds(.5f);
         changedBehaviour.NetworkedRespawn = false;
         yield return new WaitForSeconds(5);
-        
+
         m_characterModel.SetActive(false);
-        GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
-        
-        yield return new WaitForSeconds(3);
-        
-        m_characterModel.SetActive(true);
-        NetworkedIsAlive = true;
-        Debug.Log("Finish respawn");
+
+        if (GameLogicManager.Instance.NetworkedRespawnAllowed)
+        {
+            GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
+
+            yield return new WaitForSeconds(3);
+
+            m_characterModel.SetActive(true);
+            NetworkedIsAlive = true;
+            Debug.Log("Finish respawn");
+            EnableSpectateMode(false);
+        }
         StopRespawnCoroutine(changedBehaviour);
+        EnableSpectateMode(false);
     }
 
     private void StopRespawnCoroutine(CharacterHealthComponent changedBehaviour)
@@ -168,5 +184,30 @@ public class CharacterHealthComponent : NetworkBehaviour
         changedBehaviour.NetworkedIsAlive = true;
         StopCoroutine(RespawnCoroutine);
         RespawnCoroutine = null;
+    }
+
+    private void EnableSpectateMode(bool isSpectateMode)
+    {
+        if (Object.InputAuthority != Runner.LocalPlayer) return;
+
+        if (isSpectateMode)
+        {
+            if (!(GameLogicManager.Instance.NetworkedPlayerDictionary.Count > 0)) return;
+            if (SceneCamera.Instance.SpectateCamTr != null) return;
+
+            m_character.SwitchCursorMode(shouldUnlock: true);
+            GameUIViewController.Instance.ShowSpectatePlayerOptions(true);
+            m_character.CharacterCamera.EnableCameraAndAudioListener(false);
+
+            var playerToSpectate = GameLogicManager.Instance.GetSpectatePlayer(Mathf.RoundToInt(Random.Range(0, GameLogicManager.Instance.NetworkedPlayerDictionary.Count)), m_character.Player);
+            SceneCamera.Instance.SetSpectateCamTransform(playerToSpectate.NetworkedCharacter.CharacterCamera.transform, $"{playerToSpectate.Id}");
+        }
+        else
+        {
+            m_character.SwitchCursorMode(shouldUnlock: false);
+            GameUIViewController.Instance.ShowSpectatePlayerOptions(false);
+            m_character.CharacterCamera.EnableCameraAndAudioListener(true);
+            SceneCamera.Instance.SetSpectateCamTransform(null, string.Empty);
+        }
     }
 }

@@ -22560,7 +22560,13 @@ MonoBehaviour:
   _NetworkedGameIsRunning:
     _value: 0
   _NetworkedGameStartTick: 0
+  _NetworkedRespawnAllowed:
+    _value: 0
+  _NetworkedPlayerDictionary:
+    _items: []
   m_minPlayersToStart: 1
+  m_spectatePlayerIndex: 0
+  SpecCamCountDebug: 0
 --- !u!4 &1127762131
 Transform:
   m_ObjectHideFlags: 0
@@ -30590,7 +30596,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 61
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -30631,6 +30637,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_sceneCamera: {fileID: 1742798475}
   m_sceneAudioListener: {fileID: 1742798474}
+  m_spectateCamTr: {fileID: 0}
 --- !u!114 &1742798478
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,10 +15,8 @@ public class CharacterAnimation : NetworkBehaviour
     /// VARIABLE SECTION
     /// </summary>
     //Player components required in animating the player
-    private CharacterMoveComponent m_characterMoveComponent;
-    private CharacterShootComponent m_characterShootComponent;
-    private CharacterHealthComponent m_characterHealthComponent;
-    private CharacterCamera m_characterCamera;
+    private Character m_character;
+    private Animator Animator_1stPerson;
     private Animator Animator_3rdPerson;
 
     //Animator Component: Parameters (Parameters Hashed. We update these values for actual animation to happen)
@@ -35,14 +33,11 @@ public class CharacterAnimation : NetworkBehaviour
     public PlayerCameraView playerCameraView;
     private bool isInitialized;
 
-    public void Initialize () {
+    public void Initialize (Character character) {
 
-        m_characterMoveComponent = GetComponent<CharacterMoveComponent>();
-        m_characterShootComponent = GetComponent<CharacterShootComponent>();
-        m_characterHealthComponent = GetComponent<CharacterHealthComponent>();
-        m_characterCamera = GetComponent<CharacterComponents>().PlayerCamera.GetComponent<CharacterCamera>();
-        Animator_3rdPerson = GetComponent<CharacterComponents>().animator3;
-
+        m_character = character;
+        Animator_1stPerson = m_character.CharacterAnimator1st;
+        Animator_3rdPerson = m_character.CharacterAnimator3rd;
         Param_3rdPerson_AimAngle = Animator.StringToHash("Param_3rdPerson_AimAngle");
         Param_CrouchInt = Animator.StringToHash("Param_CrouchInt");
         Param_DeadInt = Animator.StringToHash("Param_DeadInt");
@@ -65,14 +60,14 @@ public class CharacterAnimation : NetworkBehaviour
         //PLAYER IS ALIVE
         if (isPlayerAlive)
         {
-            SetStateFloat(ref Param_3rdPerson_AimAngle, m_characterCamera.NetworkedRotationY / 90f, smooth: .9f);
-            SetStateInt(ref Param_CrouchInt, m_characterMoveComponent.NetworkedIsCrouched ? 1 : 0);
-            SetStateInt(ref Param_DeadInt, m_characterHealthComponent.NetworkedRespawn ? 1 : 0);
-            SetStateInt(ref Param_FireInt, m_characterShootComponent.NetworkedFire ? 1 : 0);
-            SetStateInt(ref Param_JumpInt, !m_characterMoveComponent.NetworkedFloorDetected ? 1 : 0);
-            SetStateInt(ref Param_ReloadInt, m_characterShootComponent.NetworkedReload ? 1 : 0);
-            SetStateFloat(ref Param_Speed, m_characterMoveComponent.NetworkedVelocity.magnitude);
-            SetStateInt(ref Param_SwitchWeaponInt, m_characterShootComponent.NetworkedSwitchWeapon ? 1 : 0);
+            SetStateFloat(ref Param_3rdPerson_AimAngle, m_character.CharacterCamera.NetworkedRotationY / 90f, smooth: .9f);
+            SetStateInt(ref Param_CrouchInt, m_character.CharacterMove.NetworkedIsCrouched ? 1 : 0);
+            SetStateInt(ref Param_DeadInt, m_character.CharacterHealth.NetworkedRespawn ? 1 : 0);
+            SetStateInt(ref Param_FireInt, m_character.CharacterShoot.NetworkedFire ? 1 : 0);
+            SetStateInt(ref Param_JumpInt, !m_character.CharacterMove.NetworkedFloorDetected ? 1 : 0);
+            SetStateInt(ref Param_ReloadInt, m_character.CharacterShoot.NetworkedReload ? 1 : 0);
+            SetStateFloat(ref Param_Speed, m_character.CharacterMove.NetworkedVelocity.magnitude);
+            SetStateInt(ref Param_SwitchWeaponInt, m_character.CharacterShoot.NetworkedSwitchWeapon ? 1 : 0);
         }
     }
 
@@ -103,19 +98,15 @@ public class CharacterAnimation : NetworkBehaviour
     {
         if (view.Equals(PlayerCameraView.FirstPerson))
         {
-            GetComponent<CharacterComponents>().Dolly.GetComponent<CharacterCameraDolly>().RestDollyPosition();
-            GetComponent<CharacterComponents>().PlayerCamera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Player"));
+            m_character.CharacterCameraDolly.RestDollyPosition();
+            m_character.CharacterCamera.Camera.cullingMask &= ~(1 << LayerMask.NameToLayer("Player"));
             playerCameraView = PlayerCameraView.FirstPerson;
-            GetComponent<CharacterComponents>().ThirdPersonPlayer.SetActive(false);
-            GetComponent<CharacterComponents>().FirstPersonPlayer.SetActive(true);
         }
         else if (view.Equals(PlayerCameraView.ThirdPerson))
         {
-            GetComponent<CharacterComponents>().Dolly.GetComponent<CharacterCameraDolly>().RestDollyPosition();
-            GetComponent<CharacterComponents>().PlayerCamera.GetComponent<Camera>().cullingMask |= 1 << LayerMask.NameToLayer("Player");
+            m_character.CharacterCameraDolly.RestDollyPosition();
+            m_character.CharacterCamera.Camera.cullingMask |= 1 << LayerMask.NameToLayer("Player");
             playerCameraView = PlayerCameraView.ThirdPerson;
-            GetComponent<CharacterComponents>().ThirdPersonPlayer.SetActive(true);
-            GetComponent<CharacterComponents>().FirstPersonPlayer.SetActive(false);
 
         }
     }

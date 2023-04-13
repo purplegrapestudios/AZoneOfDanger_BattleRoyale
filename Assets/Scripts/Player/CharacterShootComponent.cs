@@ -63,6 +63,7 @@ public class CharacterShootComponent : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!m_app.AllowInput) return;
         if (!m_isInitialized) return;
         if (!m_characterHealth.NetworkedIsAlive) return;
 
@@ -251,7 +252,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private void SpawnProjectile()
     {
         var forwardDir = GetForwardDirection();
-        var firePosCameraOffset = GetFirePosCameraOffset(2f);
+        var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
         var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
         
         ObjectPoolManager.Instance.SpawnProjectile(startPos: orig,

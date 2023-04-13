@@ -55,6 +55,9 @@ public class CharacterCameraDolly : NetworkBehaviour
 
     public override void Render()
     {
+        if (!m_initailized) return;
+        if (!m_character.CharacterHealth.NetworkedIsAlive) return;
+
         maxDistance = 1 + (100 - m_characterCam.FieldOfView) / 100f;
 
         if (!m_initailized) return;
@@ -104,6 +107,10 @@ public class CharacterCameraDolly : NetworkBehaviour
 
     private void LateUpdate()
     {
+        if (!m_initailized) return;
+        if (!m_character.CharacterHealth.NetworkedIsAlive) return;
+
+        //CHECK THIS IF THIS IS REALLY BEING AFFECTED..
         if (Object.HasStateAuthority)
         {
             NetworkedCameraOffset = new Vector3(modXPos, modYPos, modZPos);
