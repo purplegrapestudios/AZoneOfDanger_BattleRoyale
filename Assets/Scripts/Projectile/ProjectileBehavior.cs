@@ -86,7 +86,7 @@ public class ProjectileBehavior : MonoBehaviour
             distanceToScan += closestLengthToScan;
         }
 
-        if(m_runner.LagCompensation.Raycast(origin: lastPosition, direction: dir, distanceToScan, player: m_instigator, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX))
+        if(m_runner.LagCompensation.Raycast(origin: lastPosition, direction: dir, distanceToScan, player: m_instigator, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX | HitOptions.SubtickAccuracy))
         {
             float hitDistance = 100;
             hitDistance = hitInfo.Distance > 0 ? hitInfo.Distance : hitDistance;
@@ -172,7 +172,7 @@ public class ProjectileBehavior : MonoBehaviour
         }
     }
 
-    private void ProjectileSplashDamage(Vector3 impactPos, float radius, PlayerRef instigator, List<LagCompensatedHit> splashHits, int damagableLayers = -1, HitOptions hitOpts = HitOptions.None)
+    private void ProjectileSplashDamage(Vector3 impactPos, float radius, PlayerRef instigator, List<LagCompensatedHit> splashHits, int damagableLayers = -1, HitOptions hitOpts = HitOptions.SubtickAccuracy)
     {
         if (m_runner.LagCompensation.OverlapSphere(origin: impactPos, radius: radius, player: instigator, hits: splashHits, layerMask: damagableLayers, options: hitOpts) > 0)
         {

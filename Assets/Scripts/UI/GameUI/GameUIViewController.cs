@@ -18,11 +18,13 @@ public class GameUIViewController : MonoBehaviour
     [SerializeField] private TMP_Text m_timerToNextStateTxt;
     [SerializeField] private TMP_Text m_timerTxt;
     [SerializeField] private GameObject m_spectatePlayerOptions;
+    [SerializeField] private GameObject m_victoryScreen;
     [SerializeField] private GameObject m_crosshairObject;
     private Crosshair m_crosshair;
     private App m_app;
     private float m_tickRate;
     private System.Action<bool> m_enableSpectateOptionsCallback;
+    private System.Action<bool, bool, string> m_enableVictoryScreenCallback;
 
     private void Awake()
     {
@@ -34,10 +36,20 @@ public class GameUIViewController : MonoBehaviour
     {
         m_spectatePlayerOptions.GetComponent<SpectateOptions>().Init(app, GameLogicManager.Instance, Instance, SceneCamera.Instance);
     }
+    public void InitVictoryScreen()
+    {
+        m_victoryScreen.GetComponent<VictoryScreen>().Init(Instance);
+    }
 
-    public void SetCallback(System.Action<bool> action)
+
+    public void SetSpectateOptionsCallback(System.Action<bool> action)
     {
         m_enableSpectateOptionsCallback = action;
+    }
+
+    public void SetVictoryScreenCallback(System.Action<bool, bool, string> action)
+    {
+        m_enableVictoryScreenCallback = action;
     }
 
     public void UpdateHealthText(string value) => m_healthTxt.text = value;
@@ -106,6 +118,11 @@ public class GameUIViewController : MonoBehaviour
     public void ShowSpectatePlayerOptions(bool val)
     {
         m_enableSpectateOptionsCallback(val);
+    }
+
+    public void ShowVictoryScreen(bool show, bool isWinner, string playerIDOrName)
+    {
+        m_enableVictoryScreenCallback(show, isWinner, playerIDOrName);
     }
 
 }

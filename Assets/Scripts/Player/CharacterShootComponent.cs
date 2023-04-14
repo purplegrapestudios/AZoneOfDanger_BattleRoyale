@@ -66,6 +66,7 @@ public class CharacterShootComponent : NetworkBehaviour
         if (!m_app.AllowInput) return;
         if (!m_isInitialized) return;
         if (!m_characterHealth.NetworkedIsAlive) return;
+        if (GameLogicManager.Instance.NetworkedGameIsFinished) return;
 
         if (m_character.PlayerInputEnabled() && GetInput(out InputData data))
         {

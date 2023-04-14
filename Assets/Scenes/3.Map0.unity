@@ -22562,11 +22562,13 @@ MonoBehaviour:
   _NetworkedGameStartTick: 0
   _NetworkedRespawnAllowed:
     _value: 0
+  _NetworkedVictoryPlayer: {fileID: 0}
   _NetworkedPlayerDictionary:
     _items: []
   m_minPlayersToStart: 1
   m_spectatePlayerIndex: 0
-  SpecCamCountDebug: 0
+  PlayerCurrentlySpectating: {fileID: 0}
+  m_playerCurrentlySpectating: {fileID: 0}
 --- !u!4 &1127762131
 Transform:
   m_ObjectHideFlags: 0

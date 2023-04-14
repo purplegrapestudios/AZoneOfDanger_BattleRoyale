@@ -334,6 +334,8 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 
 	private void Update() 
 	{
+		if (!AllowInput)
+			return;
 		// Check events like KeyDown or KeyUp in Unity's update. They might be missed otherwise because they're only true for 1 frame
 		_data.ButtonFlags |= Input.GetKeyDown( KeyCode.Backspace ) ? ButtonFlag.RESPAWN : 0;
 		_data.ButtonFlags |= Input.GetKeyDown(KeyCode.LeftShift) ? ButtonFlag.CROUCH : 0;

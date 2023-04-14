@@ -7,6 +7,7 @@ using TMPro;
 public class SpectateOptions : MonoBehaviour
 {
     [SerializeField] private GameObject m_specContainer;
+    [SerializeField] private GameObject m_playerGameInfoContainer;
     [SerializeField] private TMP_Text m_spectateLabel;
     [SerializeField] private Button m_specPlayerButtonPrev;
     [SerializeField] private Button m_specPlayerButtonNext;
@@ -16,7 +17,10 @@ public class SpectateOptions : MonoBehaviour
         m_specPlayerButtonNext.onClick.AddListener(() => { gameLogicInstance.GetSpectatePlayerNext(app.GetPlayer()); });
         m_specPlayerButtonPrev.onClick.AddListener(() => { gameLogicInstance.GetSpectatePlayerPrev(app.GetPlayer()); });
         m_specContainer.SetActive(false);
-        gameUIInstance.SetCallback((bool val) => { m_specContainer.SetActive(val); });
+        gameUIInstance.SetSpectateOptionsCallback((bool val) => { 
+            m_specContainer.SetActive(val);
+            m_playerGameInfoContainer.SetActive(!val);
+        });
         sceneCameraInstance.SetSpectatePlayerLabelCallback(SetSpectatePlayerLabel);
     }
 

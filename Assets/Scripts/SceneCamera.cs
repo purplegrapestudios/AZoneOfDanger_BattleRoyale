@@ -38,9 +38,15 @@ public class SceneCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(!m_app) m_app = App.FindInstance();
+        if (!m_app)
+        {
+            m_app = App.FindInstance();
+            return;
+        }
+        if (!m_app.AllowInput) return;
 
         if (!GameLogicManager.Instance.Initialized) return;
+        if (!GameLogicManager.Instance.NetworkedGameIsRunning) return;
         if (!m_sceneCamera.enabled) return;
 
         if (!m_spectateCamTr) { GameLogicManager.Instance.GetSpectatePlayerNext(m_app.GetPlayer()); }

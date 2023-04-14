@@ -1,3 +1,4 @@
+using System.Linq;
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,14 +45,14 @@ public class CharacterHealthComponent : NetworkBehaviour
     {
         if (!isInitialized) return;
         if (!NetworkedIsAlive) return;
-
+        if (GameLogicManager.Instance.NetworkedGameIsFinished) return;
         //        Debug.Log($"{m_character.Player.Name} took {damage} damage");
         m_instigator = instigator;
         NetworkedHealth -= damage;
 
         if (NetworkedHealth <= 0)
         {
-            Debug.Log($"{m_character.Player.Name} couldn't make it");
+            Debug.Log($"{m_character.Object.InputAuthority.PlayerId} Died");
             NetworkedIsAlive = false;
             NetworkedRespawn = true;
             NetworkedDeaths += 1;
@@ -67,21 +68,37 @@ public class CharacterHealthComponent : NetworkBehaviour
     {
         if (!isInitialized) return;
         if (!m_app.AllowInput) return;
-        if (!NetworkedIsAlive) return;
+
+        if (GameLogicManager.Instance.NetworkedRespawnAllowed) return;
+        if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryPlayerCount) return;
+        GameLogicManager.Instance.NetworkedGameIsFinished = GameLogicManager.Instance.NetworkedPlayerDictionary.Count <= 1;
+
+        GameLogicManager.Instance.NetworkedVictoryPlayer = Runner.GetPlayerObject(GameLogicManager.Instance.NetworkedPlayerDictionary.ElementAt(0).Value).GetComponent<Player>();
+        GameUIViewController.Instance.ShowVictoryScreen(
+            true,
+            GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId == m_character.Player.Object.InputAuthority.PlayerId,
+            GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId.ToString()
+            );
 
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
+            if (!NetworkedIsAlive) return;
+            if (GameLogicManager.Instance.NetworkedGameIsFinished) return;
+
             if (data.GetButton(ButtonFlag.RESPAWN))
             {
                 NetworkedIsAlive = false;
                 NetworkedRespawn = true;
                 NetworkedDeaths += 1;
             }
+
             if (NetworkedRespawn)
             {
                 Respawn(this);
             }
         }
+
+
     }
 
     static void OnHealthChanged(Changed<CharacterHealthComponent> changed)
@@ -145,7 +162,13 @@ public class CharacterHealthComponent : NetworkBehaviour
         if (!GameLogicManager.Instance.NetworkedRespawnAllowed)
         {
             if (!NetworkedIsAlive)
-                GameLogicManager.Instance.NetworkedPlayerDictionary.Remove(m_character.Player.Object.InputAuthority);
+            {
+                if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryPlayerCount)
+                {
+                    GameLogicManager.Instance.NetworkedPlayerDictionary.Remove(changedBehaviour.m_character.Player.Object.InputAuthority.PlayerId);
+                    Debug.Log($"Removing Player: {changedBehaviour.m_character.Player.Object.InputAuthority.PlayerId}");
+                }
+            }
             return;
         }
 
@@ -163,19 +186,15 @@ public class CharacterHealthComponent : NetworkBehaviour
 
         m_characterModel.SetActive(false);
 
-        if (GameLogicManager.Instance.NetworkedRespawnAllowed)
-        {
-            GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
+        GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
 
-            yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(3);
 
-            m_characterModel.SetActive(true);
-            NetworkedIsAlive = true;
-            Debug.Log("Finish respawn");
-            EnableSpectateMode(false);
-        }
-        StopRespawnCoroutine(changedBehaviour);
+        m_characterModel.SetActive(true);
+        NetworkedIsAlive = true;
+        Debug.Log("Finish respawn");
         EnableSpectateMode(false);
+        StopRespawnCoroutine(changedBehaviour);
     }
 
     private void StopRespawnCoroutine(CharacterHealthComponent changedBehaviour)
@@ -200,7 +219,7 @@ public class CharacterHealthComponent : NetworkBehaviour
             m_character.CharacterCamera.EnableCameraAndAudioListener(false);
 
             var playerToSpectate = GameLogicManager.Instance.GetSpectatePlayer(Mathf.RoundToInt(Random.Range(0, GameLogicManager.Instance.NetworkedPlayerDictionary.Count)), m_character.Player);
-            SceneCamera.Instance.SetSpectateCamTransform(playerToSpectate.NetworkedCharacter.CharacterCamera.transform, $"{playerToSpectate.Id}");
+            SceneCamera.Instance.SetSpectateCamTransform(playerToSpectate.NetworkedCharacter.CharacterCamera.transform, $"{playerToSpectate.Object.InputAuthority.PlayerId}");
         }
         else
         {

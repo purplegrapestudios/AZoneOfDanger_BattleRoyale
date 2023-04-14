@@ -125,6 +125,7 @@ public class StormBehavior : NetworkBehaviour
 
     private void DamagePlayersOutsideArea()
     {
+        if (GameLogicManager.Instance.NetworkedGameIsFinished) return;
         m_app.ForEachPlayer(ply =>
         {
             if (!m_playersInZone.ContainsKey(ply))

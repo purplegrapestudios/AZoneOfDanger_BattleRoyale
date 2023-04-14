@@ -2,13 +2,17 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System.Linq.Expressions;
+using System;
 
 public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 {
     public static GameLogicManager Instance;
     [Networked] public NetworkBool NetworkedGameIsRunning { get; set; }
+    [Networked] public NetworkBool NetworkedGameIsFinished { get; set; }
     [Networked] public int NetworkedGameStartTick { get; set; }
     [Networked] public NetworkBool NetworkedRespawnAllowed { get; set; }
+    [Networked] public Player NetworkedVictoryPlayer { get; set; }
     public int MinPlayersToStart => m_minPlayersToStart;
     [SerializeField] private int m_minPlayersToStart = 2;
 
@@ -17,11 +21,11 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     public Player PlayerCurrentlySpectating;
     [SerializeField] private Player m_playerCurrentlySpectating;
 
-    public int SpecCamCountDebug;
     [Networked, Capacity(200)] public NetworkDictionary<int, PlayerRef> NetworkedPlayerDictionary => default;
-    private App m_app;
+    public int kVictoryPlayerCount = 1;
     public bool Initialized => m_initialized;
     private bool m_initialized;
+    private App m_app;
 
     private void Awake()
     {
@@ -32,6 +36,8 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     {
         m_app = App.FindInstance();
         GameUIViewController.Instance.InitSpectatePlayerButtons(m_app);
+        GameUIViewController.Instance.InitVictoryScreen();
+
         m_initialized = true;
 
         if (!Runner.IsServer) return;
@@ -47,23 +53,29 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 
     void IPlayerJoined.PlayerJoined(PlayerRef plyRef)
     {
+        Debug.Log($"Player: {plyRef.PlayerId} joined the game");
+        if (!Runner.IsServer) return;
+
         if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) return;
 
         NetworkedPlayerDictionary.Add(plyRef.PlayerId, plyRef);
-        Debug.Log($"Player: {plyRef.PlayerId} joined the game");
     }
 
     void IPlayerLeft.PlayerLeft(PlayerRef plyRef)
     {
+        Debug.Log($"Player: {plyRef.PlayerId} left the game");
+        if (!Runner.IsServer) return;
+
         if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) return;
 
-        NetworkedPlayerDictionary.Remove(plyRef);
-        Debug.Log($"Player: {plyRef.PlayerId} left the game");
+        if (NetworkedPlayerDictionary.Count > kVictoryPlayerCount)
+        {
+            NetworkedPlayerDictionary.Remove(plyRef.PlayerId);
+        }
     }
 
     public void StartGameLogic()
     {
-        //if (m_app.Session.Info.PlayerCount - (m_app.IsServerMode() ? 0 : 0) < m_minPlayersToStart) return;
         if (!Runner.IsServer) return;
         if (NetworkedGameIsRunning) return;
 
@@ -76,38 +88,53 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
         if (!m_app.AllowInput) return;
         if (!NetworkedGameIsRunning) return;
         GameUIViewController.Instance.FixedUpdateMinimapTime(NetworkedGameStartTick);
+
+        if (!Runner.IsServer) return;
         NetworkedRespawnAllowed = !StormBehavior.Instance.IsStackingPhaseComplete();
 
-        SpecCamCountDebug = NetworkedPlayerDictionary.Count;
+        if (NetworkedRespawnAllowed) return;
+        if (NetworkedPlayerDictionary.Count > 0) return;
+        //Shut Down the game after X seconds./
     }
 
     public Player GetSpectatePlayer(int spectatePlayerIndex, Player localPlayer, int fetchAttempts = 0, bool fetchPrevIfLocalUser = false)
     {
-        m_spectatePlayerIndex = ClampSpectatePlayerIndex(spectatePlayerIndex);
+        if (NetworkedPlayerDictionary.Count == 0) return null;
 
-        m_playerCurrentlySpectating = Runner.GetPlayerObject(NetworkedPlayerDictionary.ElementAt(m_spectatePlayerIndex).Value).GetComponent<Player>();
+        m_spectatePlayerIndex = ClampSpectatePlayerIndex(spectatePlayerIndex);
+        Debug.Log($"Spectate index: {m_spectatePlayerIndex}");
+        m_playerCurrentlySpectating = Runner.GetPlayerObject(NetworkedPlayerDictionary.ElementAt(m_spectatePlayerIndex).Value)?.GetComponent<Player>() ?? null;
 
         if (fetchAttempts > 0) return m_playerCurrentlySpectating;
-        if (m_playerCurrentlySpectating == localPlayer) 
-            GetSpectatePlayer(fetchPrevIfLocalUser ? m_spectatePlayerIndex - 1 : m_spectatePlayerIndex + 1, localPlayer, fetchAttempts++);
+        if (m_playerCurrentlySpectating == localPlayer)
+        {
+            fetchAttempts++;
+            GetSpectatePlayer(fetchPrevIfLocalUser ? m_spectatePlayerIndex - 1 : m_spectatePlayerIndex + 1, localPlayer, fetchAttempts);
+        }
 
         return m_playerCurrentlySpectating;
     }
 
     public void GetSpectatePlayerNext(Player localPlayer)
     {
+        if (NetworkedPlayerDictionary.Count == 0) return;
+
         m_spectatePlayerIndex++;
         m_spectatePlayerIndex = ClampSpectatePlayerIndex(m_spectatePlayerIndex);
         var p = GetSpectatePlayer(m_spectatePlayerIndex, localPlayer);
-        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Id}");
+        if (p == null) return;
+        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Object.InputAuthority.PlayerId}");
     }
 
     public void GetSpectatePlayerPrev(Player localPlayer)
     {
+        if (NetworkedPlayerDictionary.Count == 0) return;
+
         m_spectatePlayerIndex--;
         m_spectatePlayerIndex = ClampSpectatePlayerIndex(m_spectatePlayerIndex);
         var p = GetSpectatePlayer(m_spectatePlayerIndex, localPlayer, fetchPrevIfLocalUser: true);
-        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Id}");
+        if (p == null) return;
+        SceneCamera.Instance.SetSpectateCamTransform(p.NetworkedCharacter.CharacterCamera.transform, $"Spectating player {p.Object.InputAuthority.PlayerId}");
     }
 
     private int ClampSpectatePlayerIndex(int spectateIndex)
