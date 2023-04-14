@@ -26,6 +26,6 @@ public class SpectateOptions : MonoBehaviour
 
     private void SetSpectatePlayerLabel(string s)
     {
-        m_spectateLabel.text = s;
+        m_spectateLabel.text = $"You are spectating PlayerID: {s}";
     }
 }

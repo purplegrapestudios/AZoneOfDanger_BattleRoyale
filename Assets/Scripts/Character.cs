@@ -100,7 +100,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		m_characterCameraDolly.Initialize(this);
 		m_characterMuzzleDolly.Initialize(this, m_characterCamera);
 		m_minimapWorldObj.Init(this);
-		_name.text = $"{Player.Object.InputAuthority.PlayerId}";
+		_name.text = $"PlayerID: {Player.Object.InputAuthority.PlayerId}";
 
 		if (HasInputAuthority && string.IsNullOrWhiteSpace(Player.Name.Value))
 		{
