@@ -4,6 +4,7 @@ using UnityEngine;
 using Fusion;
 using System.Linq.Expressions;
 using System;
+using System.Collections;
 
 public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 {
@@ -13,6 +14,7 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     [Networked] public int NetworkedGameStartTick { get; set; }
     [Networked] public NetworkBool NetworkedRespawnAllowed { get; set; }
     [Networked] public Player NetworkedVictoryPlayer { get; set; }
+    [Networked] public NetworkBool NetworkedForceStart { get; set; }
     public int MinPlayersToStart => m_minPlayersToStart;
     [SerializeField] private int m_minPlayersToStart = 2;
 
@@ -23,8 +25,10 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 
     [Networked, Capacity(200)] public NetworkDictionary<int, PlayerRef> NetworkedPlayerDictionary => default;
     public int kVictoryPlayerCount = 1;
+    public int kMinStartPlayerCount = 1;
     public bool Initialized => m_initialized;
     private bool m_initialized;
+    private IEnumerator m_returnToStagingSceneCO;
     private App m_app;
 
     private void Awake()
@@ -74,6 +78,11 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
         }
     }
 
+    public void ForceStartGame()
+    {
+        NetworkedForceStart = true;
+    }
+
     public void StartGameLogic()
     {
         if (!Runner.IsServer) return;
@@ -89,8 +98,14 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
         if (!NetworkedGameIsRunning) return;
         GameUIViewController.Instance.FixedUpdateMinimapTime(NetworkedGameStartTick);
 
-        if (!Runner.IsServer) return;
-        NetworkedRespawnAllowed = !StormBehavior.Instance.IsStackingPhaseComplete();
+
+        if (Runner.IsServer) NetworkedRespawnAllowed = !StormBehavior.Instance.IsStackingPhaseComplete();
+        if (NetworkedGameIsFinished)
+        {
+            if (m_returnToStagingSceneCO != null) return;
+            m_returnToStagingSceneCO = ReturnToStagingSceneCO();
+            StartCoroutine(m_returnToStagingSceneCO);
+        }
 
         if (NetworkedRespawnAllowed) return;
         if (NetworkedPlayerDictionary.Count > 0) return;
@@ -142,5 +157,18 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
         if (spectateIndex > NetworkedPlayerDictionary.Count - 1) spectateIndex = 0;
         if (spectateIndex < 0) spectateIndex = NetworkedPlayerDictionary.Count - 1;
         return spectateIndex;
+    }
+
+    private IEnumerator ReturnToStagingSceneCO()
+    {
+        yield return new WaitForSeconds(30);
+        m_app.Disconnect();
+    }
+
+    public bool NotRunningOrFinished()
+    {
+        if (!NetworkedGameIsRunning) return true;
+        if (NetworkedGameIsFinished) return true;
+        return false;
     }
 }

@@ -44,11 +44,32 @@ public class Map : SimulationBehaviour, ISpawned
 			GameUIViewController.Instance.SetGameStateLabel($"Battle Begins In {Mathf.CeilToInt(session.PostLoadCountDown.RemainingTime(Runner) ?? 0)}");
 		else
 		{
-			//GameUIViewController.Instance.DeactivateGameStateLabel();
-		//	GameUIViewController.Instance.SetGameStateLabel("Storm is commencing soon");
-		//	GameUIViewController.Instance.SetGameStateTimer(Mathf.FloorToInt(StormBehavior.Instance.StormTimer.RemainingTime(Runner) ?? 0).ToString());
-			GameLogicManager.Instance.StartGameLogic();
-			_app.AllowInput = true;
+			//To see if the idle state of the server app will be efficient enough to remain under the AWS server burst threshold.
+			//If wait 5 seconds and playercount > kminStartPlayerCount=10, start game
+			//otherwise keep scanning
+			if(_app.Session.Info.PlayerCount > GameLogicManager.Instance.kMinStartPlayerCount || GameLogicManager.Instance.NetworkedForceStart)
+            {
+				if (_app.Session.Runner.IsServer)
+				{
+					Time.fixedDeltaTime = 1 / 60;
+					_app.Session.Runner.Simulation.Config.ClientPacketInterval = 1;
+					_app.Session.Runner.Simulation.Config.ServerPacketInterval = 1;
+					GameLogicManager.Instance.StartGameLogic();
+				}
+				_app.AllowInput = true;
+			}
+
+			if (_app.Session.Runner.IsServer)
+			{
+				Time.fixedDeltaTime = 1 / 6;
+				_app.Session.Runner.Simulation.Config.ClientPacketInterval = 10;
+				_app.Session.Runner.Simulation.Config.ServerPacketInterval = 10;
+			}
+			//While starting game condition Not met & No Players other than server in game,
+			//Server will make TickRate = 3, FixedDeltaTime = 1/3, TargetFrameRate = 1/3
+			//else TickRate = 100, FixedDeltaTime = 1/60, TargetFrameRate = 144
+
+			//GameLogicManager.Instance.StartGameLogic();
 		}
 	}
 

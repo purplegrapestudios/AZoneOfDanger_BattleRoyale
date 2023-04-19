@@ -95,10 +95,6 @@ public class CharacterShootComponent : NetworkBehaviour
             {
                 SwitchWeapon(2);
             }
-            else
-            {
-                NetworkedSwitchWeapon = false;
-            }
 
             if (data.GetButton(ButtonFlag.AIM))
             {
@@ -124,6 +120,13 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedFire)
         {
+            //if (m_character.CharacterAnimation.AnimatorIsPlaying(2, "TP_AR_Fire_Blend")) return;
+            if (m_character.CharacterAnimation.AnimatorIsPlaying(2, "Reload")) return;
+            if (m_character.CharacterAnimation.AnimatorIsPlaying(2, "Switch_Weapon")) return;
+
+            if (NetworkedReload) return;
+            if (NetworkedSwitchWeapon) return;
+
             if (FireCoroutine != null) return;
             BeginFireCoroutine();
         }
@@ -207,13 +210,14 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedSwitchWeapon)
         {
+            yield return new WaitForSeconds(.5f);
             m_characterWeapons.SwitchWeapons(NetworkedWeaponID);
             NetworkedCurrWeaponID = NetworkedWeaponID;
             m_ammoCounterCallback(m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount, m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount, m_characterWeapons.Weapons[NetworkedWeaponID].clipSize);
             NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount > 0;
             m_crosshairCallback(this);
 
-            yield return new WaitForSeconds(.5f);
+            NetworkedSwitchWeapon = false;
         }
         StopCoroutine(SwitchWeaponCoroutine);
         SwitchWeaponCoroutine = null;
@@ -242,7 +246,7 @@ public class CharacterShootComponent : NetworkBehaviour
                 m_audioCallback(m_characterWeapons.Weapons[NetworkedWeaponID].shotgunCloseAudio);
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(2.46f);
             NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ReloadAmmo(Object.HasInputAuthority);
             NetworkedReload = false;
         }

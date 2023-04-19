@@ -138,6 +138,10 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		{
 			SwitchCursorMode(shouldUnlock: Cursor.lockState == CursorLockMode.Locked);
 		}
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+			GameLogicManager.Instance.ForceStartGame();
+		}
 	}
 
 	void IBeforeTick.BeforeTick()

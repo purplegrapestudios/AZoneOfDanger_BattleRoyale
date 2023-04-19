@@ -19,6 +19,8 @@ Shader "Custom/StormShader"
                 CGPROGRAM
                 #pragma vertex vert
                 #pragma fragment frag
+                #pragma multi_compile_fog
+                #pragma multi_compile LIGHTMAP_ON LIGHTMAP_OFF
                 #include "UnityCG.cginc"
 
                 struct appdata {

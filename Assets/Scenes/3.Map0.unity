@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.37462184, g: 0.094117664, b: 0.7254902, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.005
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -27,10 +27,10 @@ RenderSettings:
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 316195a4969999740b32f865c1a07549, type: 2}
-  m_HaloStrength: 0.5
+  m_HaloStrength: 0
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
-  m_HaloTexture: {fileID: 0}
+  m_HaloTexture: {fileID: 2800000, guid: 5864990952058c74ea7c00cc848ee7b7, type: 3}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 148920660}
-  m_IndirectSpecularColor: {r: 0.3225266, g: 0.7296111, b: 1.4101259, a: 1}
+  m_IndirectSpecularColor: {r: 0.37897384, g: 0.1512694, b: 1.6651723, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2235,7 +2235,7 @@ PrefabInstance:
     - target: {fileID: -6285604632834273127, guid: 9d600cec0368e724497d1db10a3c2cef, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a70e4f2311e556e49b5e72dae17b1023, type: 2}
+      objectReference: {fileID: 2100000, guid: bcba980505583ab4b8945d5273718e41, type: 2}
     - target: {fileID: -6281408320741563066, guid: 9d600cec0368e724497d1db10a3c2cef, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -22559,16 +22559,22 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _NetworkedGameIsRunning:
     _value: 0
+  _NetworkedGameIsFinished:
+    _value: 0
   _NetworkedGameStartTick: 0
   _NetworkedRespawnAllowed:
     _value: 0
   _NetworkedVictoryPlayer: {fileID: 0}
+  _NetworkedForceStart:
+    _value: 0
   _NetworkedPlayerDictionary:
     _items: []
   m_minPlayersToStart: 1
   m_spectatePlayerIndex: 0
   PlayerCurrentlySpectating: {fileID: 0}
   m_playerCurrentlySpectating: {fileID: 0}
+  kVictoryPlayerCount: 1
+  kMinStartPlayerCount: 1
 --- !u!4 &1127762131
 Transform:
   m_ObjectHideFlags: 0

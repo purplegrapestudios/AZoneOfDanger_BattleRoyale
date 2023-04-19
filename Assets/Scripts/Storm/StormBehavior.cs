@@ -101,6 +101,8 @@ public class StormBehavior : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (!m_app.AllowInput) return;
+        if (GameLogicManager.Instance.NotRunningOrFinished()) return;
+
         if (Runner.IsServer) ScanForPlayers(() => DamagePlayersOutsideArea());
 
         if (Runner.Tick == GameLogicManager.Instance.NetworkedGameStartTick)
