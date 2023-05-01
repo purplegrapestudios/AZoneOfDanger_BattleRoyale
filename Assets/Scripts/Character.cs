@@ -40,7 +40,10 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private Animator m_characterAnimator3rd;
 	public Animator CharacterAnimator1st => m_characterAnimator1st;
 	[SerializeField] private Animator m_characterAnimator1st;
-
+	public Hitbox CharactHitboxBody => m_characterHitboxBody;
+	[SerializeField] private Hitbox m_characterHitboxBody;
+	public CapsuleCollider CapsuleCollider => m_capsuleCollider;
+	[SerializeField] private CapsuleCollider m_capsuleCollider;
 	public MinimapWorldObject MinimapWorldObj => m_minimapWorldObj;
 	[SerializeField] private MinimapWorldObject m_minimapWorldObj;
 
@@ -64,6 +67,9 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	private Vector2 m_fixedAimDirDelta;
 	private Vector2 m_lastKnownAimDir;
 
+	private (Vector3 hitBoxExtents, Vector3 offset) m_hitboxSettingsCrouch = (new Vector3(1, 1.5f, 1), new Vector3(0, 0, 0));
+	private (Vector3 hitBoxExtents, Vector3 offset) m_hitboxSettingsUpright = (new Vector3(1, 2, 1), new Vector3(0, -0.4f, 0));
+
 
 	[Networked] public Player Player { get; set; }
 	[Networked] Vector2 m_aimDirectionDelta { get; set; }
@@ -79,7 +85,9 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		Cursor.visible = false;
 
 		SceneCamera.Instance.SetSceneCameraActive(false);
-		m_characterMoveComponent.InitCharacterMovement(m_characterHealth, (relativeDollyPos) => { m_characterCameraDolly.SetDollyDir(relativeDollyPos); });
+		m_characterMoveComponent.InitCharacterMovement(m_characterHealth, 
+			(relativeDollyPos) => { m_characterCameraDolly.SetDollyDir(relativeDollyPos); }, 
+			(value) => { SetHitboxCrouch(value); });
 		m_characterHealth.Initialize(this, m_characterModel);
 		m_characterAudio.Initialize(m_characterCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
@@ -106,6 +114,12 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 		{
 			//App.FindInstance().ShowPlayerSetup();
 		}
+	}
+
+	private void SetHitboxCrouch(bool crouch)
+	{
+		m_characterHitboxBody.BoxExtents = crouch ? m_hitboxSettingsCrouch.hitBoxExtents : m_hitboxSettingsUpright.hitBoxExtents;
+		m_characterHitboxBody.Offset = crouch ? m_hitboxSettingsCrouch.offset : m_hitboxSettingsUpright.offset;
 	}
 
 	public void LateUpdate()
@@ -234,4 +248,20 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
     {
 		return m_aimDirectionDelta;
 	}
+
+	public Vector3 GetAimDirection()
+	{
+		var rot = GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
+		return rot * Vector3.forward;
+	}
+
+	public Vector3 GetForward()
+    {
+		return GetComponent<NetworkRigidbody>().ReadRotation() * Vector3.forward;
+	}
+	public Vector3 GetUp()
+	{
+		return GetComponent<NetworkRigidbody>().ReadRotation() * Vector3.up;
+	}
+
 }

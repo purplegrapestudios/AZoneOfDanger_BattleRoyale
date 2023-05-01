@@ -408,11 +408,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2361759756019383055, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
       propertyPath: FootDistance
-      value: 1.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2361759756019383055, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
-      propertyPath: layerMask.m_Bits
-      value: 16
+      value: 3.37
       objectReference: {fileID: 0}
     - target: {fileID: 4610285444781331941, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
       propertyPath: m_RootOrder
@@ -464,11 +460,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4610285444781331943, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
-      value: 3333189652243722431
+      value: 9027462669697276479
       objectReference: {fileID: 0}
     - target: {fileID: 4610285444781331943, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
-      value: 7251146383957815486
+      value: -5471916166073176392
       objectReference: {fileID: 0}
     - target: {fileID: 4610285444781331945, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
       propertyPath: m_Name

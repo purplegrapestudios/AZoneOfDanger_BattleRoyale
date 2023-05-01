@@ -50,6 +50,7 @@ public class CharacterCameraDolly : NetworkBehaviour
         m_character = character;
         m_initailized = true;
         m_characterCam.Initialize(character);
+        maxDistance = 1 + (100 - m_characterCam.FieldOfView) / 100f;
 
     }
 
@@ -58,7 +59,6 @@ public class CharacterCameraDolly : NetworkBehaviour
         if (!m_initailized) return;
         if (!m_character.CharacterHealth.NetworkedIsAlive) return;
 
-        maxDistance = 1 + (100 - m_characterCam.FieldOfView) / 100f;
 
         if (!m_initailized) return;
         if (!m_character.PlayerInputEnabled()) return;

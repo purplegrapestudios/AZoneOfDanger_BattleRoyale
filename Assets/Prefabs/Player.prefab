@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  CharacterPrefab: {fileID: 4610285444781331942, guid: cc346e6293a1ef04683d451a07653dbc, type: 3}
+  CharacterPrefab: {fileID: 4610285444781331942, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
   _Name:
     _length: 0
     _data:
@@ -57,6 +57,7 @@ MonoBehaviour:
   _DoneLoading:
     _value: 0
   playerModel: {fileID: 0}
+  _NetworkedCharacter: {fileID: 0}
 --- !u!114 &7979975255234169264
 MonoBehaviour:
   m_ObjectHideFlags: 0

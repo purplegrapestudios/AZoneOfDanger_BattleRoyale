@@ -13,8 +13,8 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     [Networked] public int NetworkedGameStartTick { get; set; }
     [Networked] public NetworkBool NetworkedRespawnAllowed { get; set; }
     [Networked] public Player NetworkedVictoryPlayer { get; set; }
-    public int MinPlayersToStart => m_minPlayersToStart;
-    [SerializeField] private int m_minPlayersToStart = 2;
+    public int MinTeamsToStart => m_minTeamsToStart;
+    [SerializeField] private int m_minTeamsToStart;
 
     public int SpectatePlayerIndex => m_spectatePlayerIndex;
     [SerializeField] private int m_spectatePlayerIndex;
@@ -22,7 +22,7 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     [SerializeField] private Player m_playerCurrentlySpectating;
 
     [Networked, Capacity(200)] public NetworkDictionary<int, PlayerRef> NetworkedPlayerDictionary => default;
-    public int kVictoryPlayerCount = 1;
+    public int kVictoryTeamCount;
     public bool Initialized => m_initialized;
     private bool m_initialized;
     private App m_app;
@@ -68,7 +68,7 @@ public class GameLogicManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 
         if (NetworkedPlayerDictionary.Contains(new KeyValuePair<int, PlayerRef>(plyRef.PlayerId, plyRef))) return;
 
-        if (NetworkedPlayerDictionary.Count > kVictoryPlayerCount)
+        if (NetworkedPlayerDictionary.Count > kVictoryTeamCount)
         {
             NetworkedPlayerDictionary.Remove(plyRef.PlayerId);
         }
