@@ -7,6 +7,7 @@ public class Weapon
 {
     public int id;
     public GameObject weaponObj;
+    public float reloadTime;
     public int clipSize;
     public int maxAmmo;
     public int ammoCount;
@@ -27,6 +28,7 @@ public class Weapon
     {
         this.id = id;
         this.weaponObj = weaponObj;
+        reloadTime = 2.567f;
         this.clipSize = clipSize;
         this.maxAmmo = maxAmmo;
         this.ammoCount = ammoCount;
@@ -64,12 +66,19 @@ public class CharacterWeapons : MonoBehaviour
     [SerializeField] private GameObject m_AR_01;
     [SerializeField] private GameObject m_Shotgun_01;
     [SerializeField] private GameObject m_GL_01;
+
+    [SerializeField] private GameObject m_FKAR_01;
+    [SerializeField] private GameObject m_FKShotgun_01;
+    [SerializeField] private GameObject m_FKGL_01;
+
     public GameObject Weapon_0 => m_AR_01;
     public GameObject Weapon_1 => m_Shotgun_01;
     public GameObject Weapon_2 => m_GL_01;
 
-    private List<Weapon> m_weapons;
     public List<Weapon> Weapons => m_weapons;
+    private List<Weapon> m_weapons;
+    public List<GameObject> WeaponsFK => m_weaponsFK;
+    private List<GameObject> m_weaponsFK;
 
     private void Awake()
     {
@@ -78,6 +87,11 @@ public class CharacterWeapons : MonoBehaviour
             new Weapon(1, Weapon_1, clipSize: 4, maxAmmo: 500, ammoCount: 50, ammoInClipCount: 4, shotAudio: EAudioClip.FireShotgun, reloadAudio: EAudioClip.ReloadShotgun, reloadEmptyAudio: EAudioClip.None, shotgunOpenAudio: EAudioClip.ShotgunOpen, shotgunCloseAudio: EAudioClip.ShotgunClose),
             new Weapon(2, Weapon_2, clipSize: 10, maxAmmo: 100, ammoCount: 50, ammoInClipCount: 10, shotAudio: EAudioClip.FireShotgun, reloadAudio: EAudioClip.ReloadShotgun, reloadEmptyAudio: EAudioClip.None, shotgunOpenAudio: EAudioClip.ShotgunOpen, shotgunCloseAudio: EAudioClip.ShotgunClose)
         };
+
+        m_weaponsFK = new List<GameObject>
+        {
+            m_FKAR_01, m_FKShotgun_01, m_FKGL_01
+        };
     }
 
     public void SwitchWeapons(int switchToWeaponID)
@@ -85,6 +99,7 @@ public class CharacterWeapons : MonoBehaviour
         for (int i = 0; i < m_weapons.Count; i++)
         {
             m_weapons[i].weaponObj.SetActive(i == switchToWeaponID);
+            m_weaponsFK[i].SetActive(i == switchToWeaponID);
         }
     }
 }

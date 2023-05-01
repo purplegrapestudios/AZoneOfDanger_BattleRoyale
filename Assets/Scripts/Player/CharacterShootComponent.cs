@@ -10,9 +10,10 @@ public class CharacterShootComponent : NetworkBehaviour
     private CharacterHealthComponent m_characterHealth;
     private CharacterCamera m_characterCamera;
     private CharacterMuzzleComponent m_characterMuzzle;
-    private CharacterWeapons m_characterWeapons; 
+    private CharacterWeapons m_characterWeapons;
     private ParticleSystem m_muzzleFlash;
-    
+
+    private Weapon m_currentWeapon => m_characterWeapons.Weapons[NetworkedWeaponID];
     [SerializeField] private int m_fireRate = 10;
     [SerializeField] private bool m_isInitialized;
     
@@ -21,6 +22,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private System.Action<int, int, int> m_ammoCounterCallback;
     private System.Action<CharacterShootComponent> m_crosshairCallback;
     private System.Action<float> m_aimCallback;
+    private TickTimer m_reloadTimer;
 
     [Networked] public NetworkBool NetworkedHasAmmo { get; set; }
     [Networked] public NetworkBool NetworkedFire { get; set; }
@@ -94,10 +96,6 @@ public class CharacterShootComponent : NetworkBehaviour
             else if (data.GetButton(ButtonFlag.WEAPON_02))
             {
                 SwitchWeapon(2);
-            }
-            else
-            {
-                NetworkedSwitchWeapon = false;
             }
 
             if (data.GetButton(ButtonFlag.AIM))
@@ -184,20 +182,8 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void SwitchWeaponInput()
     {
-        if (NetworkedSwitchWeapon)
-        {
-            if (SwitchWeaponCoroutine != null) return;
-            BeginSwitchWeaponCoroutine();
-        }
-    }
-
-    private void BeginSwitchWeaponCoroutine()
-    {
-        if (SwitchWeaponCoroutine != null)
-        {
-            Debug.Log("Still Switching Weapon");
-            return;
-        }
+        if (!NetworkedSwitchWeapon) return;
+        if (SwitchWeaponCoroutine != null) return;
         SwitchWeaponCoroutine = SwitchWeaponCO();
         StartCoroutine(SwitchWeaponCoroutine);
     }
@@ -209,11 +195,12 @@ public class CharacterShootComponent : NetworkBehaviour
         {
             m_characterWeapons.SwitchWeapons(NetworkedWeaponID);
             NetworkedCurrWeaponID = NetworkedWeaponID;
-            m_ammoCounterCallback(m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount, m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount, m_characterWeapons.Weapons[NetworkedWeaponID].clipSize);
-            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ammoCount > 0;
+            m_ammoCounterCallback(m_currentWeapon.ammoInClipCount, m_currentWeapon.ammoCount, m_currentWeapon.clipSize);
+            NetworkedHasAmmo = m_currentWeapon.ammoCount > 0;
             m_crosshairCallback(this);
 
             yield return new WaitForSeconds(.5f);
+            NetworkedSwitchWeapon = false;
         }
         StopCoroutine(SwitchWeaponCoroutine);
         SwitchWeaponCoroutine = null;
@@ -221,11 +208,8 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void ReloadInput()
     {
-        if (ReloadCoroutine != null)
-        {
-            //Debug.Log("Still Reloading");
-            return;
-        }
+        if (!NetworkedReload) return;
+        if (ReloadCoroutine != null) return;
         ReloadCoroutine = ReloadCO();
         StartCoroutine(ReloadCoroutine);
     }
@@ -235,15 +219,17 @@ public class CharacterShootComponent : NetworkBehaviour
     {
         if (NetworkedReload)
         {
-            if(NetworkedWeaponID == 0) m_audioCallback(NetworkedHasAmmo ? m_characterWeapons.Weapons[NetworkedWeaponID].reloadAudio : m_characterWeapons.Weapons[NetworkedWeaponID].reloadEmptyAudio);
+            var timeOffset = 0f;
+            if (NetworkedWeaponID == 0) m_audioCallback(NetworkedHasAmmo ? m_currentWeapon.reloadAudio : m_currentWeapon.reloadEmptyAudio);
             if (NetworkedWeaponID == 1) {
-                m_audioCallback(m_characterWeapons.Weapons[NetworkedWeaponID].shotgunOpenAudio);
-                yield return new WaitForSeconds(0.2f);
-                m_audioCallback(m_characterWeapons.Weapons[NetworkedWeaponID].shotgunCloseAudio);
+                m_audioCallback(m_currentWeapon.shotgunOpenAudio);
+                timeOffset = 0.2f;
+                yield return new WaitForSeconds(timeOffset);
+                m_audioCallback(m_currentWeapon.shotgunCloseAudio);
             }
 
-            yield return new WaitForSeconds(0.5f);
-            NetworkedHasAmmo = m_characterWeapons.Weapons[NetworkedWeaponID].ReloadAmmo(Object.HasInputAuthority);
+            yield return new WaitForSeconds(m_currentWeapon.reloadTime - timeOffset);
+            NetworkedHasAmmo = m_currentWeapon.ReloadAmmo(Object.HasInputAuthority);
             NetworkedReload = false;
         }
         StopCoroutine(ReloadCoroutine);
@@ -252,7 +238,7 @@ public class CharacterShootComponent : NetworkBehaviour
 
     private void SpawnProjectile()
     {
-        var forwardDir = GetForwardDirection();
+        var forwardDir = m_character.GetAimDirection();
         var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
         var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
         
@@ -261,7 +247,8 @@ public class CharacterShootComponent : NetworkBehaviour
             hitTarget: HitTargets.Player,
             ownerRef: Object.InputAuthority,
             owner: m_character,
-            muzzlePos: m_character.CharacterMuzzleDolly.NetworkedRenderedShotPosition,
+            //muzzlePos: m_character.CharacterMuzzleDolly.NetworkedRenderedShotPosition,
+            muzzlePos: m_character.CharacterMuzzle.NetworkedMuzzlePosition,
             damageCallback: m_takeDamageCallback
             );
         
@@ -272,14 +259,14 @@ public class CharacterShootComponent : NetworkBehaviour
     private void FireHitScanWeapon()
     {
         if (!NetworkedFire) return;
-        if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
-        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
+        if (m_currentWeapon.ammoInClipCount <= 0) return; // Do Reload Stuff
+        m_currentWeapon.ConsumeAmmo(Object.HasInputAuthority, 1);
 
-        var forwardDir = GetForwardDirection();
+        var forwardDir = m_character.GetAimDirection();
         var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
 
         var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
-        Runner.LagCompensation.Raycast(origin: orig, direction: forwardDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
+        Runner.LagCompensation.Raycast(origin: orig, direction: forwardDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IgnoreInputAuthority | HitOptions.IncludePhysX);
         //Debug.DrawRay(orig, forwardDir * 100, Color.red, 0.1f);
 
         float hitDistance = 100;
@@ -312,10 +299,10 @@ public class CharacterShootComponent : NetworkBehaviour
     private void FireShotgunSpread()
     {
         if (!NetworkedFire) return;
-        if (m_characterWeapons.Weapons[NetworkedWeaponID].ammoInClipCount <= 0) return; // Do Reload Stuff
-        m_characterWeapons.Weapons[NetworkedWeaponID].ConsumeAmmo(Object.HasInputAuthority, 1);
+        if (m_currentWeapon.ammoInClipCount <= 0) return; // Do Reload Stuff
+        m_currentWeapon.ConsumeAmmo(Object.HasInputAuthority, 1);
 
-        var forwardDir = GetForwardDirection();
+        var forwardDir = m_character.GetAimDirection();
         var firePosCameraOffset = GetFirePosCameraOffset(1.5f);
 
         var orig = m_characterCamera.NetworkedPosition + forwardDir * firePosCameraOffset;
@@ -325,7 +312,7 @@ public class CharacterShootComponent : NetworkBehaviour
             float angleX = Random.Range(-180, 180) * Mathf.Deg2Rad;
             float angleZ = Random.Range(-180, 180) * Mathf.Deg2Rad;
             Vector3 spreadDir = Quaternion.Euler(0f, angleX, angleZ) * forwardDir;
-            Runner.LagCompensation.Raycast(origin: orig, direction: spreadDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IncludePhysX);
+            Runner.LagCompensation.Raycast(origin: orig, direction: spreadDir, 100, player: Object.InputAuthority, hit: out var hitInfo, layerMask: m_damagableLayerMask, HitOptions.IgnoreInputAuthority | HitOptions.IncludePhysX);
             Debug.DrawRay(orig, spreadDir * 100, Color.red, 0.1f);
 
             float hitDistance = 100;
@@ -368,9 +355,4 @@ public class CharacterShootComponent : NetworkBehaviour
 
     }
 
-    private Vector3 GetForwardDirection()
-    {
-        var rot = m_character.GetComponent<NetworkRigidbody>().ReadRotation() * Quaternion.AngleAxis(m_characterCamera.NetworkedRotationY, Vector3.left);
-        return rot * Vector3.forward;
-    }
 }

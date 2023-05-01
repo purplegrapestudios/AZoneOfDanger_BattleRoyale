@@ -56,6 +56,7 @@ public class CharacterMoveComponent : NetworkBehaviour
     private CharacterHealthComponent m_characterHealthComponent;
     private Character m_character;
     private System.Action<Vector3> m_crouchCameraCallback;
+    private System.Action<bool> m_crouchHitboxCallback;
     private bool m_initialized;
 
     [Networked] [SerializeField] public NetworkBool NetworkedFloorDetected { get; set; }
@@ -76,10 +77,11 @@ public class CharacterMoveComponent : NetworkBehaviour
         Rigidbody.inertiaTensorRotation = Quaternion.identity;
     }
 
-    public void InitCharacterMovement(CharacterHealthComponent characterHealthComponent, System.Action<Vector3> crouchCameraCallback)
+    public void InitCharacterMovement(CharacterHealthComponent characterHealthComponent, System.Action<Vector3> crouchCameraCallback, System.Action<bool> crouchHitboxCallback)
     {
         m_characterHealthComponent = characterHealthComponent;
         m_crouchCameraCallback = crouchCameraCallback;
+        m_crouchHitboxCallback = crouchHitboxCallback;
 
         m_character = GetComponent<Character>();
         Rigidbody = GetComponent<Rigidbody>();
@@ -285,10 +287,10 @@ public class CharacterMoveComponent : NetworkBehaviour
         m_moveData.V_TempRampJumpSpeed = m_moveData.P_JumpSpeed * 10;
         if (m_moveData.V_WishJump) { m_moveData.V_TempJumpSpeed *= 10; m_moveData.V_TempRampJumpSpeed *= 2; }
         m_moveData.V_Rays_Ground[0] = new Ray(Transform.position, -Transform.up);
-        m_moveData.V_Rays_Ground[1] = new Ray(Transform.position + Transform.forward, -Transform.up);
-        m_moveData.V_Rays_Ground[2] = new Ray(Transform.position - Transform.forward, -Transform.up);
-        m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.right, -Transform.up);
-        m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.right, -Transform.up);
+        //m_moveData.V_Rays_Ground[1] = new Ray(Transform.position + Transform.forward, -Transform.up);
+        //m_moveData.V_Rays_Ground[2] = new Ray(Transform.position - Transform.forward, -Transform.up);
+        //m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.right, -Transform.up);
+        //m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.right, -Transform.up);
         //DO NOT WANT NOT BEING ABLE TO JUMP UNEXPECTEDLY. MUST RAYCAST AT LEAST >= PLAYER HEIGHT=4
 
         //scan an additional height of (between 0 - 1 * PlayerHeight) depending on MaxAngle of traversable slope;
@@ -301,12 +303,12 @@ public class CharacterMoveComponent : NetworkBehaviour
                 if (slopeAngle < m_maxSlopeAngle)
                 {
                     m_moveData.V_Rays_Ground[0] = new Ray(Transform.position, -m_moveData.V_SlopeHit.normal);
-                    m_moveData.V_Rays_Ground[1] = new Ray(Transform.position + Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
-                    m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
-                    m_moveData.V_Rays_Ground[2] = new Ray(Transform.position - Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
-                    m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
-                    Debug.DrawRay(Transform.position, -m_moveData.V_SlopeHit.normal * 100, Color.blue);
-                    distance += Mathf.Sin(slopeAngle * Mathf.PI / 180) * transform.localScale.y;
+                    //m_moveData.V_Rays_Ground[1] = new Ray(Transform.position + Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
+                    //m_moveData.V_Rays_Ground[3] = new Ray(Transform.position + Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
+                    //m_moveData.V_Rays_Ground[2] = new Ray(Transform.position - Transform.forward + Transform.right, -m_moveData.V_SlopeHit.normal);
+                    //m_moveData.V_Rays_Ground[4] = new Ray(Transform.position - Transform.forward - Transform.right, -m_moveData.V_SlopeHit.normal);
+                    Debug.DrawRay(Transform.position, -m_moveData.V_SlopeHit.normal * m_maxSlopeRayDist, Color.blue);
+                    //distance += Mathf.Sin(slopeAngle * Mathf.PI / 180) * transform.localScale.y;
                     m_slopeRayDist = distance;
                     break;
                 }
@@ -369,7 +371,7 @@ public class CharacterMoveComponent : NetworkBehaviour
                     }
                     else
                     {
-                        if (!m_moveData.V_IsBouncePadWallDetected && m_slopeRayDist > 0)
+                        if (!m_moveData.V_IsBouncePadWallDetected)// && m_slopeRayDist > 0)
                         {
                             m_moveData.V_IsBoosted = false;
                             m_moveData.V_IsGrounded = true;
@@ -551,6 +553,7 @@ public class CharacterMoveComponent : NetworkBehaviour
             NetworkedIsCrouched = !NetworkedIsCrouched;
         }
         m_crouchCameraCallback(NetworkedIsCrouched ? new Vector3(1, 0, -2).normalized : new Vector3(1, 1, -2).normalized);
+        m_crouchHitboxCallback(NetworkedIsCrouched);
     }
 
     private void OnGroundMove()

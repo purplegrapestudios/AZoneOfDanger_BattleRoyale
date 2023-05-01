@@ -22559,16 +22559,19 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _NetworkedGameIsRunning:
     _value: 0
+  _NetworkedGameIsFinished:
+    _value: 0
   _NetworkedGameStartTick: 0
   _NetworkedRespawnAllowed:
     _value: 0
   _NetworkedVictoryPlayer: {fileID: 0}
   _NetworkedPlayerDictionary:
     _items: []
-  m_minPlayersToStart: 1
+  m_minTeamsToStart: 3
   m_spectatePlayerIndex: 0
   PlayerCurrentlySpectating: {fileID: 0}
   m_playerCurrentlySpectating: {fileID: 0}
+  kVictoryTeamCount: 2
 --- !u!4 &1127762131
 Transform:
   m_ObjectHideFlags: 0
@@ -26032,7 +26035,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _NetworkedStormPhase: 0
-  m_stackingTime: 60
+  m_stackingTime: 6000
 --- !u!64 &1341189085
 MeshCollider:
   m_ObjectHideFlags: 0

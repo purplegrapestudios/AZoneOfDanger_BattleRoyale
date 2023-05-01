@@ -70,15 +70,18 @@ public class CharacterHealthComponent : NetworkBehaviour
         if (!m_app.AllowInput) return;
 
         if (GameLogicManager.Instance.NetworkedRespawnAllowed) return;
-        if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryPlayerCount) return;
-        GameLogicManager.Instance.NetworkedGameIsFinished = GameLogicManager.Instance.NetworkedPlayerDictionary.Count <= 1;
+        if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryTeamCount) return;
+        //GameLogicManager.Instance.NetworkedGameIsFinished = GameLogicManager.Instance.NetworkedPlayerDictionary.Count <= GameLogicManager.Instance.kVictoryTeamCount;
 
-        GameLogicManager.Instance.NetworkedVictoryPlayer = Runner.GetPlayerObject(GameLogicManager.Instance.NetworkedPlayerDictionary.ElementAt(0).Value).GetComponent<Player>();
-        GameUIViewController.Instance.ShowVictoryScreen(
-            true,
-            GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId == m_character.Player.Object.InputAuthority.PlayerId,
-            GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId.ToString()
-            );
+        if (GameLogicManager.Instance.NetworkedGameIsFinished)
+        {
+            GameLogicManager.Instance.NetworkedVictoryPlayer = Runner.GetPlayerObject(GameLogicManager.Instance.NetworkedPlayerDictionary.ElementAt(0).Value).GetComponent<Player>();
+            GameUIViewController.Instance.ShowVictoryScreen(
+                true,
+                GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId == m_character.Player.Object.InputAuthority.PlayerId,
+                GameLogicManager.Instance.NetworkedVictoryPlayer.Object.InputAuthority.PlayerId.ToString()
+                );
+        }
 
         if (m_character.Player && m_character.Player.InputEnabled && GetInput(out InputData data))
         {
@@ -163,7 +166,7 @@ public class CharacterHealthComponent : NetworkBehaviour
         {
             if (!NetworkedIsAlive)
             {
-                if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryPlayerCount)
+                if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryTeamCount)
                 {
                     GameLogicManager.Instance.NetworkedPlayerDictionary.Remove(changedBehaviour.m_character.Player.Object.InputAuthority.PlayerId);
                     Debug.Log($"Removing Player: {changedBehaviour.m_character.Player.Object.InputAuthority.PlayerId}");
