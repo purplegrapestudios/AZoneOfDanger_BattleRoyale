@@ -31,10 +31,38 @@ public struct HandPosAimAngleData
 public class IKHumanoidTestControl : NetworkBehaviour
 {
     public Animator anim;
-    [Networked] public Vector3 NetworkedTargetFootLPos { get; set; }
-    [Networked] public Vector3 NetworkedTargetFootRPos { get; set; }
-    [Networked] public Quaternion NetworkedTargetFootLRot { get; set; }
-    [Networked] public Quaternion NetworkedTargetFootRRot { get; set; }
+    [Networked (OnChanged= nameof(OnTargetFootLPos))] public Vector3 NetworkedTargetFootLPos { get; set; }
+
+    static void OnTargetFootLPos(Changed<IKHumanoidTestControl> changed)
+    {
+        //if (!changed.Behaviour.HasInputAuthority)
+        //    changed.Behaviour.targetFootL.position = changed.Behaviour.NetworkedTargetFootLPos;
+    }
+
+    [Networked(OnChanged = nameof(OnTargetFootRPos))] public Vector3 NetworkedTargetFootRPos { get; set; }
+
+    static void OnTargetFootRPos(Changed<IKHumanoidTestControl> changed)
+    {
+        //if (!changed.Behaviour.HasInputAuthority)
+        //    changed.Behaviour.targetFootR.position = changed.Behaviour.NetworkedTargetFootRPos;
+    }
+
+    [Networked(OnChanged = nameof(OnTargetFootLRot))] public Quaternion NetworkedTargetFootLRot { get; set; }
+
+    static void OnTargetFootLRot(Changed<IKHumanoidTestControl> changed)
+    {
+        //if (!changed.Behaviour.HasInputAuthority)
+        //    changed.Behaviour.targetFootL.rotation = changed.Behaviour.NetworkedTargetFootLRot;
+    }
+
+    [Networked(OnChanged = nameof(OnTargetFootRRot))] public Quaternion NetworkedTargetFootRRot { get; set; }
+
+    static void OnTargetFootRRot(Changed<IKHumanoidTestControl> changed)
+    {
+        //if (!changed.Behaviour.HasInputAuthority)
+        //    changed.Behaviour.targetFootR.rotation = changed.Behaviour.NetworkedTargetFootRRot;
+    }
+
     public Transform targetFootL;
     public Transform targetFootR;
     public Transform targetHandL;
@@ -49,10 +77,10 @@ public class IKHumanoidTestControl : NetworkBehaviour
     public Transform Root;
     public Character m_character;
 
-    [Networked] public Vector3 NetworkedHitPointL { get; set; }
-    [Networked] public Vector3 NetworkedHitPointR { get; set; }
-    [Networked] public Vector3 NetworkedHitNormalL { get; set; }
-    [Networked] public Vector3 NetworkedHitNormalR { get; set; }
+    public Vector3 NetworkedHitPointL { get; set; }
+    public Vector3 NetworkedHitPointR { get; set; }
+    public Vector3 NetworkedHitNormalL { get; set; }
+    public Vector3 NetworkedHitNormalR { get; set; }
     public float FootDistance = 0.5f;
     public LayerMask layerMask;
     public float testAimAngle;
@@ -73,6 +101,14 @@ public class IKHumanoidTestControl : NetworkBehaviour
     public Quaternion targetOrigRotHandL = default;
     public Quaternion targetOrigRotHandR = default;
 
+    public Transform referenceTargetFootL;
+    public Transform referenceTargetFootR;
+    public Vector3 targetOrigPosFootL = default;
+    public Vector3 targetOrigPosFootR = default;
+    public Quaternion targetOrigRotFootL = default;
+    public Quaternion targetOrigRotFootR = default;
+
+
     [SerializeField] private float footTargetOffset;
     public float IKCurveFoot_L;
     public float IKCurveFoot_R;
@@ -82,9 +118,14 @@ public class IKHumanoidTestControl : NetworkBehaviour
         handsOrigRot = Quaternion.Euler(0, 0, 0);
         targetOrigPosHandL = targetHandL.localPosition;
         targetOrigPosHandR = targetHandR.localPosition;
-
         targetOrigRotHandL = targetHandL.localRotation;
         targetOrigRotHandR = targetHandR.localRotation;
+
+        targetOrigPosFootL = targetFootL.localPosition;
+        targetOrigPosFootR = targetFootR.localPosition;
+        targetOrigRotFootL = targetFootL.localRotation;
+        targetOrigRotFootR = targetFootR.localRotation;
+
         handsPosAimData = new List<HandPosAimAngleData>();
 
         //Upright Hand Aim Positions
@@ -220,29 +261,6 @@ public class IKHumanoidTestControl : NetworkBehaviour
         //IKCurveFoot_R = anim.GetFloat("IKCurveFoot_R");
 
 
-        rayL = new Ray(anim.GetIKPosition(AvatarIKGoal.LeftFoot) + Vector3.up, Vector3.down);
-        if (Physics.Raycast(rayL, out hitL, FootDistance, layerMask))
-        {
-            NetworkedHitPointL = hitL.point;
-            NetworkedHitNormalL = hitL.normal;
-            //SetIKValuesRaw(AvatarIKGoal.LeftFoot, hitL.point, Quaternion.LookRotation(Root.forward, hitL.normal));
-        }
-            NetworkedTargetFootLPos = NetworkedHitPointL + m_character.GetUp() * footTargetOffset;
-            targetFootL.position = NetworkedTargetFootLPos;
-            NetworkedTargetFootLRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalL), NetworkedHitNormalL);
-            targetFootL.rotation = NetworkedTargetFootLRot;
-
-        rayR = new Ray(anim.GetIKPosition(AvatarIKGoal.RightFoot) + Vector3.up, Vector3.down);
-        if (Physics.Raycast(rayR, out hitR, FootDistance, layerMask))
-        {
-            NetworkedHitPointR = hitR.point;
-            NetworkedHitNormalR = hitR.normal;
-            //SetIKValuesRaw(AvatarIKGoal.LeftFoot, hitL.point, Quaternion.LookRotation(Root.forward, hitL.normal));
-        }
-        NetworkedTargetFootRPos = NetworkedHitPointR + m_character.GetUp() * footTargetOffset;
-            targetFootR.position = NetworkedTargetFootRPos;
-            NetworkedTargetFootRRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalR), NetworkedHitNormalR);
-            targetFootR.rotation = NetworkedTargetFootRRot;
         SetIKValues(AvatarIKGoal.LeftFoot, targetFootL);
         SetIKValues(AvatarIKGoal.RightFoot, targetFootR);
         SetIKWeights(AvatarIKGoal.LeftFoot, IKCurveFoot_L, IKCurveFoot_L);
@@ -294,5 +312,38 @@ public class IKHumanoidTestControl : NetworkBehaviour
         {
             trHands.localPosition = handsPosAimData[(int)handPosEnum].Neutral;
         }
+
+        //return;
+        rayL = new Ray(referenceTargetFootL.position, Vector3.down);
+        if (Physics.Raycast(rayL, out hitL, FootDistance, layerMask))
+        {
+            var distY = hitL.point.y - referenceTargetFootL.position.y + footTargetOffset;
+            NetworkedHitPointL = hitL.point;
+            NetworkedHitNormalL = hitL.normal;
+            //SetIKValuesRaw(AvatarIKGoal.LeftFoot, hitL.point, Quaternion.LookRotation(Root.forward, hitL.normal));
+            NetworkedTargetFootLPos = referenceTargetFootL.localPosition + Vector3.up * distY;
+            NetworkedTargetFootLRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalL), NetworkedHitNormalL);
+            //targetFootL.localPosition = referenceTargetFootL.localPosition + Vector3.up * distY;
+            //targetFootL.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalL), NetworkedHitNormalL);
+            targetFootL.localPosition = NetworkedTargetFootLPos;
+            targetFootL.rotation = NetworkedTargetFootLRot;
+        }
+
+        rayR = new Ray(referenceTargetFootR.position, Vector3.down);
+        if (Physics.Raycast(rayR, out hitR, FootDistance, layerMask))
+        {
+            var distY = hitR.point.y - referenceTargetFootR.position.y + footTargetOffset;
+            NetworkedHitPointR = hitR.point;
+            NetworkedHitNormalR = hitR.normal;
+            //SetIKValuesRaw(AvatarIKGoal.LeftFoot, hitL.point, Quaternion.LookRotation(Root.forward, hitL.normal));
+            NetworkedTargetFootRPos = referenceTargetFootR.localPosition + Vector3.up * distY;
+            NetworkedTargetFootRRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalR), NetworkedHitNormalR);
+            //targetFootR.localPosition = referenceTargetFootR.localPosition + Vector3.up * distY;
+            //targetFootR.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(m_character.GetForward(), NetworkedHitNormalR), NetworkedHitNormalR);
+            targetFootR.localPosition = NetworkedTargetFootRPos;
+            targetFootR.rotation = NetworkedTargetFootRRot;
+        }
+
+
     }
 }
