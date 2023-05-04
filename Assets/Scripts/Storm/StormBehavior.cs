@@ -66,6 +66,8 @@ public class StormBehavior : NetworkBehaviour
     [Networked] public TickTimer StackingPhaseTimer { get; set; }
     [Networked] public int NetworkedStormPhase { get; set; }
     [SerializeField] private int m_stackingTime;
+
+    HitData m_hitData;
     private TickTimer m_stormDamageTickTimer;
     private float m_tickRate;
     private Dictionary<Player, Character> m_playersInZone;
@@ -75,6 +77,7 @@ public class StormBehavior : NetworkBehaviour
 
     private void Awake()
     {
+        m_hitData = new HitData();
         Instance = this;
     }
 
@@ -131,7 +134,17 @@ public class StormBehavior : NetworkBehaviour
             if (!m_playersInZone.ContainsKey(ply))
             {
                 //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
-                ply.NetworkedCharacter.CharacterHealth.OnTakeDamage(1, instigator: null);
+
+                m_hitData.Damage = 1;
+                m_hitData.IsFatal = (ply.NetworkedCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
+                m_hitData.Position = ply.NetworkedCharacter.NetworkRigidbody.ReadPosition();
+                m_hitData.Direction = Vector3.zero;
+                m_hitData.Normal = Vector3.zero;
+                m_hitData.Instigator = null;
+                m_hitData.IsHeadShot = false;
+                m_hitData.DamageType = EDamageType.Storm;
+
+                ply.NetworkedCharacter.CharacterHealth.OnTakeDamage(m_hitData);
             }
         });
     }

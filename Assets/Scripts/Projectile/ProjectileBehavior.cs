@@ -21,7 +21,8 @@ public class ProjectileBehavior : MonoBehaviour
     private Transform tr;
     private ProjectileData m_projectileData;
     private IEnumerator m_destroyBulletCoroutine;
-    private System.Action<float, CharacterHealthComponent> m_damageCallback;
+    private HitData m_hitData;
+    private System.Action<HitData> m_damageCallback;
     private App m_app;
     private NetworkRunner m_runner;
     private PlayerRef m_instigator;
@@ -52,6 +53,7 @@ public class ProjectileBehavior : MonoBehaviour
         if (tr == null) tr = GetComponent<Transform>();
         if (m_app == null) m_app = App.FindInstance();
         if (m_splashHits == null) m_splashHits = new List<LagCompensatedHit>();
+        m_hitData = new HitData();
     }
 
     public void OnFixedUpdateProjectile()
@@ -184,21 +186,34 @@ public class ProjectileBehavior : MonoBehaviour
                 if (splashHitRoot.GetComponent<Character>())
                 {
                     var splashHitCharacter = splashHitRoot.GetComponent<Character>();
-                    var splashHitMoveComp = splashHitCharacter.CharacterMove;
-                    var splashDir = (impactPos - splashHitCharacter.transform.position) * -1;
-                    var oldVel = splashHitMoveComp.m_moveData.V_PlayerVelocity;
-                    ref Vector3 refVelocity = ref splashHitMoveComp.m_moveData.V_PlayerVelocity;
-                    if (refVelocity.y < 0)
-                        refVelocity = new Vector3(refVelocity.x, 0, refVelocity.z);
-                    refVelocity += splashDir * 10f;
-
                     var sqrMagnitudeDist = Vector3.SqrMagnitude(impactPos - splashHitCharacter.transform.position);
                     var radiusSquare = 10f * 10;
                     var maxDamage = 100f * (splashHitCharacter.Object.InputAuthority == m_instigator ? (1f - m_InstigatorImmunityFactor) : 1f);
                     var splashDamage = Mathf.Max(0f, ((radiusSquare - sqrMagnitudeDist) / radiusSquare) * maxDamage);
+
+                    m_hitData.Damage = splashDamage;
+                    m_hitData.IsFatal = (splashHitCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
+                    m_hitData.Position = splashHit.Point;
+                    m_hitData.Direction = (impactPos - splashHitCharacter.transform.position) * -1;
+                    m_hitData.Normal = splashHit.Normal;
+                    m_hitData.Instigator = m_owner.CharacterHealth;
+                    m_hitData.IsHeadShot = false;
+                    m_hitData.DamageType = EDamageType.Projectile;
+
+                    if (!m_hitData.IsFatal)
+                    {
+                        var splashHitMoveComp = splashHitCharacter.CharacterMove;
+                        var splashDir = (impactPos - splashHitCharacter.transform.position) * -1;
+                        var oldVel = splashHitMoveComp.m_moveData.V_PlayerVelocity;
+                        ref Vector3 refVelocity = ref splashHitMoveComp.m_moveData.V_PlayerVelocity;
+                        if (refVelocity.y < 0)
+                            refVelocity = new Vector3(refVelocity.x, 0, refVelocity.z);
+                        refVelocity += splashDir * 10f;
+                    }
                     //Debug.Log($"We Hit {splashHitCharacter} with Dmg: {splashDamage}. sqrDist {sqrMagnitudeDist}");
+
                     m_damageCallback = splashHitCharacter.CharacterHealth.OnTakeDamage;
-                    m_damageCallback(splashDamage, m_owner.CharacterHealth);   //callback(float dmg, CharacterHealth Instigator)
+                    m_damageCallback(m_hitData);   //callback(float dmg, CharacterHealth Instigator)
                 }
             }
         }

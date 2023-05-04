@@ -84,7 +84,7 @@ public class ObjectPoolManager : SimulationBehaviour
         return list;
     }
 
-    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character owner, Vector3 muzzlePos, System.Action<float, CharacterHealthComponent> damageCallback)
+    public void SpawnProjectile(Vector3 startPos, Vector3 endPos, HitTargets hitTarget, PlayerRef ownerRef, Character owner, Vector3 muzzlePos, System.Action<HitData> damageCallback)
     {
         if (ProjectilePrefab != null)
         {
