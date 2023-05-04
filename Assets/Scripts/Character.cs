@@ -14,6 +14,8 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 {
 	private App _app;
 	[SerializeField] private CharacterComponents m_components;
+	public NetworkRigidbody NetworkRigidbody => m_networkRigidbody;
+	[SerializeField] private NetworkRigidbody m_networkRigidbody;
 	public CharacterMoveComponent CharacterMove => m_characterMoveComponent;
 	[SerializeField] private CharacterMoveComponent m_characterMoveComponent;
 	public CharacterHealthComponent CharacterHealth => m_characterHealth;
@@ -44,6 +46,14 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 	[SerializeField] private Hitbox m_characterHitboxBody;
 	public CapsuleCollider CapsuleCollider => m_capsuleCollider;
 	[SerializeField] private CapsuleCollider m_capsuleCollider;
+	public CharacterRagdollComponent CharacterRagdoll => m_characterRagdoll;
+	[SerializeField] private CharacterRagdollComponent m_characterRagdoll;
+	public GameObject MainModel => m_mainModel;
+	[SerializeField] private GameObject m_mainModel;
+	public GameObject RagDollModel => m_ragDollModel;
+	[SerializeField] private GameObject m_ragDollModel;
+	public SkinnedMeshRenderer SkinnedMesh => m_skinnedMesh;
+	[SerializeField] private SkinnedMeshRenderer m_skinnedMesh;
 	public MinimapWorldObject MinimapWorldObj => m_minimapWorldObj;
 	[SerializeField] private MinimapWorldObject m_minimapWorldObj;
 
@@ -89,6 +99,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 			(relativeDollyPos) => { m_characterCameraDolly.SetDollyDir(relativeDollyPos); }, 
 			(value) => { SetHitboxCrouch(value); });
 		m_characterHealth.Initialize(this, m_characterModel);
+		m_characterRagdoll.Init(this);
 		m_characterAudio.Initialize(m_characterCamera.GetComponent<AudioSource>());
 		m_characterShoot.Initialize(
 			character: this,
@@ -97,7 +108,7 @@ public class Character : NetworkBehaviour, IBeforeTick, IBeforeUpdate
 			characterWeapons: m_characterWeapons,
 			characterMuzzle: m_characterMuzzle,
 			muzzleFlash: m_muzzleFlash,
-			damageCallback: (damage, instigator) => { m_characterHealth.OnTakeDamage(damage, instigator); },
+			damageCallback: (hitData) => { m_characterHealth.OnTakeDamage(hitData); },
 			audioCallback: (audioClipKey) => { m_characterAudio.OnPlayClip(audioClipKey); },
 			ammoCounterCallback: (ammoRemaining, maxAmmoRemaining, clipSize) => { GameUIViewController.Instance.SetAmmoInfo(Object.HasInputAuthority, ammoRemaining, maxAmmoRemaining, clipSize); },
 			crosshairCallback: (m_characterShoot) => { GameUIViewController.Instance.GetCrosshair().SetWeaponCrosshair(m_characterShoot); },

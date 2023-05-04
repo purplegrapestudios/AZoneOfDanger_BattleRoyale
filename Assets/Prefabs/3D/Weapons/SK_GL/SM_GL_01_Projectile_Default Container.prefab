@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a095e627b1e564da1890284ffbb065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_InstigatorImmunityFactor: 0.95
+  m_InstigatorImmunityFactor: 0.05
   m_startSpeed: 200
   m_projectileLength: 1
   m_lifeSpan: 5

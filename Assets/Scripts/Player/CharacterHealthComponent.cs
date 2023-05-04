@@ -4,6 +4,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct HitData
+{
+    public float Damage;
+    public bool IsFatal;
+    public Vector3 Position;
+    public Vector3 Direction;
+    public Vector3 Normal;
+    public CharacterHealthComponent Instigator;
+    public bool IsHeadShot;
+    public EDamageType DamageType;
+
+}
+
+public enum EDamageType
+{
+    None,
+    AR,
+    ShotGun,
+    Projectile,
+    Storm,
+}
+
 public class CharacterHealthComponent : NetworkBehaviour
 {
 
@@ -18,6 +40,7 @@ public class CharacterHealthComponent : NetworkBehaviour
     private Character m_character;
     private GameObject m_characterModel;
     private CharacterHealthComponent m_instigator;
+    private System.Action<HitData> m_fatalHitCallback;
     private bool isInitialized;
     private App m_app;
 
@@ -41,26 +64,44 @@ public class CharacterHealthComponent : NetworkBehaviour
         isInitialized = true;
     }
 
-    public void OnTakeDamage(float damage, CharacterHealthComponent instigator)
+    public void SubscribeFatalHitCallback(System.Action<HitData> action)
+    {
+        m_fatalHitCallback += action;
+    }
+    public void UnsubscribeFatalHitCallback(System.Action<HitData> action)
+    {
+        m_fatalHitCallback -= action;
+    }
+
+
+    public void OnTakeDamage(HitData hitData)
     {
         if (!isInitialized) return;
         if (!NetworkedIsAlive) return;
         if (GameLogicManager.Instance.NetworkedGameIsFinished) return;
         //        Debug.Log($"{m_character.Player.Name} took {damage} damage");
-        m_instigator = instigator;
-        NetworkedHealth -= damage;
+        m_instigator = hitData.Instigator;
+        NetworkedHealth -= hitData.Damage;
 
-        if (NetworkedHealth <= 0)
+        //To pout hitData into params.
+        if (hitData.IsFatal == true)
         {
+            //This fatal hit callback will affect Ragdoll physics
+            m_fatalHitCallback(hitData);
+
             Debug.Log($"{m_character.Object.InputAuthority.PlayerId} Died");
             NetworkedIsAlive = false;
             NetworkedRespawn = true;
             NetworkedDeaths += 1;
 
-            if (instigator != null)
+            if (hitData.Instigator != null)
             {
-                instigator.UpdateKillCount();
+                hitData.Instigator.UpdateKillCount();
             }
+        }
+
+        if (NetworkedHealth <= 0)
+        {
         }
     }
 
@@ -191,7 +232,7 @@ public class CharacterHealthComponent : NetworkBehaviour
 
         GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
 
-        yield return new WaitForSeconds(3);
+        //yield return new WaitForSeconds(3);
 
         m_characterModel.SetActive(true);
         NetworkedIsAlive = true;

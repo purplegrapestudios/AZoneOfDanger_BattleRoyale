@@ -16,8 +16,9 @@ public class CharacterShootComponent : NetworkBehaviour
     private Weapon m_currentWeapon => m_characterWeapons.Weapons[NetworkedWeaponID];
     [SerializeField] private int m_fireRate = 10;
     [SerializeField] private bool m_isInitialized;
-    
-    private System.Action<float, CharacterHealthComponent> m_takeDamageCallback;
+
+    private HitData m_hitData;    
+    private System.Action<HitData> m_takeDamageCallback;
     private System.Action<EAudioClip> m_audioCallback;
     private System.Action<int, int, int> m_ammoCounterCallback;
     private System.Action<CharacterShootComponent> m_crosshairCallback;
@@ -34,7 +35,7 @@ public class CharacterShootComponent : NetworkBehaviour
     private InputData m_inputData;
     private App m_app;
 
-    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<float, CharacterHealthComponent> damageCallback, System.Action<EAudioClip> audioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback, System.Action<float> aimCallback)
+    public void Initialize(Character character, CharacterHealthComponent characterHealth, CharacterCamera characterCamera, CharacterWeapons characterWeapons, CharacterMuzzleComponent characterMuzzle, ParticleSystem muzzleFlash, System.Action<HitData> damageCallback, System.Action<EAudioClip> audioCallback, System.Action<int, int, int> ammoCounterCallback, System.Action<CharacterShootComponent> crosshairCallback, System.Action<float> aimCallback)
     {
         m_app = App.FindInstance();
         m_character = character;
@@ -52,6 +53,7 @@ public class CharacterShootComponent : NetworkBehaviour
         NetworkedWeaponID = 0;
         NetworkedCurrWeaponID = 0;
 
+        m_hitData = new HitData();
         m_takeDamageCallback = damageCallback;
         m_audioCallback = audioCallback;
         m_ammoCounterCallback = ammoCounterCallback;
@@ -275,14 +277,23 @@ public class CharacterShootComponent : NetworkBehaviour
         
         if (hitInfo.Hitbox != null)
         {
-            if (hitInfo.Hitbox.Root.GetComponent<Character>().Object.Id != m_character.Object.Id)
+            var hitCharacter = hitInfo.Hitbox.Root.GetComponent<Character>();
+            if (hitCharacter.Object.Id != m_character.Object.Id)
             {
                 //Debug.Log($"We hit a HitBox Object: {hitInfo.Hitbox.transform.root.name}, Pos: {hitInfo.Point}");
                 ObjectPoolManager.Instance.SpawnImpact(hitInfo.Point, hitInfo.Normal, HitTargets.Player);
-
                 if (HasStateAuthority)
                 {
-                    hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(hitInfo.Hitbox.HitboxIndex == 0 ? 25 : 50, m_character.CharacterHealth);
+                    m_hitData.Damage = hitInfo.Hitbox.HitboxIndex == 0 ? 25 : 50;
+                    m_hitData.IsFatal = (hitCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
+                    m_hitData.Position = hitInfo.Point;
+                    m_hitData.Direction = forwardDir;
+                    m_hitData.Normal = hitInfo.Normal;
+                    m_hitData.Instigator = m_character.CharacterHealth;
+                    m_hitData.IsHeadShot = hitInfo.Hitbox.HitboxIndex == 0 ? false : true;
+                    m_hitData.DamageType = EDamageType.Projectile;
+
+                    hitCharacter.CharacterShoot.m_takeDamageCallback(m_hitData);
                 }
             }
         }
@@ -321,7 +332,8 @@ public class CharacterShootComponent : NetworkBehaviour
 
             if (hitInfo.Hitbox != null)
             {
-                if (hitInfo.Hitbox.Root.GetComponent<Character>().Object.Id != m_character.Object.Id)
+                var hitCharacter = hitInfo.Hitbox.Root.GetComponent<Character>();
+                if (hitCharacter.Object.Id != m_character.Object.Id)
                 {
 
                     //Debug.Log($"We hit a HitBox Object: {hitInfo.Hitbox.transform.root.name}, Pos: {hitInfo.Point}");
@@ -329,11 +341,17 @@ public class CharacterShootComponent : NetworkBehaviour
 
                     if (HasStateAuthority)
                     {
+                        m_hitData.Damage = hitInfo.Hitbox.HitboxIndex == 0 ? 25 : 50;
+                        m_hitData.IsFatal = (hitCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
+                        m_hitData.Position = hitInfo.Point;
+                        m_hitData.Direction = forwardDir;
+                        m_hitData.Normal = hitInfo.Normal;
+                        m_hitData.Instigator = m_character.CharacterHealth;
+                        m_hitData.IsHeadShot = hitInfo.Hitbox.HitboxIndex == 0 ? false : true;
+                        m_hitData.DamageType = EDamageType.Projectile;
+
                         Debug.Log($"{m_character.Player.Name} took {5} damage");
-                        if (hitInfo.Hitbox.HitboxIndex == 0)
-                            hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(5, GetComponent<CharacterHealthComponent>());
-                        else
-                            hitInfo.Hitbox.Root.GetComponent<CharacterShootComponent>().m_takeDamageCallback(15, GetComponent<CharacterHealthComponent>());
+                        hitCharacter.CharacterShoot.m_takeDamageCallback(m_hitData);
                     }
                 }
             }
