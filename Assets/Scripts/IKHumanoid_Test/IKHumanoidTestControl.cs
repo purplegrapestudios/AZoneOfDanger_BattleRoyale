@@ -112,6 +112,8 @@ public class IKHumanoidTestControl : NetworkBehaviour
     [SerializeField] private float footTargetOffset;
     public float IKCurveFoot_L;
     public float IKCurveFoot_R;
+
+    public Transform m_aimTargetTr;
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -269,16 +271,12 @@ public class IKHumanoidTestControl : NetworkBehaviour
 
     Ray rayL, rayR;
     RaycastHit hitL, hitR;
-    public float ikFootL;
-    public float ikFootR;
-    Vector3 leftUp;
-    Vector3 rightUp;
-
-    Ray rayView;
-    RaycastHit hitView;
 
     public override void Render()
     {
+        if (!anim) return;
+
+        m_aimTargetTr.position = m_character.CharacterCamera.NetworkedPosition + m_character.GetAimDirection() * 100;
 
         if (testSpeed > 0 || testJump == 1)
         {
