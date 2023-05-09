@@ -23,8 +23,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231899912145663997}
-  m_LocalRotation: {x: -0.47768426, y: -0.43010902, z: -0.51258373, w: 0.5692819}
-  m_LocalPosition: {x: 0.02546102, y: -0.006090879, z: 0.022448892}
+  m_LocalRotation: {x: -0.47768432, y: -0.430109, z: -0.51258373, w: 0.5692819}
+  m_LocalPosition: {x: 0.025461022, y: -0.0060908785, z: 0.02244889}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 3025717629814610138}
   - {fileID: 3144413008919518025}
   - {fileID: 4607646523947540290}
-  m_Father: {fileID: 1582570582190723088}
+  m_Father: {fileID: 9081399074877308622}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -108.534, y: 177.67, z: -269.797}
 --- !u!1 &542054619012127791
@@ -97,6 +97,40 @@ MonoBehaviour:
   RayCastLineCastLayers:
     serializedVersion: 2
     m_Bits: 51
+--- !u!1 &583081266830268966
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9081399074877308622}
+  m_Layer: 3
+  m_Name: AimPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9081399074877308622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583081266830268966}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7441058455309182641}
+  - {fileID: 7983366323030410585}
+  - {fileID: 448737894817356151}
+  m_Father: {fileID: 1582570582190723088}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
 --- !u!1 &631245802550711937
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,12 +370,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1314222452790283956}
-  m_LocalRotation: {x: -0.43784836, y: -0.13280025, z: -0.37541714, w: 0.8060489}
-  m_LocalPosition: {x: -1.1921966, y: -0.094141714, z: 0.37139145}
+  m_LocalRotation: {x: -0.4378484, y: -0.1328002, z: -0.37541717, w: 0.8060489}
+  m_LocalPosition: {x: -1.1921964, y: -0.094141655, z: 0.3713916}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1582570582190723088}
+  m_Father: {fileID: 9081399074877308622}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1385155762492515113
@@ -493,12 +527,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3356350565101362091}
-  m_LocalRotation: {x: 0.02467772, y: 0.09841025, z: -0.7002253, w: 0.706676}
+  m_LocalRotation: {x: 0.02467768, y: 0.09841026, z: -0.7002253, w: 0.70667607}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1582570582190723088}
+  m_Father: {fileID: 9081399074877308622}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &3596244000428314296
@@ -1332,9 +1366,7 @@ Transform:
   m_LocalScale: {x: 2.750001, y: 2.75, z: 2.7499995}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7441058455309182641}
-  - {fileID: 7983366323030410585}
-  - {fileID: 448737894817356151}
+  - {fileID: 9081399074877308622}
   m_Father: {fileID: 4301537944805695971}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4459,6 +4491,9 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 1
+  m_damagableLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
   testAimAngle: 0
   testCrouch: 0
   testJump: 0
@@ -4483,8 +4518,7 @@ MonoBehaviour:
   footTargetOffset: 0.39
   IKCurveFoot_L: 0
   IKCurveFoot_R: 0
-  ikFootL: 0
-  ikFootR: 0
+  m_aimTargetTr: {fileID: 4190689053945805950}
 --- !u!114 &6473469719853223804
 MonoBehaviour:
   m_ObjectHideFlags: 0
