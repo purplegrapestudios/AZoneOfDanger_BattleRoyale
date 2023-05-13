@@ -66,6 +66,8 @@ public class App : MonoBehaviour, INetworkRunnerCallbacks
 	public bool ResetCachedInput { get { return m_resetCachedInput; } set { m_resetCachedInput = value; }}
 	private bool m_resetCachedInput;
 
+	public int CharacterSelectionIndex = -1;
+
 	public static App FindInstance()
 	{
 		return FindObjectOfType<App>();

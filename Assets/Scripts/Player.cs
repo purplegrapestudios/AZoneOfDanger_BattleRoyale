@@ -1,4 +1,5 @@
 using Fusion;
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -10,36 +11,71 @@ using UnityEngine;
 [OrderBefore(typeof(Character))]
 public class Player : NetworkBehaviour
 {
+	[SerializeField] public Character[] m_characterPrefabs;
 	[SerializeField] public Character CharacterPrefab;
 
 	[Networked] public NetworkString<_32> Name { get; set; }
 	[Networked] public Color Color { get; set; }
 	[Networked] public NetworkBool Ready { get; set; }
 	[Networked] public NetworkBool DoneLoading { get; set; }
+	[Networked] public int NetworkedCharacterIndex { get; set; }
 
 	public bool InputEnabled => _app?.AllowInput ?? false;
 
-	[SerializeField] Transform playerModel;
 	[Networked] public Character NetworkedCharacter { get; set; }
 	private App _app;
+	public App app => _app;
+	private bool initPlayerSelection;
 
-	public override void Spawned()
+    public override void Spawned()
 	{
 		_app = App.FindInstance();
+		
+		if(this.Id == _app.GetPlayer().Id)
+        {
+			if (!_app.IsServerMode())
+				RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
+		}
+
 		// Make sure we go down with the runner and that we're not destroyed onload unless the runner is!
 		transform.SetParent(Runner.gameObject.transform);
 	}
 
+	public void SetPlayerPrefab(int characterIndex)
+    {
+		Debug.Log($"Character List Length: {m_characterPrefabs.Length}, looking for index: {characterIndex}");
+		if (characterIndex > m_characterPrefabs.Length - 1 || characterIndex < 0) return;
+		CharacterPrefab = m_characterPrefabs[characterIndex];
+	}
+
 	public override void FixedUpdateNetwork()
 	{
-		if (HasStateAuthority && NetworkedCharacter == null && _app!=null && _app.Session!=null && _app.Session.Map)
+		if (_app == null) return;
+
+		_app.ForEachPlayer(ply =>
 		{
-			Debug.Log($"Spawning avatar for player {Name} with input auth {Object.InputAuthority}");
+			if (ply.Id == _app.GetPlayer().Id && _app.GetPlayer().Runner != ply)
+			{
+				if (!_app.IsServerMode())
+				{
+					if (!initPlayerSelection)
+					{
+						ply.RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
+						initPlayerSelection = true;
+					}
+				}
+			}
+		});
+
+		if (CharacterPrefab != null && HasStateAuthority && NetworkedCharacter == null && _app!=null && _app.Session!=null && _app.Session.Map)
+		{
+			Debug.Log($"Creating Player {Name}, with InputAuthority ?= {Object.InputAuthority}");
 			Transform t = _app.Session.Map.GetSpawnPoint(Object.InputAuthority);
+
+
 			var c = Runner.Spawn(CharacterPrefab, t.position, t.rotation, Object.InputAuthority, (runner, o) =>
 			{
 				NetworkedCharacter = o.GetComponent<Character>();
-				Debug.Log($"Created Character for Player {Name} @ {t.position} & character pos = {NetworkedCharacter.transform.position}");
 				NetworkedCharacter.Player = this;
 			});
 		}
@@ -76,13 +112,12 @@ public class Player : NetworkBehaviour
 		Color = color;
 	}
 
-	private float ClampAngle(float angle, float min, float max)
+	[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+	public void RPC_SetCharacterIndex(int characterIndex)
 	{
-		if (angle > -360f)
-			angle += 360f;
-		if (angle < 360f)
-			angle -= 360f;
-		return Mathf.Clamp(angle, min, max);
+		NetworkedCharacterIndex = characterIndex;
+		SetPlayerPrefab(NetworkedCharacterIndex);
+		Debug.Log($"Character Spawn should be: {m_characterPrefabs[NetworkedCharacterIndex].name}. InputSelection: {_app.CharacterSelectionIndex}, Result: {NetworkedCharacterIndex}");
 	}
 
 }

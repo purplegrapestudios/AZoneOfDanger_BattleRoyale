@@ -22,7 +22,7 @@ public class Session : NetworkBehaviour
 	{
 		_app = App.FindInstance();
 		_app.Session = this;
-		
+
 		if (Object.HasStateAuthority && (Runner.CurrentScene == 0 || Runner.CurrentScene == SceneRef.None))
 		{
 			PostLoadCountDown = TickTimer.None;
@@ -31,10 +31,41 @@ public class Session : NetworkBehaviour
 				LoadMap(_app.AutoSession.StartMap);
 			else
 				Runner.SetActiveScene((int)MapIndex.Staging);
-		}
+        }
 	}
 
-	[Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+//    private void Update()
+//    {
+//		switch ((MapIndex)(int)Runner.CurrentScene)
+//		{
+//			case MapIndex.Map0:
+//
+//				_app.ForEachPlayer(ply =>
+//				{
+//					if (ply.Id == _app.GetPlayer().Id)
+//					{
+//						if (!_app.IsServerMode())
+//						{
+//							if (!ply.NetworkedHasChosenCharacter)
+//							{
+//								ply.RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
+//								ply.RPC_SetHasChosenCharacter(true);
+//							}
+//							else
+//							{
+//								//if (ply.NetworkedCharacterIndex > 0 && ply.NetworkedCharacterIndex < 2)
+//							}
+//						}
+//					}
+//				});
+//
+//				break;
+//			default:
+//				break;
+//		}
+//    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
 	public RpcInvokeInfo RPC_FinishedLoading(PlayerRef playerRef)
 	{
 		Debug.Log($"RPC finished loading!");

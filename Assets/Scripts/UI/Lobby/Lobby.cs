@@ -40,7 +40,6 @@ namespace GameUI.Lobby
 			int count = 0;
 			int ready = 0;
 			_playerGrid.BeginUpdate();
-
 			_app.ForEachPlayer(ply =>
 			{
 				_playerGrid.AddRow(_playerListItemPrefab, item => item.Setup(ply));
@@ -74,8 +73,8 @@ namespace GameUI.Lobby
             }
             else
             {
-				Debug.Log($"Waiting for players to join server");
 				wait = "Waiting for players to join server";
+				Debug.Log(wait);
 			}
 			_startButton.enabled = wait==null;
 			_startLabel.text = wait ?? "Start";

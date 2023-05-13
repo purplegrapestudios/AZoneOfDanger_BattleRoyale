@@ -133,18 +133,20 @@ public class StormBehavior : NetworkBehaviour
         {
             if (!m_playersInZone.ContainsKey(ply))
             {
-                //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
+                if (ply.NetworkedCharacter != null)
+                {
+                    //Debug.Log($"Storm Damaged player: {ply.Character.Id}");
+                    m_hitData.Damage = 1;
+                    m_hitData.IsFatal = (ply.NetworkedCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
+                    m_hitData.Position = ply.NetworkedCharacter.NetworkRigidbody.ReadPosition();
+                    m_hitData.Direction = Vector3.zero;
+                    m_hitData.Normal = Vector3.zero;
+                    m_hitData.Instigator = null;
+                    m_hitData.IsHeadShot = false;
+                    m_hitData.DamageType = EDamageType.Storm;
 
-                m_hitData.Damage = 1;
-                m_hitData.IsFatal = (ply.NetworkedCharacter.CharacterHealth.NetworkedHealth - m_hitData.Damage <= 0) ? true : false;
-                m_hitData.Position = ply.NetworkedCharacter.NetworkRigidbody.ReadPosition();
-                m_hitData.Direction = Vector3.zero;
-                m_hitData.Normal = Vector3.zero;
-                m_hitData.Instigator = null;
-                m_hitData.IsHeadShot = false;
-                m_hitData.DamageType = EDamageType.Storm;
-
-                ply.NetworkedCharacter.CharacterHealth.OnTakeDamage(m_hitData);
+                    ply.NetworkedCharacter.CharacterHealth.OnTakeDamage(m_hitData);
+                }
             }
         });
     }
