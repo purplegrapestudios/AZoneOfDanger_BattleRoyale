@@ -46,7 +46,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  CharacterPrefab: {fileID: 4610285444781331942, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
+  m_characterPrefabs:
+  - {fileID: 4610285444781331942, guid: 68dfbeec064e4494d93016444c7050ef, type: 3}
+  - {fileID: 4610285444781331942, guid: 8984c319d73f91c47b2e1980fd5864f5, type: 3}
+  CharacterPrefab: {fileID: 0}
   _Name:
     _length: 0
     _data:
@@ -55,6 +58,9 @@ MonoBehaviour:
   _Ready:
     _value: 0
   _DoneLoading:
+    _value: 0
+  _NetworkedCharacterIndex: 0
+  _NetworkedHasChosenCharacter:
     _value: 0
   playerModel: {fileID: 0}
   _NetworkedCharacter: {fileID: 0}

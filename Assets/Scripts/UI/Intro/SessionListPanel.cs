@@ -33,7 +33,7 @@ namespace GameUI.Intro
 			m_buttonRefreshServerList.onClick.AddListener(async () => { await RefreshServerList(); });
 		}
 
-        public async void Show(PlayMode mode, bool useHostInsteadOfServer)
+		public async void Show(PlayMode mode, bool useHostInsteadOfServer)
 		{
 			gameObject.SetActive(true);
 			_playMode = mode;

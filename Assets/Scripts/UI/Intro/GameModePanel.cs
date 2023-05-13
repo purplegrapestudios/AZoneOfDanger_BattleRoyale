@@ -11,6 +11,10 @@ namespace GameUI.Intro
 		[SerializeField] private Button m_buttonArenaServers;
 		[SerializeField] private Button m_buttonSandboxServers;
 		[SerializeField] private Button m_buttonHostServers;
+		[SerializeField] private PlayerSelectionViewController m_playerSelectionViewController;
+		[SerializeField] private Button m_buttonPlayerSelection;
+		[SerializeField] private GameObject m_menuPanel;
+		[SerializeField] private GameObject m_menuBg;
 
 		private App _app;
 
@@ -23,11 +27,14 @@ namespace GameUI.Intro
 			Cursor.lockState = CursorLockMode.None;
 			Cursor.visible = true;
 
-
 			m_buttonPublicServers.onClick.AddListener(() => { SelectGameMode(0); });
 			m_buttonArenaServers.onClick.AddListener(() => { SelectGameMode(1); });
 			m_buttonSandboxServers.onClick.AddListener(() => { SelectGameMode(2); });
 			m_buttonHostServers.onClick.AddListener(() => { StartAsHost(); });
+			m_buttonPlayerSelection.onClick.AddListener(() => { TogglePlayerSelectionViewController(true); });
+			m_playerSelectionViewController.Initialize(() => { TogglePlayerSelectionViewController(false); });
+			TogglePlayerSelectionViewController(false);
+
 		}
 
 		private void Start()
@@ -76,6 +83,14 @@ namespace GameUI.Intro
 				StopCoroutine(ServerGameModeCoroutine);
 			ServerGameModeCoroutine = ServerGameModeCO(useHostInsteadOfServer: true);
 			StartCoroutine(ServerGameModeCoroutine);
+		}
+
+		private void TogglePlayerSelectionViewController(bool show)
+        {
+			m_playerSelectionViewController.gameObject.SetActive(show);
+			m_menuPanel.SetActive(!show);
+			m_menuBg.SetActive(!show);
+
 		}
 	}
 }

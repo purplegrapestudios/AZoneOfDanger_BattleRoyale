@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &716575921731434527
 RectTransform:
   m_ObjectHideFlags: 0
@@ -496,6 +496,70 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 716575922022707294}
     m_Modifications:
+    - target: {fileID: 370537720069023988, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2768122708543254642, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2768122708543254642, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2768122708543254642, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4514236579710648718, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.0009851546
+      objectReference: {fileID: 0}
+    - target: {fileID: 4690750718963098145, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4690750718963098145, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterObjects.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterSprites.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterNameInfos.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterObjects.Array.data[0]
+      value: 
+      objectReference: {fileID: 4610285444781331945, guid: 3a19c4de1ddd7884fa5e73cddf5eccd7, type: 3}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterObjects.Array.data[1]
+      value: 
+      objectReference: {fileID: 4610285444781331945, guid: 79819dc52fcfbf04bbb162b797302a98, type: 3}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterSprites.Array.data[0]
+      value: 
+      objectReference: {fileID: 21300000, guid: bef2251c5775ceb4cad422dcb667757b, type: 3}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterSprites.Array.data[1]
+      value: 
+      objectReference: {fileID: 21300000, guid: 1639097cfbe93f84d90fcf1a06c520e2, type: 3}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterNameInfos.Array.data[0]
+      value: A soldier
+      objectReference: {fileID: 0}
+    - target: {fileID: 5487744396654968608, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_playerCharacterNameInfos.Array.data[1]
+      value: Cool dude
+      objectReference: {fileID: 0}
     - target: {fileID: 7716857563521345868, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
       propertyPath: m_Name
       value: GameModePanel
@@ -585,16 +649,152 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7716857563521345871, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_bg
+      value: 
+      objectReference: {fileID: 716575921731434526}
+    - target: {fileID: 7716857563521345871, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_menuBg
+      value: 
+      objectReference: {fileID: 716575921731434526}
+    - target: {fileID: 7716857563521345871, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_menuPanel
+      value: 
+      objectReference: {fileID: 446893252474002830}
+    - target: {fileID: 7716857563521345871, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
       propertyPath: _sessionsPanel
       value: 
       objectReference: {fileID: 716575922178368732}
-    m_RemovedComponents: []
+    - target: {fileID: 7799236322765814047, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7799236322765814047, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 2672292122654364905, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+--- !u!1 &446893252474002830 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7265902809675810886, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+  m_PrefabInstance: {fileID: 7126386829645190600}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &716575921489837189 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7716857563521345869, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
   m_PrefabInstance: {fileID: 7126386829645190600}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3969631633460236628 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6192719830870328476, guid: 29b8dc0117724fb42a31f270354c6657, type: 3}
+  m_PrefabInstance: {fileID: 7126386829645190600}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3097436193759133087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969631633460236628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 141109fb25f0083469e71ce8cb3e75c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+  m_DrawShape: 3
+  m_ImageType: 0
+  m_MaterialMode: 0
+  m_StrokeWidth: 0
+  m_OutlineWidth: 0
+  m_OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+  m_FalloffDistance: 0.5
+  m_ConstrainRotation: 1
+  m_ShapeRotation: 0
+  m_FlipHorizontal: 0
+  m_FlipVertical: 0
+  m_Triangle:
+    m_CornerRadius: {x: 0, y: 0, z: 0}
+    m_UniformCornerRadius: 0
+  m_Rectangle:
+    m_CornerRadius: {x: 0, y: 0, z: 0, w: 0}
+    m_UniformCornerRadius: 0
+  m_Circle:
+    m_Radius: 0
+    m_FitRadius: 0
+  m_Pentagon:
+    m_CornerRadius: {x: 0, y: 0, z: 0, w: 0}
+    m_UniformCornerRadius: 0
+    m_TipRadius: 0.001
+    m_TipSize: 1
+  m_Hexagon:
+    m_CornerRadius: {x: 1, y: 1, z: 1, w: 1}
+    m_UniformCornerRadius: 0
+    m_TipSize: {x: 1, y: 1}
+    m_UniformTipSize: 0
+    m_TipRadius: {x: 1, y: 1}
+    m_UniformTipRadius: 0
+  m_NStarPolygon:
+    m_SideCount: 3
+    m_Inset: 2
+    m_CornerRadius: 0
+    m_Offset: {x: 0, y: 0}
+  m_GradientEffect:
+    m_Enabled: 1
+    m_GradientType: 0
+    m_Gradient:
+      serializedVersion: 2
+      key0: {r: 0.101657346, g: 0.08632963, b: 0.14150941, a: 1}
+      key1: {r: 0.15076539, g: 0.16386113, b: 0.1981132, a: 1}
+      key2: {r: 1, g: 0.88831544, b: 0.42138356, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    m_CornerGradientColors:
+    - {r: 0, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0, b: 0, a: 0}
+    - {r: 0, g: 0, b: 0, a: 0}
+    m_Rotation: 135
 --- !u!1001 &8595092936804394356
 PrefabInstance:
   m_ObjectHideFlags: 0

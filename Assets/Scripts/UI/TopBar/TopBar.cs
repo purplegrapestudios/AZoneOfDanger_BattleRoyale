@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using MPUIKIT;
+using UnityEngine.Events;
 
 public class TopBar : MonoBehaviour
 {
@@ -28,5 +29,11 @@ public class TopBar : MonoBehaviour
             return;
         }
         m_vivoxConnectionImage.color = stateColor;
+    }
+
+    public void SetEscapeButtonCallback(UnityAction action)
+    {
+        m_escapeBtn.onClick.RemoveAllListeners();
+        m_escapeBtn.onClick.AddListener(action);
     }
 }
