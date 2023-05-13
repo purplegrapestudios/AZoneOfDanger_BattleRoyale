@@ -19,12 +19,15 @@ public class PlayerSelectionViewController : MonoBehaviour
     private Vector3 m_playerCharacterPosition = new Vector3(0f, 3f, 1.9f);
     private Vector3 m_playerCharacterEulerRotation = new Vector3(0f, 175f,0 );
     private UnityAction m_exitCallback;
-    public int m_currentSelectionIndex;
+    [SerializeField] private int m_currentSelectionIndex;
     private int m_savedPlayerSelectionIndex = -1;
     public List<GameObject> m_characterList;
     public List<PlayerSelectionCard> m_playerCards;
     private float m_spacing => m_cardHeight + m_padding;
-    private Player m_playerPrefab;
+    
+    private Vector3 m_screenPressPoint;
+    private Quaternion m_playerModelOrigRot;
+
     private App m_app;
 
     private void Awake()
@@ -51,6 +54,7 @@ public class PlayerSelectionViewController : MonoBehaviour
                     m_characterList[m_currentSelectionIndex].SetActive(false);
                     m_currentSelectionIndex = index;
                     m_characterList[m_currentSelectionIndex].SetActive(true);
+                    m_characterList[m_currentSelectionIndex].transform.rotation = Quaternion.Euler(m_playerCharacterEulerRotation);
                 });
             m_playerCards.Add(playerCard);
 
@@ -71,15 +75,35 @@ public class PlayerSelectionViewController : MonoBehaviour
         m_confirmSelectionButton.onClick.AddListener(() => { TappedConfirmButton(); });
 
         m_topbar.SetEscapeButtonCallback(() => {
-            ResetSelection();
-            m_exitCallback();
+            ExitPlayerSelectionCallback();
         });
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_screenPressPoint = Input.mousePosition;
+            m_playerModelOrigRot = m_characterList[m_currentSelectionIndex].transform.rotation;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            float curDistSinceInitialPress = (Input.mousePosition - m_screenPressPoint).x;
+            m_characterList[m_currentSelectionIndex].transform.rotation = m_playerModelOrigRot * Quaternion.Euler(Vector3.up * (curDistSinceInitialPress / Screen.width) * 360);
+        }
+    }
+
+    private void ExitPlayerSelectionCallback()
+    {
+        ResetSelection();
+        m_exitCallback();
     }
 
     private void TappedConfirmButton()
     {
         m_savedPlayerSelectionIndex = m_currentSelectionIndex;
         m_app.CharacterSelectionIndex = m_savedPlayerSelectionIndex;
+        ExitPlayerSelectionCallback();
     }
 
     public void ResetSelection()

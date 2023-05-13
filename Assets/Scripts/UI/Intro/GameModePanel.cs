@@ -15,7 +15,7 @@ namespace GameUI.Intro
 		[SerializeField] private Button m_buttonPlayerSelection;
 		[SerializeField] private GameObject m_menuPanel;
 		[SerializeField] private GameObject m_menuBg;
-
+		[SerializeField] private Camera m_sceneCamera;
 		private App _app;
 
 		private void Awake()
@@ -89,8 +89,9 @@ namespace GameUI.Intro
         {
 			m_playerSelectionViewController.gameObject.SetActive(show);
 			m_menuPanel.SetActive(!show);
-			m_menuBg.SetActive(!show);
-
+			//m_menuBg.SetActive(!show);
+			float sceneViewScreenWidth = 0.6f; // Occupies 60% of the width
+			m_sceneCamera.rect = show ? new Rect(1 - sceneViewScreenWidth, 0f, sceneViewScreenWidth, 1) : new Rect(0, 0, 1, 1);
 		}
 	}
 }
