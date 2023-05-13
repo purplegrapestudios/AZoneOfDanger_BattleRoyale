@@ -913,6 +913,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 716575921489837191, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_sceneCamera
+      value: 
+      objectReference: {fileID: 1742798475}
     - target: {fileID: 716575922022707290, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
       propertyPath: m_Name
       value: Intro
@@ -1009,17 +1013,9 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
+    - target: {fileID: 6648378820577219654, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.009992259
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
