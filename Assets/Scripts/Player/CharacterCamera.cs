@@ -73,11 +73,11 @@ public class CharacterCamera : NetworkBehaviour
         m_camera.fieldOfView = fieldOfView;
     }
 
-    public void EnableCameraAndAudioListener(bool val)
+    public void EnableCameraAndAudioListener(bool val, bool useSceneCamera = true)
     {
         m_camera.enabled = val;
         m_audioListener.enabled = val;
-        SceneCamera.Instance.SetSceneCameraActive(!val);
+        if(useSceneCamera) SceneCamera.Instance.SetSceneCameraActive(!val);
     }
 
 }

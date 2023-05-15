@@ -41,6 +41,7 @@ public class CharacterHealthComponent : NetworkBehaviour
     private GameObject m_characterModel;
     private CharacterHealthComponent m_instigator;
     private System.Action<HitData> m_fatalHitCallback;
+    private System.Action<bool> m_enableRagdollCamCallback;
     private bool isInitialized;
     private App m_app;
 
@@ -72,7 +73,10 @@ public class CharacterHealthComponent : NetworkBehaviour
     {
         m_fatalHitCallback -= action;
     }
-
+    public void SetRagdollCameraCallback(System.Action<bool> action)
+    {
+        m_enableRagdollCamCallback = action;
+    }
 
     public void OnTakeDamage(HitData hitData)
     {
@@ -201,7 +205,9 @@ public class CharacterHealthComponent : NetworkBehaviour
 
     private void Respawn(CharacterHealthComponent changedBehaviour)
     {
-        EnableSpectateMode(true);
+        m_character.CharacterCamera.EnableCameraAndAudioListener(false, useSceneCamera: false);
+        m_enableRagdollCamCallback(true);
+        //EnableSpectateMode(true);
         if (RespawnCoroutine != null) return;
         if (!GameLogicManager.Instance.NetworkedRespawnAllowed)
         {
@@ -223,11 +229,14 @@ public class CharacterHealthComponent : NetworkBehaviour
     private IEnumerator RespawnCoroutine;
     private IEnumerator RespawnCO(CharacterHealthComponent changedBehaviour)
     {
-        Debug.Log("Waiting to respawn");
         yield return new WaitForSeconds(.5f);
         changedBehaviour.NetworkedRespawn = false;
         yield return new WaitForSeconds(5);
 
+        //Now use the Spectate Camera for spectate mode, and disable ragdoll stuff
+        m_enableRagdollCamCallback(false);
+        EnableSpectateMode(true);
+        yield return new WaitForSeconds(5);
         m_characterModel.SetActive(false);
 
         GetComponent<NetworkRigidbody>().TeleportToPosition(m_app.Session.Map.GetSpawnPoint(Object.InputAuthority).transform.position);
