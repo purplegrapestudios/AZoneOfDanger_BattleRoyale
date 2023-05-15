@@ -50,27 +50,25 @@ public class ServerManager : MonoBehaviour
 	{
 		if (_app.IsBatchMode())
 		{
-			SessionProps props = new SessionProps();
-			props.StartMap = (MapIndex)ServerConfigData.MapIndexInt;
-			props.PlayMode = (PlayMode)ServerConfigData.PlayModeInt;
-			props.PlayerLimit = ServerConfigData.MaxPlayers;
-			props.RoomName = $"Server {ServerConfigData.ServerName} Room";
-			props.AllowLateJoin = true;
+			SessionProps batchModeProps = new SessionProps();
+			batchModeProps.StartMap = (MapIndex)ServerConfigData.MapIndexInt;
+			batchModeProps.PlayMode = (PlayMode)ServerConfigData.PlayModeInt;
+			batchModeProps.PlayerLimit = ServerConfigData.MaxPlayers;
+			batchModeProps.RoomName = $"Server {ServerConfigData.ServerName} Room";
+			batchModeProps.AllowLateJoin = true;
 
-			App.FindInstance().CreateSession(props, useHostInsteadOfServer: false);
+			App.FindInstance().CreateSession(batchModeProps, useHostInsteadOfServer: false);
 		}
 
-        if (useHostInsteadOfServer)
-        {
-			SessionProps props = new SessionProps();
-			props.StartMap = (MapIndex)ServerConfigData.MapIndexInt;
-			props.PlayMode = (PlayMode)ServerConfigData.PlayModeInt;
-			props.PlayerLimit = ServerConfigData.MaxPlayers;
-			props.RoomName = $"Host {ServerConfigData.ServerName} Room";
-			props.AllowLateJoin = true;
+		SessionProps props = new SessionProps();
+		props.StartMap = (MapIndex)ServerConfigData.MapIndexInt;
+		props.PlayMode = (PlayMode)ServerConfigData.PlayModeInt;
+		props.PlayerLimit = ServerConfigData.MaxPlayers;
+		props.RoomName = $"Host {ServerConfigData.ServerName} Room";
+		props.AllowLateJoin = true;
 
-			App.FindInstance().CreateSession(props, useHostInsteadOfServer: true);
-		}
+		App.FindInstance().CreateSession(props, useHostInsteadOfServer);
+
 	}
 
 	public void SetPlayMode(PlayMode playMode)

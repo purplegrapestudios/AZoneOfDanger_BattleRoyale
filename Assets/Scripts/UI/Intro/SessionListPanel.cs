@@ -33,7 +33,7 @@ namespace GameUI.Intro
 			m_buttonRefreshServerList.onClick.AddListener(async () => { await RefreshServerList(); });
 		}
 
-		public async void Show(PlayMode mode, bool useHostInsteadOfServer)
+		public async void Show(PlayMode mode, bool isClient, bool useHostInsteadOfServer)
 		{
 			gameObject.SetActive(true);
 			_playMode = mode;
@@ -42,12 +42,17 @@ namespace GameUI.Intro
 			OnSessionListUpdated(new List<SessionInfo>());
 			await _app.EnterLobby($"GameMode{mode}", OnSessionListUpdated);
 
+			if (isClient) return;
 
 			if (_app.IsBatchMode())
+			{
 				OnShowNewSessionUI(useHostInsteadOfServer: false);
+				return;
+			}
 
-			if(useHostInsteadOfServer)
-				OnShowNewSessionUI(useHostInsteadOfServer: true);
+			OnShowNewSessionUI(useHostInsteadOfServer);
+			//if(useHostInsteadOfServer)
+			//	OnShowNewSessionUI(useHostInsteadOfServer: true);
 		}
 
 		public void Hide()
