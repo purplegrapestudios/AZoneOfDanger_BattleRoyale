@@ -34,37 +34,6 @@ public class Session : NetworkBehaviour
         }
 	}
 
-//    private void Update()
-//    {
-//		switch ((MapIndex)(int)Runner.CurrentScene)
-//		{
-//			case MapIndex.Map0:
-//
-//				_app.ForEachPlayer(ply =>
-//				{
-//					if (ply.Id == _app.GetPlayer().Id)
-//					{
-//						if (!_app.IsServerMode())
-//						{
-//							if (!ply.NetworkedHasChosenCharacter)
-//							{
-//								ply.RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
-//								ply.RPC_SetHasChosenCharacter(true);
-//							}
-//							else
-//							{
-//								//if (ply.NetworkedCharacterIndex > 0 && ply.NetworkedCharacterIndex < 2)
-//							}
-//						}
-//					}
-//				});
-//
-//				break;
-//			default:
-//				break;
-//		}
-//    }
-
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
 	public RpcInvokeInfo RPC_FinishedLoading(PlayerRef playerRef)
 	{

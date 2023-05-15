@@ -5,6 +5,7 @@ using Fusion;
 
 public class CharacterRagdollComponent : SimulationBehaviour
 {
+    [SerializeField] private CharacterRagdollCamera m_characterRagdollCamera;
     [SerializeField] private GameObject m_ragdollCollider;
     [SerializeField] private float m_hitImpulse;
     private Character m_character;
@@ -45,14 +46,19 @@ public class CharacterRagdollComponent : SimulationBehaviour
 
     [SerializeField] private bool m_ragdollEnabled;
     [SerializeField] private bool init;
+    private App m_app;
 
     public void Init(Character character)
     {
+        m_app = App.FindInstance();
         GetChildPositions();
         m_character = character;
+        m_characterRagdollCamera.Initialize(character);
+        EnableRagdollCameraAndAudioListener(false);
         EnableRagdoll(false, true);
         //Debug.Log("Init(): Disabled Ragdoll");
         m_character.CharacterHealth.SubscribeFatalHitCallback(OnFatalHit);
+        m_character.CharacterHealth.SetRagdollCameraCallback(EnableRagdollCameraAndAudioListener);
         init = true;
     }
 
@@ -90,9 +96,10 @@ public class CharacterRagdollComponent : SimulationBehaviour
 
     private void EnableRagdoll(bool value, bool immediateUpdate = false)
     {
+        if (!init) return;
+
         if (value == m_ragdollEnabled && immediateUpdate == false)
         {
-            //Debug.Log($"No Force Update, RagDollEnabled: {value}");
             return;
         }
 
@@ -104,9 +111,6 @@ public class CharacterRagdollComponent : SimulationBehaviour
         //m_ragdollEnabled = value;
         //return;
         //
-
-
-
 
 
         //Disable our regular Capsule Collider used for Character.
@@ -136,6 +140,7 @@ public class CharacterRagdollComponent : SimulationBehaviour
 
         //if (!value) ReturnChildPositions();
         m_ragdollCollider.SetActive(value);
+
         //Debug.Log($"RagDollEnabled: {value}");
         m_ragdollEnabled = value;
     }
@@ -217,5 +222,12 @@ public class CharacterRagdollComponent : SimulationBehaviour
         m_forearmL.rotation = m_forearmRotationL;
         m_upperarmR.rotation = m_upperarmRotationR;
         m_forearmR.rotation = m_forearmRotationR;
+    }
+
+    private void EnableRagdollCameraAndAudioListener(bool val)
+    {
+        if (!m_character.Object.HasInputAuthority) return;
+        m_characterRagdollCamera.Camera.enabled = val;
+        m_characterRagdollCamera.AudioListener.enabled = val;
     }
 }
