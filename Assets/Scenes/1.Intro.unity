@@ -1005,6 +1005,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1031273291036056561, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1031273291036056561, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1070298761063935191, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1013,9 +1021,133 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1070298761063935191, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.ctime1
+      value: 32960
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.ctime2
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key0.b
+      value: 0.41960788
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key0.g
+      value: 0.79848933
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key1.b
+      value: 0.44025153
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key1.g
+      value: 0.6078882
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key2.b
+      value: 0.41960785
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key2.g
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.key2.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Gradient.key0.b
+      value: 0.45911944
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Gradient.key0.r
+      value: 0.7905269
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Gradient.key1.b
+      value: 0.42138356
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectHost.m_Gradient.key1.g
+      value: 0.88831544
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.ctime1
+      value: 32960
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.ctime2
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key0.b
+      value: 0.41960788
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key0.g
+      value: 0.79848933
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key1.b
+      value: 0.44025153
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key1.g
+      value: 0.6078882
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key2.b
+      value: 0.41960785
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key2.g
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.key2.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffect.m_Gradient.m_NumColorKeys
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4736107628429766935, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_gradientEffectServer.m_Gradient.m_NumColorKeys
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939424044382397882, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6648378820577219654, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.009992259
+      value: -0.00030898707
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e615e01e997f0f4f87939cb824b6e27, type: 3}

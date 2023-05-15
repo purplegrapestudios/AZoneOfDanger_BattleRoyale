@@ -103,6 +103,7 @@ public class PlayerSelectionViewController : MonoBehaviour
     {
         m_savedPlayerSelectionIndex = m_currentSelectionIndex;
         m_app.CharacterSelectionIndex = m_savedPlayerSelectionIndex;
+        Debug.Log($"Tapped Confirmed Player Button, app.CharacterSelectionIndex: {m_app.CharacterSelectionIndex}");
         ExitPlayerSelectionCallback();
     }
 

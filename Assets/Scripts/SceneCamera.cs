@@ -19,6 +19,7 @@ public class SceneCamera : MonoBehaviour
     }
     public void SetSceneCameraActive(bool val)
     {
+        if (m_app.IsServerMode()) return;
         m_sceneCamera.enabled = val;
         m_sceneAudioListener.enabled = val;
 

@@ -16,6 +16,8 @@ namespace GameUI.Lobby
 		[SerializeField] private Button _startButton;
 		[SerializeField] private TMP_Text _startLabel;
 		[SerializeField] private TMP_Text _sessionInfo;
+		[SerializeField] private int count = 0;
+		[SerializeField] private int ready = 0;
 
 		private float _sessionRefresh;
 		private App _app;
@@ -37,8 +39,8 @@ namespace GameUI.Lobby
 
 		void Update()
 		{
-			int count = 0;
-			int ready = 0;
+			count = 0;
+			ready = 0;
 			_playerGrid.BeginUpdate();
 			_app.ForEachPlayer(ply =>
 			{
@@ -67,6 +69,12 @@ namespace GameUI.Lobby
 
                     if (_app.IsHostMode())
                     {
+						OnStart();
+                    }
+                    else
+                    {
+						//Server Mode Test
+						Debug.Log("Starting Server mode via game interface");
 						OnStart();
                     }
 				}

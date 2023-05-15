@@ -27,18 +27,18 @@ public class Player : NetworkBehaviour
 	public App app => _app;
 	private bool initPlayerSelection;
 
-    public override void Spawned()
+	public override void Spawned()
 	{
 		_app = App.FindInstance();
-		
-		if(this.Id == _app.GetPlayer().Id)
-        {
-			if (!_app.IsServerMode())
-				RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
-		}
 
 		// Make sure we go down with the runner and that we're not destroyed onload unless the runner is!
 		transform.SetParent(Runner.gameObject.transform);
+
+		if (!(Runner.IsClient || _app.IsHostMode())) return;
+		if (this.Id == _app.GetPlayer().Id)
+		{
+			RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
+		}
 	}
 
 	public void SetPlayerPrefab(int characterIndex)
@@ -54,20 +54,21 @@ public class Player : NetworkBehaviour
 
 		_app.ForEachPlayer(ply =>
 		{
-			if (ply.Id == _app.GetPlayer().Id && _app.GetPlayer().Runner != ply)
+			if (ply.Runner.IsClient || _app.IsHostMode())
 			{
-				if (!_app.IsServerMode())
+				if (ply.Id == _app.GetPlayer().Id && _app.GetPlayer().Runner != ply)
 				{
 					if (!initPlayerSelection)
 					{
+						Debug.Log($"Setting Confirmed Player Selection, app.CharacterSelectionIndex: {_app.CharacterSelectionIndex}");
 						ply.RPC_SetCharacterIndex(_app.CharacterSelectionIndex);
 						initPlayerSelection = true;
 					}
 				}
-			}
+            }
 		});
 
-		if (CharacterPrefab != null && HasStateAuthority && NetworkedCharacter == null && _app!=null && _app.Session!=null && _app.Session.Map)
+		if (CharacterPrefab != null && HasStateAuthority && NetworkedCharacter == null && _app != null && _app.Session != null && _app.Session.Map)
 		{
 			Debug.Log($"Creating Player {Name}, with InputAuthority ?= {Object.InputAuthority}");
 			Transform t = _app.Session.Map.GetSpawnPoint(Object.InputAuthority);
