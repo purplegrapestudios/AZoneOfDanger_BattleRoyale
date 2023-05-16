@@ -20,21 +20,13 @@ public class CharacterAnimation : NetworkBehaviour
     private Animator Animator_3rdPerson;
 
     //Animator Component: Parameters (Parameters Hashed. We update these values for actual animation to happen)
-    public int p_3rdPersonAimAngle => Param_3rdPerson_AimAngle;
     private int Param_3rdPerson_AimAngle;
-    public int p_CrouchInt => Param_CrouchInt;
     private int Param_CrouchInt;
-    public int p_JumpInt => Param_JumpInt;
     private int Param_JumpInt;
-    public int p_DeadInt => Param_DeadInt;
     private int Param_DeadInt;
-    public int p_Speed => Param_Speed;
     private int Param_Speed;
-    public int p_FireInt => Param_FireInt;
     private int Param_FireInt;
-    public int p_ReloadInt => Param_ReloadInt;
     private int Param_ReloadInt;
-    public int p_SwitchWeaponInt => Param_SwitchWeaponInt;
     private int Param_SwitchWeaponInt;
 
     //Player camer view variables (This is for switching between First and Third person views)
@@ -97,20 +89,6 @@ public class CharacterAnimation : NetworkBehaviour
     {
         if ((playerCameraView.Equals(PlayerCameraView.ThirdPerson)) && Animator_3rdPerson.gameObject.activeSelf)
             Animator_3rdPerson.SetInteger(param, val);
-    }
-
-    public bool AnimatorIsPlaying(int animLayer, string stateName)
-    {
-        if(AnimatorIsPlaying() && Animator_3rdPerson.GetCurrentAnimatorStateInfo(layerIndex: animLayer).IsName(stateName))
-            Debug.Log("Cannot Fire");
-
-        return AnimatorIsPlaying() && Animator_3rdPerson.GetCurrentAnimatorStateInfo(layerIndex: animLayer).IsName(stateName);
-    }
-
-    private bool AnimatorIsPlaying()
-    {
-        return Animator_3rdPerson.GetCurrentAnimatorStateInfo(0).length >
-               Animator_3rdPerson.GetCurrentAnimatorStateInfo(0).normalizedTime;
     }
 
     /// <summary>

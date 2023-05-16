@@ -69,7 +69,6 @@ public class CharacterHealthComponent : NetworkBehaviour
         if (!isInitialized) return;
         if (!m_app.AllowInput) return;
 
-        if (!GameLogicManager.Instance.NetworkedGameIsRunning) return;
         if (GameLogicManager.Instance.NetworkedRespawnAllowed) return;
         if (GameLogicManager.Instance.NetworkedPlayerDictionary.Count > GameLogicManager.Instance.kVictoryPlayerCount) return;
         GameLogicManager.Instance.NetworkedGameIsFinished = GameLogicManager.Instance.NetworkedPlayerDictionary.Count <= 1;
