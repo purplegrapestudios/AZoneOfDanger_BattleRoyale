@@ -37,8 +37,8 @@ public class Minimap : SimulationBehaviour
     [SerializeField]
     public Vector2 OutOfBoundsDimension;
 
-    private App m_app;
-    private bool m_initialized = false;
+    [SerializeField] private App m_app;
+    [SerializeField] private bool m_initialized = false;
     private void Awake()
     {
         Instance = this;
@@ -58,6 +58,11 @@ public class Minimap : SimulationBehaviour
 
     private void Update()
     {
+        if (!m_app)
+        {
+            m_app = App.FindInstance();
+            return;
+        }
         if (m_app.AllowInput)
         {
             if (!m_initialized)
