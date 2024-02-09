@@ -1024,8 +1024,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   realMapDimensions: {x: 1612.5, y: 1612.5}
+  minimapObjRT: {fileID: 8688522660121262689}
   contentRectTransform: {fileID: 8688522660130300651}
   minimapIconPrefab: {fileID: 6425084940482724845, guid: ef61802226d83204eaed955dbec9a9c9, type: 3}
+  minimapStormIconPrefab: {fileID: -2185004039708524869, guid: 79f3a56222d922e4d987a580005c86e5, type: 3}
   transformationMaxtrix:
     e00: 0
     e01: 0
@@ -1045,6 +1047,8 @@ MonoBehaviour:
     e33: 0
   currentPlayerIconPosition: {x: 0, y: 0}
   OutOfBoundsDimension: {x: 190, y: 190}
+  m_app: {fileID: 0}
+  m_initialized: 0
   tempMinimapIconPrefab: {fileID: 4205643067551628011, guid: 4688606ff253fc749bdf167c07ac0ed6, type: 3}
   minimapSpriteOffScreen: {fileID: 21300000, guid: ce641a1e458674fd9b765f9d1ab86500, type: 3}
   matrixCalculated: 0

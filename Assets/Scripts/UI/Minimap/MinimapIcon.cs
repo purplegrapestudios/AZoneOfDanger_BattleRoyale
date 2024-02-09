@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using MPUIKIT;
 public class MinimapIcon : MonoBehaviour
 {
     //public Character m_character;
-    public Image IconImage;
+    public MPImage IconImage;
+
     public TextMeshProUGUI IconText;
     public RectTransform m_minimapRT;
     public RectTransform m_iconRT;
@@ -30,4 +31,10 @@ public class MinimapIcon : MonoBehaviour
     public void SetTextSize(int size) => IconText.fontSize = size;
 
     public void SetIsLocalMinimapPlayer(bool val) => isLocalMinimapPlayer = val;
+
+    public void SetRT(float xPos, float yPos, float radius)
+    {
+        m_minimapRT.rect.Set(xPos, yPos, radius, radius);
+    }
+
 }
