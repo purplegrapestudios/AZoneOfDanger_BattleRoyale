@@ -25910,6 +25910,7 @@ GameObject:
   - component: {fileID: 1339643343}
   - component: {fileID: 1339643345}
   - component: {fileID: 1339643344}
+  - component: {fileID: 1339643346}
   m_Layer: 2
   m_Name: Storm
   m_TagString: Untagged
@@ -26035,7 +26036,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _NetworkedStormPhase: 0
-  m_stackingTime: 6000
+  m_stackingTime: 60
+  m_minimapGenericObject: {fileID: 1339643346}
+--- !u!114 &1339643346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339643342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c01fa6936bb0c4b905627593932f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!64 &1341189085
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -72,6 +72,8 @@ public class StormBehavior : NetworkBehaviour
     private float m_tickRate;
     private Dictionary<Player, Character> m_playersInZone;
 
+    public MinimapGenericObject MinimapGenericObject => m_minimapGenericObject;
+    [SerializeField] private MinimapGenericObject m_minimapGenericObject;
     private App m_app;
     public static StormBehavior Instance;
 
@@ -84,6 +86,7 @@ public class StormBehavior : NetworkBehaviour
     public override void Spawned()
     {
         m_app = App.FindInstance();
+        m_minimapGenericObject.Init();
         if (m_stormHits == null) m_stormHits = new List<LagCompensatedHit>();
         m_playersInZone = new Dictionary<Player, Character>();
         m_tickRate = Mathf.RoundToInt(1 / Runner.DeltaTime);

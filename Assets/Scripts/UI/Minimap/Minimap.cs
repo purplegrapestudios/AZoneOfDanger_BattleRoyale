@@ -15,10 +15,16 @@ public class Minimap : SimulationBehaviour
     //RectTransform scrollViewRectTransform;
 
     [SerializeField]
+    RectTransform minimapObjRT;
+
+    [SerializeField]
     RectTransform contentRectTransform;
 
     [SerializeField]
     MinimapIcon minimapIconPrefab;
+
+    [SerializeField]
+    MinimapIcon minimapStormIconPrefab;
 
     [SerializeField]
     Matrix4x4 transformationMaxtrix;
@@ -28,6 +34,8 @@ public class Minimap : SimulationBehaviour
     public Dictionary<MinimapWorldObject, MinimapIcon> minimapWorldObjectDictrionary = new Dictionary<MinimapWorldObject, MinimapIcon>();
 
     public Dictionary<MinimapWorldObject, MinimapIcon> offScreenMinimapObjectDictionary = new Dictionary<MinimapWorldObject, MinimapIcon>();
+
+    public Dictionary<MinimapGenericObject, MinimapIcon> minimapGenericObjectDictrionary = new Dictionary<MinimapGenericObject, MinimapIcon>();
 
     private List<MinimapIcon> m_minimapIconsToDestroy = new List<MinimapIcon>();
     private List<MinimapIcon> m_offScreenMinimapIconsToDestroy = new List<MinimapIcon>();
@@ -77,6 +85,23 @@ public class Minimap : SimulationBehaviour
 
         if (!m_initialized) return;
         UpdateMinimapIcons();
+    }
+
+    public void RegisterStormCircleObject(MinimapGenericObject minimapGenericObject)
+    {
+        if (!minimapGenericObjectDictrionary.ContainsKey(minimapGenericObject))
+        {
+            var stormMinimapIcon = Instantiate(minimapStormIconPrefab);
+            stormMinimapIcon.transform.SetParent(contentRectTransform);
+            stormMinimapIcon.m_minimapRT.localScale = Vector3.one;
+
+            var mapPosition = -WorldPositionToMapPosition(minimapGenericObject.transform.position);
+            var mapScale = realMapDimensions.x / (minimapObjRT.sizeDelta.x * 10f);
+            stormMinimapIcon.m_minimapRT.anchoredPosition = mapPosition;
+            stormMinimapIcon.m_minimapRT.sizeDelta = Vector2.one * minimapGenericObject.transform.localScale.x * mapScale;
+
+            minimapGenericObjectDictrionary.Add(minimapGenericObject, stormMinimapIcon);
+        }
     }
 
     //For each game instance, All Players will call this. 
@@ -161,6 +186,22 @@ public class Minimap : SimulationBehaviour
         if (!m_app.AllowInput) return;
 
         RemoveOldWorldObjectAndIcons(m_minimapIconsToDestroy, m_offScreenMinimapIconsToDestroy, m_worldObjToRemove, m_offScreenWorldObjToRemove);
+
+        foreach (var keyValuePair in minimapGenericObjectDictrionary)
+        {
+            var minimapGenericObject = keyValuePair.Key;
+            var minimapIcon = keyValuePair.Value;
+            var mapPosition = Vector2.zero;
+
+            if (minimapGenericObject) {
+                mapPosition = -WorldPositionToMapPosition(minimapGenericObject.transform.position);
+                minimapIcon.m_minimapRT.anchoredPosition = mapPosition;
+
+                var mapScale = realMapDimensions.x / (minimapObjRT.sizeDelta.x * 10f);
+                minimapIcon.m_minimapRT.anchoredPosition = mapPosition;
+                minimapIcon.m_minimapRT.sizeDelta = Vector2.one * minimapGenericObject.transform.localScale.x * mapScale;
+            }
+        }
 
         foreach (var keyValuePair in minimapWorldObjectDictrionary)
         {
@@ -314,8 +355,8 @@ public class Minimap : SimulationBehaviour
         //But for purpose of learning, below is the example if the Map's Center is not at origin.
 
         //If square minimap is 200 px wide, and at bottom left (-100 units, south), your're basically out of the map. So 200/-100
-        var translation = -minimapDimensions / 2 + new Vector2(minimapDimensions.x / 2 - 30 + 5, minimapDimensions.y / 2 + 5);
-
+        //var translation = -minimapDimensions / 2 + new Vector2(minimapDimensions.x / 2 - 30 + 5, minimapDimensions.y / 2 + 5);
+        var translation = -minimapDimensions / 2 + new Vector2(minimapDimensions.x / 2, minimapDimensions.y / 2);
         transformationMaxtrix = Matrix4x4.TRS(translation, Quaternion.identity, scaleRatio);
 
         /*
