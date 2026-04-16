@@ -132,7 +132,7 @@ public class CharacterRagdollComponent : SimulationBehaviour
         m_character.CharacterMove.enabled = !value;
 
 
-        m_character.NetworkRigidbody.Rigidbody.velocity = Vector3.zero;
+        m_character.NetworkRigidbody.Rigidbody.linearVelocity = Vector3.zero;
         m_character.NetworkRigidbody.Rigidbody.angularVelocity = Vector3.zero;
         m_character.NetworkRigidbody.Rigidbody.isKinematic = value;
         m_character.NetworkRigidbody.Rigidbody.useGravity = value;
@@ -175,17 +175,17 @@ public class CharacterRagdollComponent : SimulationBehaviour
     [ContextMenu("ResetChildPositions")]
     public void ReturnChildPositions()
     {
-        m_pelvis.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_thighL.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_calfL.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_thighR.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_calfR.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_spineMid.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_head.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_upperarmL.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_forearmL.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_upperarmR.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        m_forearmR.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        m_pelvis.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_thighL.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_calfL.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_thighR.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_calfR.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_spineMid.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_head.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_upperarmL.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_forearmL.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_upperarmR.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        m_forearmR.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
 
         m_pelvis.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         m_thighL.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;

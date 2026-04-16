@@ -59,9 +59,9 @@ public class CharacterMoveComponent : NetworkBehaviour
     private System.Action<bool> m_crouchHitboxCallback;
     private bool m_initialized;
 
-    [Networked] [SerializeField] public NetworkBool NetworkedFloorDetected { get; set; }
-    [Networked] [SerializeField] public NetworkBool NetworkedIsCrouched { get; set; }
-    [Networked] [SerializeField] public Vector3 NetworkedVelocity { get; set; }
+    [Networked] public NetworkBool NetworkedFloorDetected { get; set; }
+    [Networked] public NetworkBool NetworkedIsCrouched { get; set; }
+    [Networked] public Vector3 NetworkedVelocity { get; set; }
 
     /// <summary>
     /// //////
@@ -69,10 +69,10 @@ public class CharacterMoveComponent : NetworkBehaviour
 
     private void ResetRigidBodyState()
     {
-        Rigidbody.velocity = Vector3.zero;
+        Rigidbody.linearVelocity = Vector3.zero;
         Rigidbody.angularVelocity = Vector3.zero;
-        Rigidbody.angularDrag = 0;
-        Rigidbody.drag = 0;
+        Rigidbody.angularDamping = 0;
+        Rigidbody.linearDamping = 0;
         Rigidbody.inertiaTensor = Vector3.zero;
         Rigidbody.inertiaTensorRotation = Quaternion.identity;
     }

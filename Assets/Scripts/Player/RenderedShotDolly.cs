@@ -9,7 +9,7 @@ public class RenderedShotDolly : NetworkBehaviour
      * It is used for positioning the Rendered Projectiles.
      */
 
-    [SerializeField] [Networked] public Vector3 NetworkedRenderedShotPosition { get; set; }
+    [Networked] public Vector3 NetworkedRenderedShotPosition { get; set; }
     [SerializeField] private Vector3 m_renderedShotOffset = new(0, 0, 0.5f);
     [SerializeField] private Vector3 m_renderedShotUpPos = new(0, 0.75f, 0);
     [SerializeField] private Vector3 m_renderedShotCrouchPos = new(0, 0, 0);
